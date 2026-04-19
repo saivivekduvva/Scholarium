@@ -1,0 +1,95 @@
+:root {
+  --bg-page: #F0F4FF;
+  --bg-surface: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.72);
+  --accent-primary: #4F6EF7;
+  --accent-secondary: #06C9A0;
+  --accent-warn: #F7A94F;
+  --accent-danger: #F75C5C;
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --border: rgba(79, 110, 247, 0.14);
+  --shadow-card: 0 4px 32px rgba(79, 110, 247, 0.10);
+  --shadow-node: 0 2px 16px rgba(79, 110, 247, 0.18);
+  --radius-card: 18px;
+  --radius-node: 12px;
+}
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+/* React Flow custom edge animation */
+@keyframes drawEdge {
+  from { stroke-dashoffset: 200; }
+  to   { stroke-dashoffset: 0; }
+}
+.react-flow__edge-path {
+  stroke-dasharray: 200;
+  animation: drawEdge 0.6s ease forwards;
+}
+
+/* Loading skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+
+.custom-node {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-node);
+  border-radius: var(--radius-node);
+  padding: 14px 20px;
+  width: 220px;
+}
+
+.custom-node .title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.custom-node .desc {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.node-locked { border-color: #D1D5DB; }
+.node-active { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.18); }
+.node-done { border-color: var(--accent-secondary); }
+
+.scholarium-navbar {
+  background: var(--bg-surface);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.scholarium-brand {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-decoration: none;
+}

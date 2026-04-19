@@ -1,0 +1,9 @@
+django==4.2.*
+djangorestframework
+django-cors-headers
+mysqlclient
+pymongo
+python-dotenv
+anthropic
+google-generativeai
+gunicorn
