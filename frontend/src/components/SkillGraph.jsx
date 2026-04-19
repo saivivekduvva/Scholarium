@@ -21,8 +21,7 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
         ...node.data,
         label: node.data?.label || node.label || `Node ${node.id}`,
         description: node.data?.description || node.description || ''
-      },
-      style: { opacity: 0, transform: 'translateY(12px)' },
+      }
     }));
 
     const safeEdges = initialEdges.map(edge => ({
@@ -34,14 +33,6 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
     
     setNodes(animatedNodes);
     setEdges(safeEdges);
-
-    // Trigger stagger animation
-    setTimeout(() => {
-      setNodes(nds => nds.map((n, i) => ({
-        ...n,
-        style: { ...n.style, opacity: 1, transform: 'translateY(0)', transition: `all 0.4s ease-out ${i * 0.08}s` }
-      })));
-    }, 100);
   }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   return (
