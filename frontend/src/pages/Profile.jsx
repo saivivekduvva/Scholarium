@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import ProgressRing from '../components/ProgressRing';
 import api from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 
 const Profile = () => {
   const [data, setData] = useState(null);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     // Mock user_id = 1
@@ -39,6 +41,12 @@ const Profile = () => {
     fullMark: 100,
   }));
 
+  let avgScore = 0;
+  if (data.sessions && data.sessions.length > 0) {
+    const total = data.sessions.reduce((acc, curr) => acc + (curr.score || 0), 0);
+    avgScore = Math.round(total / data.sessions.length);
+  }
+
   return (
     <motion.div 
       className="container py-5"
@@ -55,10 +63,10 @@ const Profile = () => {
             fontSize: '32px', fontWeight: 'bold', marginRight: '24px' 
           }}
         >
-          S
+          {user?.username ? user.username.charAt(0).toUpperCase() : 'S'}
         </div>
         <div>
-          <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, margin: 0 }}>My Scholarium Profile</h2>
+          <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, margin: 0 }}>{user?.username ? `${user.username}'s Profile` : 'My Scholarium Profile'}</h2>
           <div className="text-muted">Student</div>
         </div>
       </div>
@@ -78,7 +86,7 @@ const Profile = () => {
         </div>
         <div className="col-md-4">
           <div className="card border-0 p-4 text-center" style={{ backgroundColor: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)', borderRadius: 'var(--radius-card)' }}>
-            <h3 style={{ color: 'var(--accent-warn)', fontSize: '48px', margin: 0 }}>82</h3>
+            <h3 style={{ color: 'var(--accent-warn)', fontSize: '48px', margin: 0 }}>{avgScore}</h3>
             <div className="text-muted small fw-bold">AVG SCORE</div>
           </div>
         </div>

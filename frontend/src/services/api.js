@@ -7,11 +7,25 @@ const api = axios.create({
   },
 });
 
-// Basic error handling for AI fallback
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If backend throws 500 for LLM parsing or failure, we redirect to /error
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('username');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
     if (error.response && error.response.status === 500) {
       window.location.href = '/error';
     }
@@ -20,6 +34,8 @@ api.interceptors.response.use(
 );
 
 export default {
+  login: (data) => api.post('auth/login/', data),
+  register: (data) => api.post('auth/register/', data),
   createGoal: (data) => api.post('goals/', data),
   getGoals: () => api.get('goals/'),
   getGraph: (id) => api.get(`goals/${id}/graph/`),

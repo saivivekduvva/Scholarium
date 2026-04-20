@@ -1,31 +1,27 @@
 import json
 from datetime import datetime
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Goal, SkillNode, LearningPath, Session, Checkpoint
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer
-from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary
+from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError
 from .mongo_client import graphs_col
 
-from users.models import User
-
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def create_goal(request):
     if request.method == 'GET':
-        goals = Goal.objects.all().order_by('-created_at')
+        goals = Goal.objects.filter(user=request.user).order_by('-created_at')
         return Response(GoalSerializer(goals, many=True).data)
 
     # POST logic
     title = request.data.get('title')
     description = request.data.get('description', '')
-    user_id = request.data.get('user_id')
     
-    if user_id:
-        User.objects.get_or_create(id=user_id, defaults={'name': 'MVP User', 'email': f'mvp{user_id}@scholarium.com'})
-    
-    goal = Goal.objects.create(title=title, description=description, user_id=user_id, status='active')
+    goal = Goal.objects.create(title=title, description=description, user=request.user, status='active')
     
     try:
         skills_data = identify_skills(title)
@@ -50,26 +46,24 @@ def create_goal(request):
             'created_at': datetime.utcnow()
         })
         
-        # Also need to update nodes with layout positions if possible, 
-        # but React Flow usually maps node coordinates from graph_data.nodes
         return Response({'goal': GoalSerializer(goal).data, 'graph': graph_data}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_graph(request, id):
-    # MongoDB query
-    graph = graphs_col.find_one({'goal_id': id}, sort=[('created_at', -1)])
+    goal = get_object_or_404(Goal, pk=id, user=request.user)
+    graph = graphs_col.find_one({'goal_id': goal.id}, sort=[('created_at', -1)])
     if not graph:
         return Response({'error': 'Graph not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    # Exclude _id from response
     graph['_id'] = str(graph['_id'])
     return Response(graph['graph_json'])
 
-from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def expand_skill(request, id):
     skill_name = request.data.get('skill_name')
     if not skill_name:
@@ -84,23 +78,21 @@ def expand_skill(request, id):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def save_path(request, id):
-    goal = get_object_or_404(Goal, pk=id)
+    goal = get_object_or_404(Goal, pk=id, user=request.user)
     ordered_ids = request.data.get('ordered_skill_ids', [])
     path = LearningPath.objects.create(goal=goal, ordered_skill_ids=ordered_ids)
     return Response({'status': 'success', 'path_id': path.id})
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def start_session(request):
     skill_name = request.data.get('skill_name')
     difficulty = request.data.get('difficulty', 'beginner')
-    user_id = request.data.get('user_id')
-    
-    if user_id:
-        User.objects.get_or_create(id=user_id, defaults={'name': 'MVP User', 'email': f'mvp{user_id}@scholarium.com'})
         
-    node = get_object_or_404(SkillNode, skill_name=skill_name)
-    session = Session.objects.create(user_id=user_id, skill_node=node)
+    node = get_object_or_404(SkillNode, skill_name=skill_name, goal__user=request.user)
+    session = Session.objects.create(user=request.user, skill_node=node)
     
     try:
         practice = generate_practice(node.skill_name, difficulty)
@@ -109,8 +101,9 @@ def start_session(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def evaluate_session_answer(request, id):
-    session = get_object_or_404(Session, pk=id)
+    session = get_object_or_404(Session, pk=id, user=request.user)
     question = request.data.get('question')
     answer = request.data.get('answer')
     
@@ -127,7 +120,6 @@ def evaluate_session_answer(request, id):
             defaults={'proficiency': 0}
         )
         
-        # Simple update logic: weighted average or just max
         checkpoint.proficiency = max(checkpoint.proficiency, score)
         checkpoint.save()
         
@@ -136,16 +128,18 @@ def evaluate_session_answer(request, id):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_progress(request, user_id):
-    sessions = Session.objects.filter(user_id=user_id)
-    checkpoints = Checkpoint.objects.filter(user_id=user_id)
+    sessions = Session.objects.filter(user=request.user)
+    checkpoints = Checkpoint.objects.filter(user=request.user)
     return Response({
         'sessions': SessionSerializer(sessions, many=True).data,
         'checkpoints': CheckpointSerializer(checkpoints, many=True).data
     })
 
 @api_view(['GET'])
-def get_summary(request, id): # user_id actually
-    checkpoints = list(Checkpoint.objects.filter(user_id=id).values('skill_name', 'proficiency'))
-    summary = generate_summary(id, checkpoints)
+@permission_classes([IsAuthenticated])
+def get_summary(request, id): 
+    checkpoints = list(Checkpoint.objects.filter(user=request.user).values('skill_name', 'proficiency'))
+    summary = generate_summary(request.user.id, checkpoints)
     return Response({'summary': summary})
