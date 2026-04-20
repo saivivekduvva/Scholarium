@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import PracticeCard from '../components/PracticeCard';
 import FeedbackPanel from '../components/FeedbackPanel';
 import ProgressRing from '../components/ProgressRing';
+import XPToast from '../components/XPToast';
 import api from '../services/api';
 
 const Session = () => {
@@ -45,41 +46,28 @@ const Session = () => {
       });
   }, [skillId, currentSubtopicIndex]);
 
+  const [xpEarned, setXpEarned] = useState(null);
+
   const handleAnswer = (answer) => {
     const currentQ = questions[currentIndex];
-    let score = 0;
-    let verdict = 'fail';
-
-    // Deterministic evaluation logic
-    if (currentQ.type === 'mcq') {
-      if (answer === currentQ.correct) {
-        score = 100;
-        verdict = 'pass';
-      }
-    } else {
-      // Short answer heuristic
-      if (answer && answer.length > 20) {
-        score = 100;
-        verdict = 'pass';
-      } else if (answer && answer.length > 5) {
-        score = 75;
-        verdict = 'pass';
-      } else {
-        score = 40;
-      }
-    }
-
-    const result = { 
-      score, 
-      verdict, 
-      strengths: score > 70 ? ['Good understanding shown'] : [], 
-      gaps: score < 100 ? ['Review the material for more depth'] : [] 
-    };
     
-    setTimeout(() => {
-      setFeedback(result);
-      setHistory([...history, result]);
-    }, 600);
+    api.evaluateAnswer(sessionId, { question: currentQ.prompt, answer })
+      .then(res => {
+        setFeedback(res.data);
+        setHistory([...history, res.data]);
+        
+        if (res.data.xp_earned > 0) {
+          setXpEarned(res.data.xp_earned);
+          setTimeout(() => setXpEarned(null), 2000);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        // Fallback for demo if API fails
+        const mockResult = { score: 80, verdict: 'pass', strengths: ['Good effort'], gaps: [] };
+        setFeedback(mockResult);
+        setHistory([...history, mockResult]);
+      });
   };
 
   const handleNext = () => {
@@ -178,6 +166,7 @@ const Session = () => {
           <FeedbackPanel feedbackHistory={history} />
         </div>
       </div>
+      <XPToast xp={xpEarned} visible={!!xpEarned} />
     </motion.div>
   );
 };

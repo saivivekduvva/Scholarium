@@ -1,0 +1,64 @@
+# Implementation Plan - Skill Streak + XP System
+
+This plan outlines the implementation of a gamification system for Scholarium, including XP tracking, daily streaks, and a weekly leaderboard to drive user engagement.
+
+## User Review Required
+
+> [!IMPORTANT]
+> The leaderboard will be calculated based on XP earned within the last 7 days. We will implement a new `XPActivity` model to track these individual gains accurately.
+
+## Proposed Changes
+
+### Backend Enhancements
+
+#### [MODIFY] [users/models.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/users/models.py)
+- Add fields to `User` model:
+    - `total_xp` (Integer)
+    - `streak_count` (Integer)
+    - `last_activity_date` (Date)
+
+#### [NEW] [agent/models.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/models.py)
+- Add `XPActivity` model:
+    - `user` (ForeignKey)
+    - `amount` (Integer)
+    - `activity_type` (String: 'subtopic_complete', 'session_pass', etc.)
+    - `created_at` (DateTimeField)
+
+#### [MODIFY] [agent/views.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/views.py)
+- Implement `award_xp` utility logic.
+- Update `toggle_subtopic` and `evaluate_session_answer` to trigger XP awards.
+- Add `get_leaderboard` view to return top 10 users for the current week.
+
+---
+
+### Frontend Enhancements
+
+#### [NEW] [Leaderboard.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/pages/Leaderboard.jsx)
+- Create a premium leaderboard page showing:
+    - User rankings (1st, 2nd, 3rd with special icons).
+    - XP earned this week.
+    - Avatars and usernames.
+
+#### [NEW] [XPToast.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/components/XPToast.jsx)
+- A micro-animation component that shows "+XP" floating up briefly when a task is completed.
+
+#### [MODIFY] [Dashboard.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/pages/Dashboard.jsx)
+- Add a "Stats Bar" at the top showing current Streak and total XP.
+
+#### [MODIFY] [App.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/App.jsx)
+- Register the `/leaderboard` route.
+- Add "Leaderboard" to the Navbar.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- Verify XP calculation logic via unit tests.
+- Verify streak reset/increment logic.
+
+### Manual Verification
+1. Complete a subtopic and check if XP increases.
+2. Complete a session with a high score and check XP.
+3. Check if the "Streak" increments correctly on consecutive days.
+4. View the Leaderboard and ensure users are ranked correctly by weekly XP.

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import GoalAnalyzer from './GoalAnalyzer';
 
 const GoalInput = () => {
   const [goal, setGoal] = useState('');
@@ -17,34 +18,19 @@ const GoalInput = () => {
       // Mock user_id = 1 for MVP
       const response = await api.createGoal({ title: goal, description: '', user_id: 1 });
       const goalId = response.data.goal.id;
-      navigate(`/graph/${goalId}`);
+      
+      // Delay navigation slightly to let the user see the analyzer finish
+      setTimeout(() => {
+        navigate(`/graph/${goalId}`);
+      }, 8500); // 4 steps * 2s + 0.5s buffer
     } catch (error) {
       console.error(error);
       setLoading(false);
-      // Let api.js interceptor handle the 500 error redirect
     }
   };
 
   if (loading) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        className="text-center py-5"
-      >
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          style={{
-            width: '60px', height: '60px', 
-            border: '4px solid var(--border)', 
-            borderTop: '4px solid var(--accent-primary)', 
-            borderRadius: '50%', margin: '0 auto 20px'
-          }}
-        />
-        <h3 style={{ color: 'var(--accent-primary)' }}>Scholarium is thinking...</h3>
-      </motion.div>
-    );
+    return <GoalAnalyzer goalTitle={goal} />;
   }
 
   return (

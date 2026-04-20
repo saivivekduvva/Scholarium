@@ -113,3 +113,65 @@ h1, h2, h3 {
   color: var(--accent-primary);
   text-decoration: none;
 }
+
+/* Goal Analyzer Styles - Subtle & Integrated */
+.goal-analyzer-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 20px 0;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: none;
+  margin: 0 auto;
+}
+
+.analyzer-header {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.analyzer-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.analyzer-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.analyzer-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.analyzer-step {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.analyzer-step.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(79, 110, 247, 0.04);
+}
+
+.analyzer-step.completed {
+  border-color: var(--accent-secondary);
+  color: var(--accent-secondary);
+  background: rgba(6, 201, 160, 0.04);
+}

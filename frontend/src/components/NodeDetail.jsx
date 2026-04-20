@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import XPToast from './XPToast';
 
 const subtopicsCache = {};
 
 const NodeDetail = ({ node, onClose }) => {
   const [subtopics, setSubtopics] = useState(null);
+  const [xpEarned, setXpEarned] = useState(null);
   const navigate = useNavigate();
 
   const skillName = node?.data?.label || node?.label || node?.id;
@@ -48,13 +50,20 @@ const NodeDetail = ({ node, onClose }) => {
     setSubtopics(newSubtopics);
     subtopicsCache[skillName] = newSubtopics;
 
-    api.toggleSubtopic(subtopic.id).catch(err => {
-      console.error("Failed to toggle subtopic", err);
-      const reverted = [...subtopics];
-      reverted[index].is_studied = !reverted[index].is_studied;
-      setSubtopics(reverted);
-      subtopicsCache[skillName] = reverted;
-    });
+    api.toggleSubtopic(subtopic.id)
+      .then(res => {
+        if (res.data.xp_earned > 0) {
+          setXpEarned(res.data.xp_earned);
+          setTimeout(() => setXpEarned(null), 2000);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to toggle subtopic", err);
+        const reverted = [...subtopics];
+        reverted[index].is_studied = !reverted[index].is_studied;
+        setSubtopics(reverted);
+        subtopicsCache[skillName] = reverted;
+      });
   };
 
   if (!node) return null;
@@ -156,6 +165,7 @@ const NodeDetail = ({ node, onClose }) => {
         >
           Take Quiz (AI Validation) &rarr;
         </button>
+        <XPToast xp={xpEarned} visible={!!xpEarned} />
       </motion.div>
     </>
   );

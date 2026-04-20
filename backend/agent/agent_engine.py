@@ -77,8 +77,23 @@ def _parse_json(text: str) -> dict:
     return json.loads(text.strip())
 
 def identify_skills(goal: str) -> dict:
-    system = "You are a skill decomposition expert for Scholarium. Return ONLY valid JSON."
-    user = f"Goal: {goal}\nReturn JSON: {{\"skills\": [{{\"id\": \"unique_id_string\", \"name\": \"name\", \"description\": \"desc\", \"prerequisites\": [\"id1\"]}}]}}"
+    system = """You are a skill decomposition expert for Scholarium. 
+    Break down the goal into a logical sequence of skills. 
+    For each skill, identify its prerequisites and estimate the time required to master it.
+    Return ONLY valid JSON."""
+    
+    user = f"""Goal: {goal}
+    Return JSON: {{
+        "skills": [
+            {{
+                "id": "unique_id_string", 
+                "name": "Skill Name", 
+                "description": "Short description", 
+                "prerequisites": ["prereq_id_1"],
+                "estimated_hours": 5
+            }}
+        ]
+    }}"""
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)

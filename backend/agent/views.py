@@ -5,10 +5,34 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
+from datetime import date, timedelta
+from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic, XPActivity
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
 from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
 from .mongo_client import graphs_col
+
+def award_xp(user, amount, activity_type):
+    # 1. Create XPActivity record
+    XPActivity.objects.create(user=user, amount=amount, activity_type=activity_type)
+    
+    # 2. Update total XP
+    user.total_xp += amount
+    
+    # 3. Update Streak
+    today = date.today()
+    if user.last_activity_date:
+        if user.last_activity_date == today - timedelta(days=1):
+            # Consecutive day!
+            user.streak_count += 1
+        elif user.last_activity_date < today - timedelta(days=1):
+            # Streak broken
+            user.streak_count = 1
+    else:
+        # First activity ever
+        user.streak_count = 1
+        
+    user.last_activity_date = today
+    user.save()
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -32,7 +56,8 @@ def create_goal(request):
             SkillNode.objects.create(
                 goal=goal,
                 skill_name=skill.get('name', 'Unknown'),
-                description=skill.get('description', '')
+                description=skill.get('description', ''),
+                estimated_hours=skill.get('estimated_hours', 1)
             )
             
         # Generate Graph
@@ -103,7 +128,10 @@ def toggle_subtopic(request, id):
         subtopic = Subtopic.objects.get(pk=id, skill_node__goal__user=request.user)
         subtopic.is_studied = not subtopic.is_studied
         subtopic.save()
-        return Response({'status': 'success', 'is_studied': subtopic.is_studied})
+        if subtopic.is_studied:
+            award_xp(request.user, 10, 'subtopic_complete')
+            
+        return Response({'status': 'success', 'is_studied': subtopic.is_studied, 'xp_earned': 10 if subtopic.is_studied else 0})
     except Subtopic.DoesNotExist:
         return Response({'error': 'Subtopic not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -165,7 +193,13 @@ def evaluate_session_answer(request, id):
         checkpoint.proficiency = max(checkpoint.proficiency, score)
         checkpoint.save()
         
-        return Response(result)
+        # Award XP for session passing
+        xp_earned = 0
+        if score >= 70:
+            xp_earned = 50
+            award_xp(session.user, xp_earned, 'session_pass')
+        
+        return Response({**result, 'xp_earned': xp_earned})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -178,6 +212,30 @@ def get_progress(request, user_id):
         'sessions': SessionSerializer(sessions, many=True).data,
         'checkpoints': CheckpointSerializer(checkpoints, many=True).data
     })
+
+from django.db.models import Sum
+from users.models import User
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_leaderboard(request):
+    # XP earned this week (last 7 days)
+    last_week = date.today() - timedelta(days=7)
+    
+    top_users = User.objects.annotate(
+        weekly_xp=Sum('xp_activities__amount', filter=models.Q(xp_activities__created_at__gte=last_week))
+    ).filter(weekly_xp__gt=0).order_by('-weekly_xp')[:10]
+    
+    leaderboard = []
+    for user in top_users:
+        leaderboard.append({
+            'username': user.username,
+            'weekly_xp': user.weekly_xp,
+            'avatar_url': user.avatar_url,
+            'total_xp': user.total_xp
+        })
+        
+    return Response(leaderboard)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

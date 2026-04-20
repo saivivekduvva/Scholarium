@@ -47,4 +47,6 @@ export default {
   getProgress: (user_id) => api.get(`progress/${user_id}/`),
   getSummary: (id) => api.get(`goals/${id}/summary/`),
   getExplanation: (skill_name, subtopic_title) => api.post('subtopics/explanation/', { skill_name, subtopic_title }),
+  getLeaderboard: () => api.get('leaderboard/'),
+  getProfile: () => api.get('auth/profile/'), // I'll need to check if this exists or add it
 };

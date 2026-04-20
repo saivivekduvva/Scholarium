@@ -25,6 +25,7 @@ class SkillNode(models.Model):
     x_pos = models.FloatField(default=0.0)
     y_pos = models.FloatField(default=0.0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='locked')
+    estimated_hours = models.IntegerField(default=1)
 
 class LearningPath(models.Model):
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name='paths')
@@ -50,5 +51,16 @@ class Subtopic(models.Model):
     description = models.TextField(blank=True)
     duration_mins = models.IntegerField(default=30)
     is_studied = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class XPActivity(models.Model):
+    ACTIVITY_TYPES = [
+        ('subtopic_complete', 'Subtopic Complete'),
+        ('session_pass', 'Session Pass'),
+        ('goal_complete', 'Goal Complete')
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='xp_activities')
+    amount = models.IntegerField()
+    activity_type = models.CharField(max_length=50, choices=ACTIVITY_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
 
