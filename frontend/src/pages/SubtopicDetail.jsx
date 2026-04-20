@@ -3,7 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { IoArrowBack, IoBookOutline, IoVideocamOutline, IoNewspaperOutline, IoExtensionPuzzleOutline } from 'react-icons/io5';
 import ReactMarkdown from 'react-markdown';
+import TurndownService from 'turndown';
 import api from '../services/api';
+
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced'
+});
+
+// Custom rule to handle Wikipedia's specific code structures
+turndownService.addRule('wikiCode', {
+  filter: ['pre', 'code'],
+  replacement: function (content, node) {
+    return '\n```\n' + content + '\n```\n';
+  }
+});
 
 const SubtopicDetail = () => {
   const { skillName, subtopicTitle } = useParams();
@@ -31,23 +45,18 @@ const SubtopicDetail = () => {
           
           if (results && results.length > 0) {
             const bestTitle = results[0].title;
-            // 2. Fetch a LARGER, more detailed extract
-            // explaintext=1 gives clean plain text, which is easier to structure
-            const fullRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&titles=${encodeURIComponent(bestTitle)}&format=json&origin=*`);
+            // 2. Fetch HTML content to preserve rich elements like code and tables
+            const fullRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=${encodeURIComponent(bestTitle)}&format=json&origin=*`);
             if (fullRes.ok) {
               const fullData = await fullRes.json();
               const pages = fullData.query.pages;
               const pageId = Object.keys(pages)[0];
-              const extract = pages[pageId].extract;
+              const html = pages[pageId].extract;
               
-              if (extract && extract.length > 500) {
-                // Structure the plain text a bit by adding headers back for sections
-                // Wikipedia returns sections with '==' notation in explaintext mode
-                const structured = extract
-                  .replace(/== (.*?) ==/g, '## $1')
-                  .replace(/=== (.*?) ===/g, '### $1');
-                
-                return { text: structured, source: `Wikipedia (Full Article: ${bestTitle})` };
+              if (html && html.length > 500) {
+                // Convert HTML to clean Markdown while preserving code blocks
+                const markdown = turndownService.turndown(html);
+                return { text: markdown, source: `Wikipedia (Full Article: ${bestTitle})` };
               }
             }
           }
@@ -190,25 +199,6 @@ We couldn't find a clear-cut explanation on Wikipedia or Dev.to for this specifi
                 >
                   Watch on YouTube
                 </a>
-              </div>
-            </div>
-
-            {/* Articles Section */}
-            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: '#fff' }}>
-              <div className="card-body p-4">
-                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
-                  <IoNewspaperOutline className="text-primary" size={20} /> Recommended Articles
-                </h6>
-                <div className="d-flex flex-column gap-3">
-                  {scrapedData.articles.length > 0 ? scrapedData.articles.map(a => (
-                    <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="text-decoration-none group">
-                      <div className="fw-bold text-dark small group-hover:text-primary transition-colors">{a.title}</div>
-                      <div className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
-                        <span>{a.user.name}</span> &bull; <span style={{ color: '#000' }}>Dev.to</span>
-                      </div>
-                    </a>
-                  )) : <p className="small text-muted">No articles found.</p>}
-                </div>
               </div>
             </div>
 
