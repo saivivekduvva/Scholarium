@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PracticeCard from '../components/PracticeCard';
 import FeedbackPanel from '../components/FeedbackPanel';
@@ -9,7 +9,11 @@ import api from '../services/api';
 const Session = () => {
   const { skillId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   
+  const subtopics = location.state?.subtopics || [];
+  const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
+
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [feedback, setFeedback] = useState(null);
@@ -17,29 +21,60 @@ const Session = () => {
   const [sessionDone, setSessionDone] = useState(false);
   const [sessionId, setSessionId] = useState(null);
 
+  const generateMockQuestions = (topic) => [
+    { id: `q1_${Date.now()}`, prompt: `Explain the core concept of "${topic}" in your own words.`, type: 'short' },
+    { id: `q2_${Date.now()}`, prompt: `Which of the following best relates to ${topic}?`, type: 'mcq', options: ['A core fundamental concept', 'Something else entirely', 'Not applicable'], correct: 'A core fundamental concept' }
+  ];
+
   useEffect(() => {
-    // Decode the URL parameter just in case
     const decodedSkillName = decodeURIComponent(skillId);
+    const currentTopicTitle = subtopics[currentSubtopicIndex]?.title || decodedSkillName;
     
-    // Mock fetching questions
-    api.startSession({ skill_name: decodedSkillName, difficulty: 'beginner', user_id: 1 })
+    api.startSession({ skill_name: currentTopicTitle, difficulty: 'beginner', user_id: 1 })
       .then(res => {
         setSessionId(res.data.session_id);
-        setQuestions(res.data.practice?.questions || [
-          { id: 'q1', prompt: 'What is a REST API?', type: 'short' },
-          { id: 'q2', prompt: 'HTTP status 404 means?', type: 'mcq', options: ['OK', 'Not Found', 'Server Error'] }
-        ]);
+        if (res.data.practice?.questions) {
+          setQuestions(res.data.practice.questions);
+        } else {
+          setQuestions(generateMockQuestions(currentTopicTitle));
+        }
       })
-      .catch(err => console.error(err));
-  }, [skillId]);
+      .catch(err => {
+        console.error(err);
+        setQuestions(generateMockQuestions(currentTopicTitle));
+      });
+  }, [skillId, currentSubtopicIndex]);
 
   const handleAnswer = (answer) => {
-    // Mock evaluate call
-    const result = { score: Math.floor(Math.random() * 40) + 60, verdict: 'pass', strengths: ['Good understanding'], gaps: ['Need more details'] };
-    
-    // In real app:
-    // api.evaluateAnswer(sessionId, { question: questions[currentIndex].prompt, answer })
-    //   .then(res => setFeedback(res.data))
+    const currentQ = questions[currentIndex];
+    let score = 0;
+    let verdict = 'fail';
+
+    // Deterministic evaluation logic
+    if (currentQ.type === 'mcq') {
+      if (answer === currentQ.correct) {
+        score = 100;
+        verdict = 'pass';
+      }
+    } else {
+      // Short answer heuristic
+      if (answer && answer.length > 20) {
+        score = 100;
+        verdict = 'pass';
+      } else if (answer && answer.length > 5) {
+        score = 75;
+        verdict = 'pass';
+      } else {
+        score = 40;
+      }
+    }
+
+    const result = { 
+      score, 
+      verdict, 
+      strengths: score > 70 ? ['Good understanding shown'] : [], 
+      gaps: score < 100 ? ['Review the material for more depth'] : [] 
+    };
     
     setTimeout(() => {
       setFeedback(result);
@@ -56,7 +91,21 @@ const Session = () => {
     }
   };
 
+  const handleNextSubtopic = () => {
+    if (currentSubtopicIndex < subtopics.length - 1) {
+      setCurrentSubtopicIndex(currentSubtopicIndex + 1);
+      setCurrentIndex(0);
+      setFeedback(null);
+      setHistory([]);
+      setSessionDone(false);
+    } else {
+      navigate(-1);
+    }
+  };
+
   if (sessionDone) {
+    const isLastSubtopic = currentSubtopicIndex >= subtopics.length - 1 || subtopics.length === 0;
+    
     return (
       <motion.div 
         className="d-flex flex-column justify-content-center align-items-center" 
@@ -65,13 +114,21 @@ const Session = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="mb-4">Session Complete — Scholarium</h1>
+        <h1 className="mb-4">Subtopic Complete — Scholarium</h1>
         <div style={{ fontSize: '64px', fontWeight: 700, color: 'var(--accent-secondary)', marginBottom: '32px' }}>
-          +{history.reduce((acc, curr) => acc + curr.score, 0) / history.length}%
+          +{Math.round(history.reduce((acc, curr) => acc + curr.score, 0) / history.length)}%
         </div>
         <div>
-          <button className="btn me-3" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }} onClick={() => navigate(-1)}>Back to Skill Map</button>
-          <button className="btn" style={{ backgroundColor: 'var(--accent-primary)', color: 'white' }}>Next Skill &rarr;</button>
+          <button 
+            className="btn me-3" 
+            style={{ backgroundColor: 'var(--accent-primary)', color: 'white', border: 'none' }} 
+            onClick={handleNextSubtopic}
+          >
+            {isLastSubtopic ? 'Finish Skill &rarr;' : 'Next Subtopic &rarr;'}
+          </button>
+          {!isLastSubtopic && (
+            <button className="btn" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }} onClick={() => navigate(-1)}>Return to Roadmap</button>
+          )}
         </div>
       </motion.div>
     );
@@ -91,7 +148,12 @@ const Session = () => {
         <div className="col-lg-3 col-md-4">
           <div className="card h-100 border-0 p-4" style={{ backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-card)', boxShadow: 'var(--shadow-card)' }}>
             <div className="text-muted small fw-bold mb-2">SCHOLARIUM SESSION</div>
-            <h4 style={{ fontFamily: 'Outfit', fontWeight: 700, marginBottom: '32px' }}>Skill Training</h4>
+            <h4 style={{ fontFamily: 'Outfit', fontWeight: 700, marginBottom: '16px' }}>Skill Training</h4>
+            {subtopics.length > 0 && (
+              <div style={{ fontSize: '14px', color: 'var(--accent-primary)', fontWeight: 600, marginBottom: '32px' }}>
+                {subtopics[currentSubtopicIndex]?.title}
+              </div>
+            )}
             
             <div className="d-flex justify-content-center my-4">
               <ProgressRing radius={48} stroke={8} progress={overallProgress} />

@@ -73,9 +73,29 @@ h1, h2, h3 {
   color: var(--text-muted);
 }
 
-.node-locked { border-color: #D1D5DB; }
-.node-active { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.18); }
-.node-done { border-color: var(--accent-secondary); }
+.node-locked { 
+  border-color: #E5E7EB; 
+  background-color: #F9FAFB;
+  opacity: 0.6;
+}
+.node-locked .title { color: var(--text-muted); }
+.node-locked .desc { color: #D1D5DB; }
+
+.node-active { 
+  border-color: var(--accent-primary); 
+  box-shadow: 0 0 0 4px rgba(79,110,247,0.15), var(--shadow-node); 
+  animation: pulseActive 2s infinite;
+}
+@keyframes pulseActive {
+  0% { box-shadow: 0 0 0 0 rgba(79,110,247,0.4), var(--shadow-node); }
+  70% { box-shadow: 0 0 0 10px rgba(79,110,247,0), var(--shadow-node); }
+  100% { box-shadow: 0 0 0 0 rgba(79,110,247,0), var(--shadow-node); }
+}
+
+.node-done { 
+  border-color: var(--accent-secondary); 
+  background-color: rgba(6, 201, 160, 0.05);
+}
 
 .scholarium-navbar {
   background: var(--bg-surface);
