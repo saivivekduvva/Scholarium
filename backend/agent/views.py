@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Goal, SkillNode, LearningPath, Session, Checkpoint
-from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer
+from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
+from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
 from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError
 from .mongo_client import graphs_col
 
@@ -70,12 +70,43 @@ def expand_skill(request, id):
         return Response({'error': 'skill_name required'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        subtopics = expand_subtopics(skill_name)
-        return Response(subtopics)
+        node = SkillNode.objects.get(skill_name=skill_name, goal__user=request.user)
+        existing_subtopics = node.subtopics.all()
+        
+        if existing_subtopics.exists():
+            return Response({'subtopics': SubtopicSerializer(existing_subtopics, many=True).data})
+            
+        subtopics_data = expand_subtopics(skill_name)
+        subtopics_list = subtopics_data.get('subtopics', [])
+        
+        created_subtopics = []
+        for st in subtopics_list:
+            created_subtopics.append(Subtopic.objects.create(
+                skill_node=node,
+                title=st.get('title', 'Unknown Topic'),
+                description=st.get('description', ''),
+                duration_mins=st.get('duration_mins', 30)
+            ))
+            
+        return Response({'subtopics': SubtopicSerializer(created_subtopics, many=True).data})
+    except SkillNode.DoesNotExist:
+        return Response({'error': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
     except RateLimitError as e:
         return Response({'error': 'AI is rate limited'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_subtopic(request, id):
+    try:
+        subtopic = Subtopic.objects.get(pk=id, skill_node__goal__user=request.user)
+        subtopic.is_studied = not subtopic.is_studied
+        subtopic.save()
+        return Response({'status': 'success', 'is_studied': subtopic.is_studied})
+    except Subtopic.DoesNotExist:
+        return Response({'error': 'Subtopic not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
