@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import GraphView from './pages/GraphView';
 import Session from './pages/Session';
 import Profile from './pages/Profile';
+import SubtopicDetail from './pages/SubtopicDetail';
 import ErrorPage from './pages/ErrorPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -55,6 +56,7 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/graph/:goalId" element={<ProtectedRoute><GraphView /></ProtectedRoute>} />
             <Route path="/session/:skillId" element={<ProtectedRoute><Session /></ProtectedRoute>} />
+            <Route path="/subtopic/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             
             <Route path="/error" element={<ErrorPage />} />

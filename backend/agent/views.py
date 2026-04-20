@@ -7,7 +7,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
-from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError
+from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
 from .mongo_client import graphs_col
 
 @api_view(['GET', 'POST'])
@@ -107,6 +107,17 @@ def toggle_subtopic(request, id):
     except Subtopic.DoesNotExist:
         return Response({'error': 'Subtopic not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_explanation(request):
+    skill_name = request.data.get('skill_name')
+    subtopic_title = request.data.get('subtopic_title')
+    if not skill_name or not subtopic_title:
+        return Response({'error': 'skill_name and subtopic_title required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    explanation = get_subtopic_explanation(skill_name, subtopic_title)
+    return Response({'explanation': explanation})
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
