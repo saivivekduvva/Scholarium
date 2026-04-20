@@ -15,7 +15,7 @@ load_dotenv()
 # Setup Providers
 anthropic_client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY', 'dummy'))
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
 
 def log_conversation(session_id, role, content):
     conversations_col.update_one(
