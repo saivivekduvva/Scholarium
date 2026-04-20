@@ -62,18 +62,18 @@ const NodeDetail = ({ node, onClose }) => {
   return (
     <>
       <div 
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} 
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000, backgroundColor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(2px)' }} 
         onClick={onClose} 
       />
       <motion.div
-        initial={{ x: 400, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 400, opacity: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         style={{
-          position: 'fixed', right: 0, top: '64px', bottom: 0, width: '360px',
-          backgroundColor: 'var(--bg-surface)', boxShadow: '-4px 0 32px rgba(0,0,0,0.1)',
-          zIndex: 1001, padding: '24px', overflowY: 'auto'
+          position: 'fixed', left: '10%', right: '10%', top: '5vh', bottom: '5vh',
+          backgroundColor: 'var(--bg-surface)', boxShadow: '0 32px 80px rgba(0,0,0,0.2)',
+          zIndex: 1001, padding: '40px', overflowY: 'auto', borderRadius: '24px'
         }}
       >
         <button onClick={onClose} className="btn-close float-end"></button>
@@ -102,7 +102,7 @@ const NodeDetail = ({ node, onClose }) => {
                   key={st.id || i}
                   variants={{ initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }}
                   whileHover={{ y: -2, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-                  className="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center"
+                  className="card mb-2 p-3 d-flex flex-column"
                   style={{ 
                     backgroundColor: isDone ? 'rgba(6, 201, 160, 0.05)' : 'var(--bg-page)', 
                     border: isDone ? '1px solid var(--accent-secondary)' : '1px solid transparent',
@@ -132,6 +132,17 @@ const NodeDetail = ({ node, onClose }) => {
                       <div className="small text-muted">{st.duration_mins} mins</div>
                     </div>
                   </div>
+                  
+                  <button 
+                    className="btn btn-sm btn-outline-primary mt-2 rounded-pill px-3" 
+                    style={{ fontSize: '12px', alignSelf: 'flex-start' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
+                    }}
+                  >
+                    Learn More &rarr;
+                  </button>
                 </motion.div>
               );
             })}

@@ -144,3 +144,12 @@ def generate_summary(user_id: int, checkpoints: list) -> str:
     except Exception as e:
         print(f"Error generating summary: {e}")
         return "Failed to generate summary."
+
+def get_subtopic_explanation(skill_name: str, subtopic_title: str) -> str:
+    system = "You are an expert technical educator. Write a clear-cut, well-structured, and highly detailed explanation for a subtopic within a larger skill. Use clean Markdown formatting, include examples, and organize with clear headings. Ensure the explanation is 'perfect' and addresses deep conceptual understanding."
+    user = f"Skill: {skill_name}\nSubtopic: {subtopic_title}\n\nWrite a comprehensive explanation in Markdown."
+    try:
+        return call_llm(system, user)
+    except Exception as e:
+        print(f"Error generating explanation: {e}")
+        return "Failed to generate explanation. Please try again."
