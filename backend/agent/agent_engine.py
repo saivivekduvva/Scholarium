@@ -4,7 +4,11 @@ import anthropic
 import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime
-from .mongo_client import evaluations_col, conversations_col
+import hashlib
+from .mongo_client import evaluations_col, conversations_col, llm_cache_col
+
+class RateLimitError(Exception):
+    pass
 
 load_dotenv()
 
@@ -34,10 +38,32 @@ def call_gemini(system: str, user: str) -> str:
     return response.text
 
 def call_llm(system: str, user: str) -> str:
+    prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
+    
+    cached = llm_cache_col.find_one({'prompt_hash': prompt_hash})
+    if cached:
+        return cached['response']
+        
     provider = os.environ.get('LLM_PROVIDER', 'claude').lower()
-    if provider == 'gemini':
-        return call_gemini(system, user)
-    return call_claude(system, user)
+    try:
+        if provider == 'gemini':
+            response_text = call_gemini(system, user)
+        else:
+            response_text = call_claude(system, user)
+    except Exception as e:
+        if '429' in str(e) or 'quota' in str(e).lower() or getattr(e, 'code', None) == 429:
+            raise RateLimitError(str(e))
+        raise e
+        
+    llm_cache_col.insert_one({
+        'prompt_hash': prompt_hash,
+        'system': system,
+        'user': user,
+        'response': response_text,
+        'created_at': datetime.utcnow()
+    })
+    
+    return response_text
 
 def _parse_json(text: str) -> dict:
     # Clean markdown block if present
@@ -76,6 +102,9 @@ def expand_subtopics(skill_name: str) -> dict:
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
+    except RateLimitError as e:
+        print(f"Rate limit hit in expand_subtopics: {e}")
+        raise e
     except Exception as e:
         print(f"Error parsing expand_subtopics: {e}")
         raise ValueError("Failed to parse JSON")

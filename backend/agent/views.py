@@ -67,6 +67,8 @@ def get_graph(request, id):
     graph['_id'] = str(graph['_id'])
     return Response(graph['graph_json'])
 
+from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError
+
 @api_view(['POST'])
 def expand_skill(request, id):
     skill_name = request.data.get('skill_name')
@@ -76,6 +78,8 @@ def expand_skill(request, id):
     try:
         subtopics = expand_subtopics(skill_name)
         return Response(subtopics)
+    except RateLimitError as e:
+        return Response({'error': 'AI is rate limited'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
