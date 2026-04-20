@@ -40,6 +40,23 @@ const NodeDetail = ({ node, onClose }) => {
     }
   }, [node, skillName]);
 
+  const handleToggleSubtopic = (subtopic, index) => {
+    if (!subtopic.id) return;
+    
+    const newSubtopics = [...subtopics];
+    newSubtopics[index].is_studied = !newSubtopics[index].is_studied;
+    setSubtopics(newSubtopics);
+    subtopicsCache[skillName] = newSubtopics;
+
+    api.toggleSubtopic(subtopic.id).catch(err => {
+      console.error("Failed to toggle subtopic", err);
+      const reverted = [...subtopics];
+      reverted[index].is_studied = !reverted[index].is_studied;
+      setSubtopics(reverted);
+      subtopicsCache[skillName] = reverted;
+    });
+  };
+
   if (!node) return null;
 
   return (
@@ -78,30 +95,43 @@ const NodeDetail = ({ node, onClose }) => {
         ) : (
           <motion.div variants={{ animate: { transition: { staggerChildren: 0.06 } } }} initial="initial" animate="animate">
             {subtopics.map((st, i) => {
-              const completedCount = Math.floor(((node.data.progress || 0) / 100) * subtopics.length);
-              const isDone = i < completedCount || node.data.status === 'done';
+              const isDone = st.is_studied || node.data.status === 'done';
               
               return (
                 <motion.div
-                  key={i}
+                  key={st.id || i}
                   variants={{ initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }}
                   whileHover={{ y: -2, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                   className="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center"
                   style={{ 
                     backgroundColor: isDone ? 'rgba(6, 201, 160, 0.05)' : 'var(--bg-page)', 
                     border: isDone ? '1px solid var(--accent-secondary)' : '1px solid transparent',
-                    borderRadius: '12px' 
+                    borderRadius: '12px',
+                    cursor: 'pointer'
                   }}
+                  onClick={() => handleToggleSubtopic(st, i)}
                 >
-                  <div>
-                    <div className="fw-bold" style={{ fontSize: '14px', color: isDone ? 'var(--text-primary)' : 'inherit' }}>{st.title}</div>
-                    <div className="small text-muted">{st.duration_mins} mins</div>
-                  </div>
-                  {isDone && (
-                    <div style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: 'var(--accent-secondary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <div className="d-flex align-items-center gap-3">
+                    <div 
+                      style={{ 
+                        width: '20px', 
+                        height: '20px', 
+                        borderRadius: '4px', 
+                        border: isDone ? 'none' : '2px solid var(--border)',
+                        backgroundColor: isDone ? 'var(--accent-secondary)' : 'transparent',
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        color: 'white'
+                      }}
+                    >
+                      {isDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                     </div>
-                  )}
+                    <div>
+                      <div className="fw-bold" style={{ fontSize: '14px', color: isDone ? 'var(--text-primary)' : 'inherit', textDecoration: isDone ? 'line-through' : 'none', opacity: isDone ? 0.7 : 1 }}>{st.title}</div>
+                      <div className="small text-muted">{st.duration_mins} mins</div>
+                    </div>
+                  </div>
                 </motion.div>
               );
             })}
@@ -113,7 +143,7 @@ const NodeDetail = ({ node, onClose }) => {
           style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '8px' }}
           onClick={() => navigate(`/session/${encodeURIComponent(skillName)}`, { state: { subtopics: subtopics || [] } })}
         >
-          Practice This Skill &rarr;
+          Take Quiz (AI Validation) &rarr;
         </button>
       </motion.div>
     </>

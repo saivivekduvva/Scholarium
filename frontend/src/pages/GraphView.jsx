@@ -80,6 +80,25 @@ const GraphView = () => {
     setSelectedNode(node);
   };
 
+  const handleStartLearning = () => {
+    if (!graphData || !graphData.nodes) return;
+    const activeNode = graphData.nodes.find(n => n.data.status === 'active');
+    if (activeNode) {
+      setSelectedNode(activeNode);
+    } else {
+      alert("No active skills available. You might have completed them all!");
+    }
+  };
+
+  const handleAutoSequence = () => {
+    if (!graphData || !graphData.nodes) return;
+    // Simple top-sort logic based on levels or just saving the current nodes
+    const orderedIds = graphData.nodes.map(n => n.id);
+    api.savePath(goalId, orderedIds)
+      .then(() => alert("Path auto-sequenced and saved!"))
+      .catch(err => console.error(err));
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -128,8 +147,8 @@ const GraphView = () => {
         }}
       >
         <span style={{ fontWeight: 600 }}>Build Your Path</span>
-        <button className="btn btn-sm btn-outline-secondary" style={{ borderRadius: '16px' }}>Auto-Sequence</button>
-        <button className="btn btn-sm" style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '16px' }}>Start Learning &rarr;</button>
+        <button className="btn btn-sm btn-outline-secondary" style={{ borderRadius: '16px' }} onClick={handleAutoSequence}>Auto-Sequence</button>
+        <button className="btn btn-sm" style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '16px' }} onClick={handleStartLearning}>Start Learning &rarr;</button>
       </div>
     </motion.div>
   );

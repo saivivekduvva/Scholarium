@@ -1,0 +1,24 @@
+# Scholarium Task Manager & Quiz Quality Update
+
+The platform has been successfully refactored to support the **Task Manager workflow** alongside AI validation.
+
+## What changed?
+
+1. **Subtopics as Checklists**: 
+   - Subtopics are now permanently saved to your database the first time you expand a skill. 
+   - We updated the **[NodeDetail UI](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/components/NodeDetail.jsx)** so that each subtopic has a clickable checkbox. 
+   - When you study a topic from your books, you can check it off. The UI will strike it through and save your progress to the backend so it persists across sessions.
+
+2. **High-Quality Quizzes**: 
+   - The primary purpose of the quiz is now AI validation of your self-study. We updated the **[AI Prompt Engine](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/agent_engine.py)** to instruct the model to generate deep, conceptual, and scenario-based questions.
+   - The button on the Skill panel has been relabeled to **"Take Quiz (AI Validation)"** to reflect this workflow.
+
+## How to test
+
+1. Go to your Scholarium dashboard and create or open a goal.
+2. Click on a locked or active **Skill Node**.
+3. Once the subtopics load, click on them to toggle the checkmarks. Refresh the page and open the node again to verify that your checkmarks have been saved!
+4. Click **Take Quiz (AI Validation)** and verify that the AI is generating much more complex, thought-provoking questions than before.
+
+> [!TIP]
+> The AI is now instructed to generate scenario-based questions. Depending on the skill, you might get small case studies or conceptual logic questions instead of simple definitions!

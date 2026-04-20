@@ -43,3 +43,12 @@ class Checkpoint(models.Model):
     skill_name = models.CharField(max_length=255)
     proficiency = models.IntegerField(default=0)
     last_assessed = models.DateTimeField(auto_now=True)
+
+class Subtopic(models.Model):
+    skill_node = models.ForeignKey(SkillNode, on_delete=models.CASCADE, related_name='subtopics')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    duration_mins = models.IntegerField(default=30)
+    is_studied = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+

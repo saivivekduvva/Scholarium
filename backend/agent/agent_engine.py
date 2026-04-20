@@ -110,8 +110,8 @@ def expand_subtopics(skill_name: str) -> dict:
         raise ValueError("Failed to parse JSON")
 
 def generate_practice(skill: str, difficulty: str) -> dict:
-    system = "You are a skill trainer. Return ONLY valid JSON."
-    user = f"Skill: {skill}, difficulty: {difficulty}\nReturn JSON: {{\"questions\": [{{\"id\": \"q1\", \"prompt\": \"text\", \"type\": \"mcq\"|\"short\", \"options\": [\"A\", \"B\"], \"correct\": \"A\"}}]}}"
+    system = "You are an expert tutor and examiner. Generate high-quality, thought-provoking questions that test deep understanding and application of concepts, not just rote memorization. Provide scenario-based questions where possible. Return ONLY valid JSON."
+    user = f"Skill: {skill}, difficulty: {difficulty}\nGenerate complex scenario-based questions.\nReturn JSON: {{\"questions\": [{{\"id\": \"q1\", \"prompt\": \"scenario or question text\", \"type\": \"mcq\"|\"short\", \"options\": [\"A\", \"B\"], \"correct\": \"A\"}}]}}"
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
