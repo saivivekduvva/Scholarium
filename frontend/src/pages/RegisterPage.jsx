@@ -20,31 +20,34 @@ const RegisterPage = () => {
   };
 
   return (
-    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: '#0f172a' }}>
-      {/* Animated Background */}
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          rotate: [0, -90, 0],
-          borderRadius: ["20%", "40%", "20%"],
-        }}
-        transition={{ duration: 18, ease: "linear", repeat: Infinity }}
-        style={{
-          position: 'absolute', top: '10%', right: '-10%', width: '55vw', height: '55vw',
-          background: 'radial-gradient(circle, rgba(142,45,226,0.3) 0%, rgba(0,0,0,0) 70%)', filter: 'blur(70px)', zIndex: 0
-        }}
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.4, 1],
-          rotate: [0, 90, 0],
-        }}
-        transition={{ duration: 22, ease: "linear", repeat: Infinity }}
-        style={{
-          position: 'absolute', bottom: '-15%', left: '-15%', width: '65vw', height: '65vw',
-          background: 'radial-gradient(circle, rgba(79,110,247,0.35) 0%, rgba(0,0,0,0) 70%)', filter: 'blur(90px)', zIndex: 0
-        }}
-      />
+    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
+      {/* High-level Bubbly Background */}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            y: [0, -100, 0],
+            x: [0, Math.random() * 50 - 25, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 10 + Math.random() * 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            width: 100 + Math.random() * 300,
+            height: 100 + Math.random() * 300,
+            borderRadius: '50%',
+            background: i % 2 === 0 ? 'rgba(79,110,247,0.1)' : 'rgba(142,45,226,0.08)',
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            filter: 'blur(40px)',
+            zIndex: 0
+          }}
+        />
+      ))}
 
       <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div
@@ -52,51 +55,54 @@ const RegisterPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
-            background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-            borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '48px', width: '100%', maxWidth: '420px',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.3)', color: 'white'
+            background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: '24px', border: '1px solid rgba(0, 0, 0, 0.05)', padding: '48px', width: '100%', maxWidth: '420px',
+            boxShadow: '0 24px 64px rgba(0,0,0,0.05)', color: '#1e293b'
           }}
         >
-          <h2 className="mb-4 text-center" style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '32px' }}>Join Scholarium</h2>
+          <div className="text-center mb-4">
+            <div className="d-inline-block px-3 py-1 rounded-pill mb-3" style={{ background: 'rgba(79,110,247,0.1)', color: '#4F6EF7', fontSize: '12px', fontWeight: 700 }}>JOIN SCHOLARIUM</div>
+            <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '32px', color: '#0f172a' }}>Create Account</h2>
+          </div>
           
           {error && <div className="alert alert-danger" style={{ fontSize: '14px', borderRadius: '8px' }}>{error}</div>}
           
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>Username</label>
+              <label className="form-label" style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Username</label>
               <input 
                 type="text" 
                 className="form-control" 
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)} 
                 required 
-                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '12px 16px', borderRadius: '12px' }} 
+                style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px 16px', borderRadius: '12px' }} 
               />
             </div>
             <div className="mb-3">
-              <label className="form-label" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>Email</label>
+              <label className="form-label" style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Email</label>
               <input 
                 type="email" 
                 className="form-control" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
-                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '12px 16px', borderRadius: '12px' }} 
+                style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px 16px', borderRadius: '12px' }} 
               />
             </div>
             <div className="mb-5">
-              <label className="form-label" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>Password</label>
+              <label className="form-label" style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Password</label>
               <input 
                 type="password" 
                 className="form-control" 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
-                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '12px 16px', borderRadius: '12px' }} 
+                style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px 16px', borderRadius: '12px' }} 
               />
             </div>
             <motion.button 
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(79,110,247,0.2)' }}
               whileTap={{ scale: 0.98 }}
               type="submit" 
               className="btn w-100" 
@@ -105,7 +111,7 @@ const RegisterPage = () => {
               Sign Up
             </motion.button>
           </form>
-          <div className="text-center mt-4" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>
+          <div className="text-center mt-4" style={{ color: '#64748b', fontSize: '14px' }}>
             Already have an account? <Link to="/login" style={{ color: '#4F6EF7', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
           </div>
         </motion.div>

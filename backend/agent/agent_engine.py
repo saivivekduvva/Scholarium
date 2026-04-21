@@ -76,6 +76,40 @@ def _parse_json(text: str) -> dict:
         text = text[:-3]
     return json.loads(text.strip())
 
+def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
+    """
+    Returns the title of the similar goal if found, else None.
+    existing_goals is a list of strings (titles).
+    """
+    if not existing_goals:
+        return None
+        
+    # 1. Check for exact match first (case-insensitive)
+    for g in existing_goals:
+        if g.strip().lower() == new_goal_title.strip().lower():
+            return g
+        
+    system = "You are a semantic matching expert. Compare the NEW goal with the list of EXISTING goals."
+    user = f"""NEW Goal: {new_goal_title}
+    EXISTING Goals: {json.dumps(existing_goals)}
+    
+    If the NEW goal is semantically the same as one of the EXISTING goals (e.g. 'Learn Python' and 'Study Python Programming'), return ONLY the exact title from the EXISTING list.
+    If there is no close match, return ONLY the word 'NONE'.
+    Do not provide any explanation."""
+    
+    try:
+        resp = call_llm(system, user).strip()
+        if resp.upper() == 'NONE' or resp == '':
+            return None
+        # Verify it's actually in the list (case insensitive search just in case)
+        for g in existing_goals:
+            if g.lower() == resp.lower():
+                return g
+        return None
+    except Exception as e:
+        print(f"Error in find_similar_goal: {e}")
+        return None
+
 def identify_skills(goal: str) -> dict:
     system = """You are a skill decomposition expert for Scholarium. 
     Break down the goal into a logical sequence of skills. 

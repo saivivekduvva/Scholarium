@@ -18,11 +18,17 @@ const GoalInput = () => {
       // Mock user_id = 1 for MVP
       const response = await api.createGoal({ title: goal, description: '', user_id: 1 });
       const goalId = response.data.goal.id;
+      const isDuplicate = response.data.is_duplicate;
       
-      // Delay navigation slightly to let the user see the analyzer finish
-      setTimeout(() => {
+      if (isDuplicate) {
+        // If it's a duplicate, don't make them wait for the analyzer
         navigate(`/graph/${goalId}`);
-      }, 8500); // 4 steps * 2s + 0.5s buffer
+      } else {
+        // New goal, show the full analyzer experience
+        setTimeout(() => {
+          navigate(`/graph/${goalId}`);
+        }, 8500); 
+      }
     } catch (error) {
       console.error(error);
       setLoading(false);

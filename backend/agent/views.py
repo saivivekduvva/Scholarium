@@ -1,3 +1,4 @@
+from django.db import models
 import json
 from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
@@ -44,6 +45,22 @@ def create_goal(request):
     # POST logic
     title = request.data.get('title')
     description = request.data.get('description', '')
+
+    # Check for similar goals first
+    existing_titles = list(Goal.objects.filter(user=request.user).values_list('title', flat=True))
+    similar_title = find_similar_goal(title, existing_titles)
+
+    if similar_title:
+        existing_goal = Goal.objects.get(title=similar_title, user=request.user)
+        # Fetch its graph from Mongo
+        graph = graphs_col.find_one({'goal_id': existing_goal.id}, sort=[('created_at', -1)])
+        if graph:
+            graph['_id'] = str(graph['_id'])
+            return Response({
+                'goal': GoalSerializer(existing_goal).data, 
+                'graph': graph['graph_json'],
+                'is_duplicate': True 
+            }, status=status.HTTP_200_OK)
     
     goal = Goal.objects.create(title=title, description=description, user=request.user, status='active')
     
@@ -246,16 +263,18 @@ def get_leaderboard(request):
     # XP earned this week (last 7 days)
     last_week = date.today() - timedelta(days=7)
     
+    from django.db.models.functions import Coalesce
+    
     top_users = User.objects.annotate(
-        weekly_xp=Sum('xp_activities__amount', filter=models.Q(xp_activities__created_at__gte=last_week))
-    ).filter(weekly_xp__gt=0).order_by('-weekly_xp')[:10]
+        weekly_xp=Coalesce(Sum('xp_activities__amount', filter=models.Q(xp_activities__created_at__gte=last_week)), 0)
+    ).order_by('-weekly_xp', '-total_xp')[:10]
     
     leaderboard = []
     for user in top_users:
         leaderboard.append({
             'username': user.username,
             'weekly_xp': user.weekly_xp,
-            'avatar_url': user.avatar_url,
+            'avatar_url': getattr(user, 'avatar_url', None), # Safe access
             'total_xp': user.total_xp
         })
         
