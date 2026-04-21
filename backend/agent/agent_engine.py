@@ -1,6 +1,5 @@
 import os
 import json
-import anthropic
 import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime
@@ -14,8 +13,9 @@ load_dotenv()
 
 # Setup Providers
 try:
+    import anthropic
     anthropic_client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY', 'dummy'))
-except Exception:
+except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
 gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
