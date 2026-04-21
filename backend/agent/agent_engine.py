@@ -13,7 +13,10 @@ class RateLimitError(Exception):
 load_dotenv()
 
 # Setup Providers
-anthropic_client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY', 'dummy'))
+try:
+    anthropic_client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY', 'dummy'))
+except Exception:
+    anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
 gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
 
