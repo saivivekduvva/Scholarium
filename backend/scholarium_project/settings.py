@@ -10,9 +10,20 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key')
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-if os.environ.get('ALLOWED_HOSTS'):
-    ALLOWED_HOSTS.extend(os.environ.get('ALLOWED_HOSTS').split(','))
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
+
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:5173').split(',')
+
+# Security Settings for Production
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False') == 'True'
+    SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
+    CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
+    X_FRAME_OPTIONS = 'DENY'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -108,7 +119,3 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
