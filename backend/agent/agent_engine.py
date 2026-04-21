@@ -160,40 +160,32 @@ def expand_subtopics(skill_name: str) -> dict:
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
     system = """You are a friendly and encouraging tutor for Scholarium. 
-    Your goal is to assess the learner's understanding with clear, concise, and approachable questions.
+    Your goal is to rigorously assess the learner's deep understanding with challenging, high-quality questions.
     
     Rules for question generation:
-    1. KEEP IT SHORT: Questions should be max 2 sentences. No long, intimidating paragraphs.
-    2. BE ENCOURAGING: Use a supportive tone.
-    3. FOCUS ON CORE CONCEPTS: Test the most important ideas clearly. 
-    4. VARIETY: Mix 1-2 multiple-choice questions with a simple open-ended question.
-    5. No "trick" questions or overly complex scenarios.
+    1. HIGH DIFFICULTY: Focus on nuances, edge cases, and deep conceptual understanding. Avoid trivial questions.
+    2. BE PRECISE: Use technical terminology correctly.
+    3. NO OBVIOUS ANSWERS: Distractors should be plausible and require careful thought.
+    4. VARIETY: Ensure questions cover different aspects of the subtopic.
     
     Return ONLY valid JSON."""
     
     context_str = json.dumps(context) if context else "No additional context."
     user = f"""Topic: {skill}
-    Difficulty: {difficulty}
+    Difficulty: advanced
     Context: {context_str}
     
-    Generate 3 simple but effective questions.
+    Generate 5 challenging multiple-choice questions.
     Return JSON format: 
-    {{
+    {
         "questions": [
-            {{
-                "id": "q1", 
-                "prompt": "Short, clear question...", 
-                "type": "mcq", 
-                "options": ["A", "B", "C", "D"], 
-                "correct": "A"
-            }},
-            {{
-                "id": "q2", 
-                "prompt": "Simple conceptual question...", 
-                "type": "short"
-            }}
+            {
+                "prompt": "Rigorous, technical question...", 
+                "options": ["Nuanced A", "Nuanced B", "Nuanced C", "Nuanced D"], 
+                "correct_option": 0
+            }
         ]
-    }}"""
+    }"""
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)

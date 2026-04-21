@@ -14,6 +14,14 @@ const SubtopicDetail = () => {
   const [proSources, setProSources] = useState([]);
   const [scrapedData, setScrapedData] = useState({ articles: [], books: [], searched: false });
 
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [quizActive, setQuizActive] = useState(false);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [quizResult, setQuizResult] = useState(null);
+  const [isStudied, setIsStudied] = useState(false);
+
   const rawQuery = `${subtopicTitle} ${skillName}`;
   const query = rawQuery.replace(/\s+/g, '+');
   const tag = subtopicTitle.toLowerCase().replace(/\s+/g, '-').split('-')[0];
@@ -32,9 +40,7 @@ const SubtopicDetail = () => {
         }
       } catch (err) {
         console.error("Explanation fetch failed:", err);
-        setExplanation(`### We encountered an issue.
-        
-Our AI system is currently recalibrating or at capacity. In the meantime, please check the **"Pro Study Sources"** or **"Watch Tutorials"** on the right for high-quality external resources.`);
+        setExplanation(`### We encountered an issue. Our AI system is recalibrating.`);
         setSource('System Fallback');
       } finally {
         setLoading(false);
@@ -43,26 +49,71 @@ Our AI system is currently recalibrating or at capacity. In the meantime, please
 
     loadExplanation();
 
-    // Fetch References (Books and Articles)
     const fetchRefs = async () => {
       try {
         const devRes = await fetch(`https://dev.to/api/articles?tag=${tag}&per_page=4`);
         const devData = devRes.ok ? await devRes.json() : [];
-
         const olRes = await fetch(`https://openlibrary.org/search.json?q=${query}&limit=4`);
         const olData = olRes.ok ? await olRes.json() : { docs: [] };
-
-        setScrapedData({
-          articles: devData,
-          books: olData.docs || [],
-          searched: true
-        });
-      } catch (err) {
-        console.error("Error fetching refs:", err);
-      }
+        setScrapedData({ articles: devData, books: olData.docs || [], searched: true });
+      } catch (err) { console.error(err); }
     };
     fetchRefs();
   }, [skillName, subtopicTitle, query, tag]);
+
+  const startAssessment = async () => {
+    setQuizLoading(true);
+    try {
+      const res = await api.startSession({
+        skill_name: skillName,
+        subtopic_title: subtopicTitle,
+        difficulty: 'beginner',
+        user_id: 1
+      });
+      if (res.data.practice?.questions) {
+        setQuestions(res.data.practice.questions.slice(0, 5)); // 5 questions for deep mastery
+        setQuizActive(true);
+      }
+    } catch (err) {
+      alert("Failed to start assessment. AI Rate Limit might be reached.");
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const [feedback, setFeedback] = useState(null);
+
+  const handleQuizAnswer = (optionIndex) => {
+    if (feedback) return; // Prevent double clicks
+    
+    const isCorrect = optionIndex === questions[currentQIndex].correct_option;
+    setFeedback({ isCorrect, selected: optionIndex });
+    
+    const newAnswers = [...answers, isCorrect];
+    setAnswers(newAnswers);
+
+    setTimeout(() => {
+      setFeedback(null);
+      if (currentQIndex < questions.length - 1) {
+        setCurrentQIndex(currentQIndex + 1);
+      } else {
+        const correctCount = newAnswers.filter(a => a).length;
+        const passed = correctCount >= 4; // 4/5 required for advanced mastery
+        setQuizResult({ passed, correctCount, total: questions.length });
+        setQuizActive(false);
+        
+        if (passed) {
+          api.markSubtopicMastered(skillName, subtopicTitle)
+            .then(() => setIsStudied(true))
+            .catch(err => console.error(err));
+        }
+      }
+    }, 1200);
+  };
+
+  const awardXP = (amt) => {
+    // Local XP toast trigger if available
+  };
 
   if (loading) {
     return (
@@ -102,11 +153,94 @@ Our AI system is currently recalibrating or at capacity. In the meantime, please
               <IoExtensionPuzzleOutline size={14} />
               <span className="fw-bold">Source: {source}</span>
             </div>
+            {isStudied && (
+              <div className="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                <IoCheckmarkCircle className="me-1" /> MASTERED
+              </div>
+            )}
           </div>
 
-          <div className="prose bg-white p-5 rounded-4 shadow-sm border" style={{ borderColor: 'var(--border)', minHeight: '600px' }}>
+          <div className="prose bg-white p-5 rounded-4 shadow-sm border mb-5" style={{ borderColor: 'var(--border)', minHeight: '600px' }}>
             <ReactMarkdown>{explanation}</ReactMarkdown>
           </div>
+
+          {/* Mastery Assessment Section */}
+          <section id="assessment" className="mt-5 pt-5 border-top">
+            <div className="card border-0 shadow-lg p-5" style={{ borderRadius: '32px', background: 'linear-gradient(135deg, #f8faff 0%, #ffffff 100%)', border: '1px solid rgba(79, 110, 247, 0.1) !important' }}>
+              {!quizActive && !quizResult ? (
+                <div className="text-center py-4">
+                  <div className="display-6 mb-3">🎓</div>
+                  <h3 className="fw-bold mb-3">Ready to prove your mastery?</h3>
+                  <p className="text-muted mb-5 mx-auto" style={{ maxWidth: '450px' }}>
+                    Complete a quick 3-question assessment to verify your understanding of {subtopicTitle} and unlock the next step in your roadmap.
+                  </p>
+                  <button 
+                    disabled={quizLoading}
+                    onClick={startAssessment}
+                    className="btn btn-primary btn-lg px-5 py-3 shadow-sm" 
+                    style={{ borderRadius: '20px', fontWeight: 700 }}
+                  >
+                    {quizLoading ? 'Generating Quiz...' : 'Start Assessment'}
+                  </button>
+                </div>
+              ) : (quizActive && questions[currentQIndex]) ? (
+                <div>
+                  <div className="d-flex justify-content-between align-items-center mb-5">
+                    <span className="badge bg-primary px-3 py-2">QUESTION {currentQIndex + 1} OF {questions.length}</span>
+                    <span className="text-muted small fw-bold">SUBTOPIC MASTERY TEST</span>
+                  </div>
+                  <h4 className="fw-bold mb-5" style={{ lineHeight: 1.4 }}>{questions[currentQIndex].prompt}</h4>
+                  <div className="d-flex flex-column gap-3">
+                    {questions[currentQIndex].options.map((opt, i) => {
+                      const isSelected = feedback?.selected === i;
+                      const isCorrect = questions[currentQIndex].correct_option === i;
+                      
+                      let btnStyle = { borderRadius: '16px', border: '2px solid rgba(79, 110, 247, 0.1)', background: 'white' };
+                      if (feedback) {
+                        if (isCorrect) {
+                          btnStyle = { ...btnStyle, borderColor: '#06C9A0', background: 'rgba(6, 201, 160, 0.05)', color: '#06C9A0' };
+                        } else if (isSelected) {
+                          btnStyle = { ...btnStyle, borderColor: '#F75C5C', background: 'rgba(247, 92, 92, 0.05)', color: '#F75C5C' };
+                        }
+                      }
+
+                      return (
+                        <button 
+                          key={i}
+                          disabled={!!feedback}
+                          onClick={() => handleQuizAnswer(i)}
+                          className={`btn text-start p-4 ${!feedback ? 'hover-lift' : ''}`} 
+                          style={btnStyle}
+                        >
+                          <span className="fw-bold me-3" style={{ opacity: 0.5 }}>{String.fromCharCode(65 + i)}</span>
+                          {opt}
+                          {feedback && isCorrect && <IoCheckmarkCircle className="float-end mt-1" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  {quizResult.passed ? (
+                    <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
+                      <div className="display-1 text-success mb-4">🏆</div>
+                      <h2 className="fw-bold mb-2">Mastery Verified!</h2>
+                      <p className="text-muted mb-4">You got {quizResult.correctCount} out of {quizResult.total} correct. Scholarium has marked this subtopic as mastered.</p>
+                      <button onClick={() => navigate(-1)} className="btn btn-primary px-5 py-3 rounded-pill fw-bold">Continue Journey &rarr;</button>
+                    </motion.div>
+                  ) : (
+                    <div>
+                      <div className="display-1 mb-4">✍️</div>
+                      <h2 className="fw-bold mb-2">Not quite there yet</h2>
+                      <p className="text-muted mb-4">You got {quizResult.correctCount} correct. Review the explanation again and try the assessment once more to master this topic.</p>
+                      <button onClick={() => { setQuizResult(null); setAnswers([]); setCurrentQIndex(0); }} className="btn btn-outline-primary px-5 py-3 rounded-pill fw-bold">Retry Assessment</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
         </div>
 
         {/* Sidebar References */}
@@ -178,6 +312,14 @@ Our AI system is currently recalibrating or at capacity. In the meantime, please
           </div>
         </div>
       </div>
+      
+      <style dangerouslySetInnerHTML={{ __html: `
+        .hover-lift:hover {
+          transform: translateY(-2px);
+          border-color: var(--accent-primary) !important;
+          box-shadow: 0 10px 20px rgba(79, 110, 247, 0.08);
+        }
+      `}} />
     </motion.div>
   );
 };

@@ -4,22 +4,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SkillGraph from '../components/SkillGraph';
 import NodeDetail from '../components/NodeDetail';
 import api from '../services/api';
+import { IoRocketOutline } from 'react-icons/io5';
 
 const GraphView = () => {
   const { goalId } = useParams();
   const [graphData, setGraphData] = useState(null);
-  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+  const selectedNode = graphData?.nodes?.find(n => n.id === selectedNodeId);
 
   useEffect(() => {
     Promise.all([
       api.getGraph(goalId),
-      api.getProgress(1) // user ID is ignored by backend JWT but required in URL
+      api.getProgress(1)
     ])
       .then(([graphRes, progressRes]) => {
         const rawGraph = graphRes.data;
         const progress = progressRes.data;
         
-        // Build map of skill_name -> proficiency
         const cpMap = {};
         if (progress.checkpoints) {
           progress.checkpoints.forEach(cp => {
@@ -27,7 +29,6 @@ const GraphView = () => {
           });
         }
 
-        // Build adjacency map
         const prereqs = {}; 
         rawGraph.nodes.forEach(n => prereqs[n.id] = []);
         rawGraph.edges.forEach(e => {
@@ -72,31 +73,44 @@ const GraphView = () => {
       });
   }, [goalId]);
 
+  const handleAutoSequence = () => {
+    if (!graphData || !graphData.nodes) return;
+    const orderedIds = graphData.nodes.map(n => n.id);
+    api.savePath(goalId, orderedIds)
+      .then(() => alert("Path auto-sequenced and saved!"))
+      .catch(err => console.error(err));
+  };
+
   const handleNodeClick = (node) => {
     if (node.data.status === 'locked') {
       alert("This skill is locked. Complete its prerequisites first!");
       return;
     }
-    setSelectedNode(node);
+    setSelectedNodeId(node.id);
   };
 
   const handleStartLearning = () => {
     if (!graphData || !graphData.nodes) return;
     const activeNode = graphData.nodes.find(n => n.data.status === 'active');
     if (activeNode) {
-      setSelectedNode(activeNode);
+      setSelectedNodeId(activeNode.id);
     } else {
       alert("No active skills available. You might have completed them all!");
     }
   };
 
-  const handleAutoSequence = () => {
-    if (!graphData || !graphData.nodes) return;
-    // Simple top-sort logic based on levels or just saving the current nodes
-    const orderedIds = graphData.nodes.map(n => n.id);
-    api.savePath(goalId, orderedIds)
-      .then(() => alert("Path auto-sequenced and saved!"))
-      .catch(err => console.error(err));
+  const updateNodeProgress = (skillName, newProgress) => {
+    setGraphData(prev => {
+      if (!prev) return prev;
+      const newNodes = prev.nodes.map(node => {
+        if (node.data.label === skillName) {
+          const status = newProgress >= 80 ? 'done' : node.data.status;
+          return { ...node, data: { ...node.data, progress: newProgress, status } };
+        }
+        return node;
+      });
+      return { ...prev, nodes: newNodes };
+    });
   };
 
   return (
@@ -128,28 +142,53 @@ const GraphView = () => {
         </div>
       )}
 
-      <AnimatePresence>
-        {selectedNode && (
+      <AnimatePresence mode="wait">
+        {selectedNodeId && selectedNode && (
           <NodeDetail 
             node={selectedNode} 
-            onClose={() => setSelectedNode(null)} 
+            onClose={() => setSelectedNodeId(null)} 
+            onUpdate={updateNodeProgress}
           />
         )}
       </AnimatePresence>
       
       {/* Path Builder Floating Toolbar */}
-      <div 
+      <motion.div 
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 1, type: 'spring', damping: 20 }}
+        className="floating-toolbar d-flex align-items-center gap-4 px-4 py-3"
         style={{
-          position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
-          backgroundColor: 'var(--bg-surface)', padding: '12px 24px', borderRadius: '30px',
-          boxShadow: 'var(--shadow-card)', display: 'flex', alignItems: 'center', gap: '16px',
-          border: '1px solid var(--border)', zIndex: 10
+          position: 'fixed', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
+          borderRadius: '40px', zIndex: 100
         }}
       >
-        <span style={{ fontWeight: 600 }}>Build Your Path</span>
-        <button className="btn btn-sm btn-outline-secondary" style={{ borderRadius: '16px' }} onClick={handleAutoSequence}>Auto-Sequence</button>
-        <button className="btn btn-sm" style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '16px' }} onClick={handleStartLearning}>Start Learning &rarr;</button>
-      </div>
+        <div className="d-flex align-items-center gap-2">
+          <div className="p-2 rounded-circle" style={{ background: 'rgba(79, 110, 247, 0.1)', color: 'var(--accent-primary)' }}>
+            <IoRocketOutline size={20} />
+          </div>
+          <span style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A' }}>Mastery Path</span>
+        </div>
+        
+        <div style={{ width: '1px', height: '24px', background: '#E2E8F0' }} />
+        
+        <div className="d-flex gap-2">
+          <button 
+            className="btn btn-sm btn-light px-3 py-2" 
+            style={{ borderRadius: '20px', fontWeight: 700, fontSize: '13px', border: '1px solid #E2E8F0' }} 
+            onClick={handleAutoSequence}
+          >
+            Auto-Sequence
+          </button>
+          <button 
+            className="btn btn-sm px-4 py-2" 
+            style={{ background: 'var(--accent-primary)', color: 'white', borderRadius: '20px', fontWeight: 700, fontSize: '13px', boxShadow: '0 4px 12px rgba(79, 110, 247, 0.2)' }} 
+            onClick={handleStartLearning}
+          >
+            Start Learning &rarr;
+          </button>
+        </div>
+      </motion.div>
     </motion.div>
   );
 };

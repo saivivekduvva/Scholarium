@@ -12,5 +12,6 @@ urlpatterns = [
     path('sessions/<int:id>/evaluate/', views.evaluate_session_answer, name='evaluate_session_answer'),
     path('progress/<int:user_id>/', views.get_progress, name='get_progress'),
     path('goals/<int:id>/summary/', views.get_summary, name='get_summary'),
+    path('subtopics/mastered/', views.mark_subtopic_mastered, name='mark_subtopic_mastered'),
     path('leaderboard/', views.get_leaderboard, name='leaderboard'),
 ]

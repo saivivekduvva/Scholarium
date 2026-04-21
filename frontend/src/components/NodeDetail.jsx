@@ -6,7 +6,7 @@ import XPToast from './XPToast';
 
 const subtopicsCache = {};
 
-const NodeDetail = ({ node, onClose }) => {
+const NodeDetail = ({ node, onClose, onUpdate }) => {
   const [subtopics, setSubtopics] = useState(null);
   const [xpEarned, setXpEarned] = useState(null);
   const navigate = useNavigate();
@@ -15,7 +15,12 @@ const NodeDetail = ({ node, onClose }) => {
 
   const [errorMsg, setErrorMsg] = useState(null);
 
+  const currentProgress = subtopics 
+    ? Math.round((subtopics.filter(s => s.is_studied).length / subtopics.length) * 100) 
+    : (node.data.progress || 0);
+
   useEffect(() => {
+    // ... rest of useEffect ...
     if (node && skillName) {
       if (subtopicsCache[skillName]) {
         setSubtopics(subtopicsCache[skillName]);
@@ -50,6 +55,16 @@ const NodeDetail = ({ node, onClose }) => {
     setSubtopics(newSubtopics);
     subtopicsCache[skillName] = newSubtopics;
 
+    // Calculate new progress
+    const completedCount = newSubtopics.filter(s => s.is_studied).length;
+    const totalCount = newSubtopics.length;
+    const newProgress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+    
+    // Notify parent to update graph
+    if (onUpdate) {
+      onUpdate(skillName, newProgress);
+    }
+
     api.toggleSubtopic(subtopic.id)
       .then(res => {
         if (res.data.xp_earned > 0) {
@@ -63,6 +78,9 @@ const NodeDetail = ({ node, onClose }) => {
         reverted[index].is_studied = !reverted[index].is_studied;
         setSubtopics(reverted);
         subtopicsCache[skillName] = reverted;
+        
+        const revertedProgress = totalCount > 0 ? Math.round((reverted.filter(s => s.is_studied).length / totalCount) * 100) : 0;
+        if (onUpdate) onUpdate(skillName, revertedProgress);
       });
   };
 
@@ -92,8 +110,9 @@ const NodeDetail = ({ node, onClose }) => {
         <div className="mb-4">
           <label className="form-label text-muted small">Proficiency</label>
           <div className="progress" style={{ height: '8px' }}>
-            <div className="progress-bar" style={{ width: `${node.data.progress || 0}%`, backgroundColor: 'var(--accent-secondary)' }}></div>
+            <div className="progress-bar" style={{ width: `${currentProgress}%`, backgroundColor: 'var(--accent-secondary)' }}></div>
           </div>
+          <div className="text-end small text-muted mt-1 fw-bold">{currentProgress}% Mastery</div>
         </div>
 
         <h5 className="mb-3" style={{ fontFamily: 'Outfit', fontWeight: 600 }}>Subtopics</h5>
@@ -122,6 +141,7 @@ const NodeDetail = ({ node, onClose }) => {
                 >
                   <div className="d-flex align-items-center gap-3">
                     <div 
+                      className="checkbox-custom"
                       style={{ 
                         width: '20px', 
                         height: '20px', 
@@ -137,34 +157,37 @@ const NodeDetail = ({ node, onClose }) => {
                       {isDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                     </div>
                     <div>
-                      <div className="fw-bold" style={{ fontSize: '14px', color: isDone ? 'var(--text-primary)' : 'inherit', textDecoration: isDone ? 'line-through' : 'none', opacity: isDone ? 0.7 : 1 }}>{st.title}</div>
+                      <div className="fw-bold" style={{ fontSize: '14px', color: isDone ? 'var(--text-primary)' : 'inherit', opacity: isDone ? 0.7 : 1, textDecoration: isDone ? 'line-through' : 'none' }}>{st.title}</div>
                       <div className="small text-muted">{st.duration_mins} mins</div>
                     </div>
                   </div>
                   
-                  <button 
-                    className="btn btn-sm btn-outline-primary mt-2 rounded-pill px-3" 
-                    style={{ fontSize: '12px', alignSelf: 'flex-start' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
-                    }}
-                  >
-                    Learn More &rarr;
-                  </button>
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <button 
+                      className="btn btn-sm btn-outline-primary rounded-pill px-4" 
+                      style={{ fontSize: '12px', fontWeight: 700 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
+                      }}
+                    >
+                      {isDone ? 'Review Content' : 'Start Learning'} &rarr;
+                    </button>
+                    {isDone && (
+                      <span className="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill" style={{ fontSize: '11px' }}>
+                        MASTERED
+                      </span>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}
           </motion.div>
         )}
 
-        <button 
-          className="btn w-100 mt-4" 
-          style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '8px' }}
-          onClick={() => navigate(`/session/${encodeURIComponent(skillName)}`, { state: { subtopics: subtopics || [] } })}
-        >
-          Take Quiz (AI Validation) &rarr;
-        </button>
+        <div className="alert alert-info mt-4" style={{ borderRadius: '16px', fontSize: '13px' }}>
+          💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
+        </div>
         <XPToast xp={xpEarned} visible={!!xpEarned} />
       </motion.div>
     </>

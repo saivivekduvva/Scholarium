@@ -1,37 +1,53 @@
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { motion } from 'framer-motion';
-import ProgressRing from './ProgressRing';
+import { IoLockClosedOutline, IoCheckmarkCircle, IoPlayCircleOutline } from 'react-icons/io5';
 
 const SkillNode = ({ data, selected }) => {
   const status = data.status || 'locked';
   const progress = data.progress || 0;
   
+  // Icon based on status
+  const getIcon = () => {
+    if (status === 'done') return <IoCheckmarkCircle className="text-success" size={20} />;
+    if (status === 'active') return <IoPlayCircleOutline className="text-primary" size={20} />;
+    return <IoLockClosedOutline size={20} style={{ color: '#94a3b8' }} />;
+  };
+
   return (
     <motion.div
-      whileHover={{ scale: 1.04, boxShadow: '0 8px 32px rgba(79,110,247,0.22)' }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
       className={`custom-node node-${status}`}
-      style={selected ? { border: '2px solid var(--accent-primary)', backgroundColor: 'rgba(79,110,247,0.06)' } : {}}
+      style={selected ? { borderColor: 'var(--accent-primary)', ring: '4px var(--accent-primary)' } : {}}
     >
       <Handle type="target" position={Position.Top} style={{ visibility: 'hidden' }} />
       
-      <div className="d-flex justify-content-between align-items-start">
-        <div>
-          <div className="title">{data.label}</div>
-          <div className="desc text-truncate" style={{ maxWidth: '140px' }}>{data.description}</div>
+      <div className="d-flex align-items-center gap-2 mb-2">
+        {getIcon()}
+        <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: status === 'active' ? 'var(--accent-primary)' : '#64748B' }}>
+          {status === 'active' ? 'Current Skill' : status}
+        </span>
+      </div>
+
+      <div className="node-title mb-1">{data.label}</div>
+      <div className="node-desc text-truncate-2 mb-3" style={{ height: '34px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        {data.description || 'Master this fundamental concept to progress.'}
+      </div>
+
+      {/* Mastery Progress Bar */}
+      <div className="w-100 mt-2">
+        <div className="d-flex justify-content-between align-items-center mb-1">
+          <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8' }}>MASTERY</span>
+          <span style={{ fontSize: '10px', fontWeight: 800, color: status === 'done' ? 'var(--accent-secondary)' : 'var(--accent-primary)' }}>{progress}%</span>
         </div>
-        {status === 'done' ? (
-          <div style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'var(--accent-secondary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
-        ) : status === 'locked' ? (
-          <div style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#E5E7EB', color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          </div>
-        ) : (
-          <ProgressRing radius={16} stroke={3} progress={progress} />
-        )}
+        <div className="progress" style={{ height: '6px', borderRadius: '3px', backgroundColor: '#f1f5f9' }}>
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            className={`progress-bar ${status === 'done' ? 'bg-success' : 'bg-primary'}`}
+            style={{ borderRadius: '3px' }}
+          />
+        </div>
       </div>
       
       <Handle type="source" position={Position.Bottom} style={{ visibility: 'hidden' }} />

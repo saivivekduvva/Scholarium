@@ -286,3 +286,25 @@ def get_summary(request, id):
     checkpoints = list(Checkpoint.objects.filter(user=request.user).values('skill_name', 'proficiency'))
     summary = generate_summary(request.user.id, checkpoints)
     return Response({'summary': summary})
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_subtopic_mastered(request):
+    skill_name = request.data.get('skill_name')
+    subtopic_title = request.data.get('subtopic_title')
+    
+    try:
+        subtopic = Subtopic.objects.get(
+            title=subtopic_title, 
+            skill_node__skill_name=skill_name, 
+            skill_node__goal__user=request.user
+        )
+        if not subtopic.is_studied:
+            subtopic.is_studied = True
+            subtopic.save()
+            award_xp(request.user, 50, 'subtopic_mastery') # Premium bonus for passing quiz
+            
+        return Response({'status': 'success', 'xp_earned': 50})
+    except Subtopic.DoesNotExist:
+        return Response({'error': 'Subtopic not found'}, status=404)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)

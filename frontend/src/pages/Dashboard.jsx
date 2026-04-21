@@ -38,41 +38,95 @@ const Dashboard = () => {
   return (
     <div style={{ minHeight: 'calc(100vh - 120px)', backgroundColor: '#F8FAFC', paddingBottom: '80px' }}>
       
-      {/* Hero Header Section */}
-      <div style={{ background: 'linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%)', borderBottom: '1px solid #E2E8F0', padding: '60px 0 40px 0' }}>
+      {/* Premium Hero Header Section */}
+      <div style={{ 
+        position: 'relative', 
+        overflow: 'hidden',
+        background: 'radial-gradient(circle at top right, rgba(79, 110, 247, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(142, 45, 226, 0.03), transparent 30%), #FFFFFF',
+        borderBottom: '1px solid #E2E8F0', 
+        padding: '80px 0 60px 0' 
+      }}>
         <div className="container">
           <div className="row align-items-center">
-            <div className="col-lg-7">
-              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                <h1 style={{ fontSize: '42px', fontWeight: 800, color: '#0F172A', marginBottom: '12px' }}>
-                  Welcome back, <span style={{ color: 'var(--accent-primary)' }}>{userStats?.username || 'Learner'}</span>
-                </h1>
-                <p style={{ fontSize: '18px', color: '#64748B', maxWidth: '500px' }}>
-                  You've mastered <span style={{ fontWeight: 700, color: '#0F172A' }}>{goals.length}</span> topics so far. What's next on your journey?
-                </p>
+            <div className="col-lg-8">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { 
+                    opacity: 1,
+                    transition: { staggerChildren: 0.15, delayChildren: 0.2 } 
+                  }
+                }}
+              >
+                <motion.div 
+                  variants={{ 
+                    hidden: { opacity: 0, y: 20 }, 
+                    visible: { opacity: 1, y: 0 } 
+                  }}
+                  className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4"
+                  style={{ background: 'rgba(79, 110, 247, 0.08)', color: 'var(--accent-primary)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px' }}
+                >
+                  <IoRocketOutline size={16} />
+                  <span>YOUR PERSONAL LEARNING ENGINE</span>
+                </motion.div>
+                
+                <motion.h1 
+                  variants={{ 
+                    hidden: { opacity: 0, y: 20 }, 
+                    visible: { opacity: 1, y: 0 } 
+                  }}
+                  style={{ fontSize: '56px', fontWeight: 800, color: '#0F172A', marginBottom: '16px', lineHeight: 1.1, letterSpacing: '-1px' }}
+                >
+                  Welcome back,<br />
+                  <span style={{ 
+                    background: 'linear-gradient(135deg, #4F6EF7 0%, #8E2DE2 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    display: 'inline-block'
+                  }}>
+                    {userStats?.username || 'Learner'}
+                  </span>
+                </motion.h1>
+                
+                <motion.p 
+                  variants={{ 
+                    hidden: { opacity: 0, y: 20 }, 
+                    visible: { opacity: 1, y: 0 } 
+                  }}
+                  style={{ fontSize: '20px', color: '#64748B', maxWidth: '600px', lineHeight: 1.6, fontWeight: 500 }}
+                >
+                  You've already mastered <span style={{ color: '#0F172A', fontWeight: 700 }}>{goals.length} mastery roadmaps</span>. Ready to dive back in or explore something new?
+                </motion.p>
               </motion.div>
             </div>
             
-            <div className="col-lg-5">
+            <div className="col-lg-4">
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }} 
-                animate={{ opacity: 1, scale: 1 }}
-                className="d-flex gap-3 justify-content-lg-end mt-4 mt-lg-0"
+                initial={{ opacity: 0, scale: 0.9, rotate: -2 }} 
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.8, type: 'spring' }}
+                className="d-flex flex-column gap-3 mt-5 mt-lg-0"
               >
-                <div className="card border-0 shadow-sm p-3" style={{ borderRadius: '20px', minWidth: '160px', background: 'white' }}>
-                  <div className="d-flex align-items-center gap-2 mb-1">
-                    <IoFlameOutline className="text-danger" size={24} />
-                    <span style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>{userStats?.streak_count || 0}</span>
+                <div className="card border-0 shadow-sm p-4 d-flex flex-row align-items-center gap-4" style={{ borderRadius: '24px', background: 'white' }}>
+                  <div className="p-3 rounded-4" style={{ background: 'rgba(239, 68, 68, 0.08)', color: '#EF4444' }}>
+                    <IoFlameOutline size={32} />
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Day Streak</div>
+                  <div>
+                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>{userStats?.streak_count || 0}</div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Day Streak</div>
+                  </div>
                 </div>
                 
-                <div className="card border-0 shadow-sm p-3" style={{ borderRadius: '20px', minWidth: '160px', background: 'white' }}>
-                  <div className="d-flex align-items-center gap-2 mb-1">
-                    <IoSparklesOutline className="text-warning" size={24} />
-                    <span style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A' }}>{userStats?.total_xp || 0}</span>
+                <div className="card border-0 shadow-sm p-4 d-flex flex-row align-items-center gap-4" style={{ borderRadius: '24px', background: 'white' }}>
+                  <div className="p-3 rounded-4" style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#F59E0B' }}>
+                    <IoSparklesOutline size={32} />
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total XP</div>
+                  <div>
+                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>{userStats?.total_xp || 0}</div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Total XP</div>
+                  </div>
                 </div>
               </motion.div>
             </div>

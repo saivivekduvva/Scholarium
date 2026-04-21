@@ -57,14 +57,25 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
       }
     }));
 
-    const formattedEdges = initialEdges.map(edge => ({
-      ...edge,
-      id: String(edge.id || `e${edge.source}-${edge.target}`),
-      source: String(edge.source),
-      target: String(edge.target),
-      animated: true,
-      style: { stroke: 'var(--accent-primary)', strokeWidth: 2 }
-    }));
+    const formattedEdges = initialEdges.map(edge => {
+      // Find the source node to check status
+      const sourceNode = initialNodes.find(n => n.id === edge.source);
+      const isActive = sourceNode && sourceNode.data.status === 'done';
+      
+      return {
+        ...edge,
+        id: String(edge.id || `e${edge.source}-${edge.target}`),
+        source: String(edge.source),
+        target: String(edge.target),
+        className: isActive ? 'edge-active' : 'edge-locked',
+        animated: isActive,
+        style: { 
+          stroke: isActive ? 'var(--accent-primary)' : '#cbd5e1', 
+          strokeWidth: isActive ? 3 : 2,
+          transition: 'all 0.5s ease'
+        }
+      };
+    });
     
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(formattedNodes, formattedEdges);
 
@@ -73,7 +84,7 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
   }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   return (
-    <div style={{ height: 'calc(100vh - 64px)', width: '100%' }}>
+    <div style={{ height: 'calc(100vh - 64px)', width: '100%', position: 'relative' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -82,10 +93,30 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
         onNodeClick={(e, node) => onNodeClick(node)}
         nodeTypes={nodeTypes}
         fitView
+        minZoom={0.2}
+        maxZoom={1.5}
       >
-        <Background color="#ccc" gap={16} size={1} />
-        <MiniMap nodeStrokeColor="#4F6EF7" nodeColor="#fff" maskColor="rgba(240, 244, 255, 0.7)" />
-        <Controls />
+        <Background variant="dots" gap={24} size={1} color="#cbd5e1" />
+        <MiniMap 
+          nodeColor={(node) => {
+            if (node.data.status === 'done') return '#06C9A0';
+            if (node.data.status === 'active') return '#4F6EF7';
+            return '#e2e8f0';
+          }}
+          maskColor="rgba(240, 244, 255, 0.6)"
+          style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }}
+        />
+        <Controls 
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '4px',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+          }} 
+        />
       </ReactFlow>
     </div>
   );
