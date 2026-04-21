@@ -113,19 +113,27 @@ def expand_skill(request, id):
     
     try:
         node = SkillNode.objects.get(skill_name=skill_name, goal__user=request.user)
-        existing_subtopics = node.subtopics.all()
+        force_refresh = request.data.get('force_refresh', False)
         
-        if existing_subtopics.exists():
-            return Response({'subtopics': SubtopicSerializer(existing_subtopics, many=True).data})
+        if force_refresh:
+            node.subtopics.all().delete()
+        elif node.subtopics.exists():
+            return Response({'subtopics': SubtopicSerializer(node.subtopics.all(), many=True).data})
             
         subtopics_data = expand_subtopics(skill_name)
         subtopics_list = subtopics_data.get('subtopics', [])
         
         created_subtopics = []
+        seen_titles = set()
         for st in subtopics_list:
+            title = st.get('title', 'Unknown Topic').strip()
+            if title.lower() in seen_titles:
+                continue
+            seen_titles.add(title.lower())
+            
             created_subtopics.append(Subtopic.objects.create(
                 skill_node=node,
-                title=st.get('title', 'Unknown Topic'),
+                title=title,
                 description=st.get('description', ''),
                 duration_mins=st.get('duration_mins', 30)
             ))

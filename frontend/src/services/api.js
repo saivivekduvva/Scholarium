@@ -39,7 +39,7 @@ export default {
   createGoal: (data) => api.post('goals/', data),
   getGoals: () => api.get('goals/'),
   getGraph: (id) => api.get(`goals/${id}/graph/`),
-  expandSkill: (id, skill_name) => api.post(`skills/${id}/expand/`, { skill_name }),
+  expandSkill: (id, skill_name, force = false) => api.post(`skills/${id}/expand/`, { skill_name, force_refresh: force }),
   toggleSubtopic: (id) => api.post(`subtopics/${id}/toggle/`),
   savePath: (id, ordered_skill_ids) => api.post(`goals/${id}/path/`, { ordered_skill_ids }),
   startSession: (data) => api.post('sessions/start/', data),

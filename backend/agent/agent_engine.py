@@ -146,8 +146,16 @@ def generate_graph_layout(skills: list) -> dict:
         raise ValueError("Failed to parse JSON")
 
 def expand_subtopics(skill_name: str) -> dict:
-    system = "You are a curriculum designer for Scholarium. Return ONLY valid JSON."
-    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{\"title\": \"t\", \"description\": \"d\", \"duration_mins\": 30}}]}}"
+    system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 6-8 logically sequenced, UNIQUE subtopics.
+    
+    RULES:
+    1. NO DUPLICATES: Every subtopic must have a unique title and distinct focus.
+    2. LOGICAL FLOW: Order them from foundational to advanced.
+    3. PRECISION: Use exact technical terms.
+    4. VARIETY: Cover different facets of the skill (Theory, Application, Tools).
+    
+    Return ONLY valid JSON."""
+    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Detailed focus\", \"duration_mins\": 30 }}]}}"
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
