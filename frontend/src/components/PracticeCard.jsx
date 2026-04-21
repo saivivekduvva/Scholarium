@@ -1,12 +1,16 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const PracticeCard = ({ question, onAnswer, onNext, feedback }) => {
+const PracticeCard = ({ question, onAnswer, onNext, feedback, isEvaluating }) => {
   const [answer, setAnswer] = React.useState('');
+
+  React.useEffect(() => {
+    setAnswer('');
+  }, [question]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (answer) onAnswer(answer);
+    if (answer.trim() && !isEvaluating) onAnswer(answer);
   };
 
   return (
@@ -26,11 +30,13 @@ const PracticeCard = ({ question, onAnswer, onNext, feedback }) => {
                 {question.options.map((opt, i) => (
                   <button 
                     key={i} 
-                    className="btn text-start p-3" 
-                    style={{ backgroundColor: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: '12px' }}
+                    className="btn text-start p-3 d-flex justify-content-between align-items-center" 
+                    style={{ backgroundColor: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: '12px', opacity: isEvaluating ? 0.6 : 1 }}
                     onClick={() => onAnswer(opt)}
+                    disabled={isEvaluating}
                   >
-                    {opt}
+                    <span>{opt}</span>
+                    {isEvaluating && <span className="spinner-border spinner-border-sm ms-2"></span>}
                   </button>
                 ))}
               </div>
@@ -44,9 +50,16 @@ const PracticeCard = ({ question, onAnswer, onNext, feedback }) => {
                   placeholder="Type your answer here..."
                   style={{ borderRadius: '12px', border: '1px solid var(--border)' }}
                 />
-                <button type="submit" className="btn w-100" style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '8px' }}>
-                  Submit to Scholarium
-                </button>
+                  <button 
+                    type="submit" 
+                    className="btn w-100" 
+                    style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '8px' }}
+                    disabled={isEvaluating || !answer.trim()}
+                  >
+                    {isEvaluating ? (
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    ) : 'Submit to Scholarium'}
+                  </button>
               </form>
             )}
           </motion.div>
@@ -64,13 +77,13 @@ const PracticeCard = ({ question, onAnswer, onNext, feedback }) => {
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
               style={{
                 display: 'inline-block', padding: '16px 24px', borderRadius: '16px',
-                backgroundColor: feedback.score > 70 ? 'var(--accent-secondary)' : 'var(--accent-warn)',
+                backgroundColor: feedback.score >= 70 ? 'var(--accent-secondary)' : 'var(--accent-warn)',
                 color: 'white', fontSize: '32px', fontWeight: 700, marginBottom: '24px'
               }}
             >
-              Score: {feedback.score}/100
+              {feedback.score >= 70 ? 'Correct' : 'Incorrect'}
             </motion.div>
-            <h5 className="mb-3">{feedback.verdict === 'pass' ? 'Great Job!' : 'Keep Practicing!'}</h5>
+            <h5 className="mb-3">{feedback.verdict === 'pass' ? 'Great Job!' : 'Keep Studying!'}</h5>
             <button onClick={onNext} className="btn mt-4" style={{ backgroundColor: 'var(--accent-primary)', color: 'white', borderRadius: '8px' }}>
               Next Question &rarr;
             </button>

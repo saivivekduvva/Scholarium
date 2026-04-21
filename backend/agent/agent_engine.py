@@ -124,9 +124,42 @@ def expand_subtopics(skill_name: str) -> dict:
         print(f"Error parsing expand_subtopics: {e}")
         raise ValueError("Failed to parse JSON")
 
-def generate_practice(skill: str, difficulty: str) -> dict:
-    system = "You are an expert tutor and examiner. Generate high-quality, thought-provoking questions that test deep understanding and application of concepts, not just rote memorization. Provide scenario-based questions where possible. Return ONLY valid JSON."
-    user = f"Skill: {skill}, difficulty: {difficulty}\nGenerate complex scenario-based questions.\nReturn JSON: {{\"questions\": [{{\"id\": \"q1\", \"prompt\": \"scenario or question text\", \"type\": \"mcq\"|\"short\", \"options\": [\"A\", \"B\"], \"correct\": \"A\"}}]}}"
+def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
+    system = """You are a friendly and encouraging tutor for Scholarium. 
+    Your goal is to assess the learner's understanding with clear, concise, and approachable questions.
+    
+    Rules for question generation:
+    1. KEEP IT SHORT: Questions should be max 2 sentences. No long, intimidating paragraphs.
+    2. BE ENCOURAGING: Use a supportive tone.
+    3. FOCUS ON CORE CONCEPTS: Test the most important ideas clearly. 
+    4. VARIETY: Mix 1-2 multiple-choice questions with a simple open-ended question.
+    5. No "trick" questions or overly complex scenarios.
+    
+    Return ONLY valid JSON."""
+    
+    context_str = json.dumps(context) if context else "No additional context."
+    user = f"""Topic: {skill}
+    Difficulty: {difficulty}
+    Context: {context_str}
+    
+    Generate 3 simple but effective questions.
+    Return JSON format: 
+    {{
+        "questions": [
+            {{
+                "id": "q1", 
+                "prompt": "Short, clear question...", 
+                "type": "mcq", 
+                "options": ["A", "B", "C", "D"], 
+                "correct": "A"
+            }},
+            {{
+                "id": "q2", 
+                "prompt": "Simple conceptual question...", 
+                "type": "short"
+            }}
+        ]
+    }}"""
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
@@ -135,8 +168,29 @@ def generate_practice(skill: str, difficulty: str) -> dict:
         raise ValueError("Failed to parse JSON")
 
 def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> dict:
-    system = "You are a strict but fair evaluator. Return ONLY valid JSON."
-    user = f"Skill: {skill}\nQuestion: {question}\nAnswer: {answer}\nReturn JSON: {{\"score\": 0, \"verdict\": \"pass\"|\"fail\", \"strengths\": [\"\"], \"gaps\": [\"\"], \"next_step\": \"\"}}"
+    system = """You are a supportive and helpful technical mentor. 
+    Your goal is to provide encouraging feedback that helps the learner grow.
+    
+    CRITICAL RULES:
+    1. BINARY SCORING: For Multiple Choice Questions, the score MUST be 100 if correct and 0 if wrong. No in-between.
+    2. TEXT SCORING: For text answers, use 100 for correct, 50 for partially correct, and 0 for wrong. Avoid random values.
+    3. BE SUPPORTIVE: Use a positive, encouraging tone.
+    4. NO LENGTH BIAS: Judge only on the technical accuracy.
+    
+    Return ONLY valid JSON."""
+    
+    user = f"""Topic: {skill}
+    Question: {question}
+    Student Answer: {answer}
+    
+    Return JSON format: 
+    {{
+        "score": 0-100, 
+        "verdict": "pass" | "fail", 
+        "strengths": ["list 1-2 things they did well"], 
+        "gaps": ["list 1-2 things they can improve"], 
+        "next_step": "Encouraging advice for next time"
+    }}"""
     try:
         resp = call_llm(system, user)
         evaluations_col.insert_one({
@@ -160,9 +214,25 @@ def generate_summary(user_id: int, checkpoints: list) -> str:
         print(f"Error generating summary: {e}")
         return "Failed to generate summary."
 
-def get_subtopic_explanation(skill_name: str, subtopic_title: str) -> str:
-    system = "You are an expert technical educator. Write a clear-cut, well-structured, and highly detailed explanation for a subtopic within a larger skill. Use clean Markdown formatting, include examples, and organize with clear headings. Ensure the explanation is 'perfect' and addresses deep conceptual understanding."
-    user = f"Skill: {skill_name}\nSubtopic: {subtopic_title}\n\nWrite a comprehensive explanation in Markdown."
+def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subtopics: list = None) -> str:
+    system = """You are a world-class technical educator for Scholarium. 
+    Your goal is to write a highly relevant, accurate, and deep explanation for a specific subtopic.
+    
+    STRICT RULES:
+    1. RELEVANCE: Only talk about the specific subtopic. Do NOT drift into advanced topics or unrelated frameworks unless they are absolutely necessary for the core concept.
+    2. CONTEXT BOUNDARIES: You are given a list of other subtopics in this skill. DO NOT explain those other topics; stay within your specific boundary.
+    3. NO HALLUCINATIONS: If the skill is 'Java' and subtopic is 'Intro', do not talk about 'Spring' or 'Hibernate'.
+    4. FORMATTING: Use clean Markdown, bold headers, and high-quality code examples.
+    5. STRUCTURE: Start with a high-level overview, followed by core details, and end with a practical example."""
+    
+    context_str = ", ".join(context_subtopics) if context_subtopics else "No other topics provided."
+    user = f"""Skill: {skill_name}
+    Specific Subtopic to explain: {subtopic_title}
+    
+    Context (Other subtopics in this skill - DO NOT EXPLAIN THESE): {context_str}
+    
+    Write a comprehensive, professional explanation for '{subtopic_title}' only."""
+    
     try:
         return call_llm(system, user)
     except Exception as e:

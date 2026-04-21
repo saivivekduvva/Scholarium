@@ -25,6 +25,7 @@ const SubtopicDetail = () => {
   const [explanation, setExplanation] = useState('');
   const [source, setSource] = useState('');
   const [loading, setLoading] = useState(true);
+  const [proSources, setProSources] = useState([]);
   const [scrapedData, setScrapedData] = useState({ articles: [], books: [], searched: false });
 
   const rawQuery = `${subtopicTitle} ${skillName}`;
@@ -34,78 +35,20 @@ const SubtopicDetail = () => {
   useEffect(() => {
     const loadExplanation = async () => {
       setLoading(true);
-      
-      const searchAndFetchWiki = async (searchTerm) => {
-        try {
-          // 1. Search for the best matching title
-          const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&format=json&origin=*`);
-          if (!searchRes.ok) return null;
-          const searchData = await searchRes.json();
-          const results = searchData.query.search;
-          
-          if (results && results.length > 0) {
-            const bestTitle = results[0].title;
-            // 2. Fetch HTML content to preserve rich elements like code and tables
-            const fullRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=${encodeURIComponent(bestTitle)}&format=json&origin=*`);
-            if (fullRes.ok) {
-              const fullData = await fullRes.json();
-              const pages = fullData.query.pages;
-              const pageId = Object.keys(pages)[0];
-              const html = pages[pageId].extract;
-              
-              if (html && html.length > 500) {
-                // Convert HTML to clean Markdown while preserving code blocks
-                const markdown = turndownService.turndown(html);
-                return { text: markdown, source: `Wikipedia (Full Article: ${bestTitle})` };
-              }
-            }
-          }
-        } catch (e) { console.error("Wiki search error:", e); }
-        return null;
-      };
-
       try {
-        // Attempt 1: Search Wikipedia with full title
-        let result = await searchAndFetchWiki(`${subtopicTitle} ${skillName}`);
-        if (!result) result = await searchAndFetchWiki(subtopicTitle);
-        
-        if (result) {
-          setExplanation(result.text);
-          setSource(result.source);
-          setLoading(false);
-          return;
-        }
-
-        // Attempt 2: Fallback to Dev.to (Fetch most relevant article snippet)
-        const devRes = await fetch(`https://dev.to/api/articles?tag=${tag}&per_page=1`);
-        if (devRes.ok) {
-          const devData = await devRes.json();
-          if (devData.length > 0 && devData[0].description) {
-            setExplanation(`${devData[0].description}\n\n*Note: This is a summary from a community article. You can read more in the "Articles" section.*`);
-            setSource(`Dev.to (${devData[0].user.name})`);
-            setLoading(false);
-            return;
-          }
-        }
-
-        // 3. Final Fallback to AI Generation
-        const aiRes = await api.getExplanation(skillName, subtopicTitle);
-        if (aiRes.data.explanation && !aiRes.data.explanation.includes("Failed")) {
-          setExplanation(aiRes.data.explanation);
-          setSource('AI Generated (Gemini)');
+        const res = await api.getExplanation(skillName, subtopicTitle);
+        if (res.data.explanation && !res.data.explanation.includes("Failed")) {
+          setExplanation(res.data.explanation);
+          setProSources(res.data.pro_sources || []);
+          setSource('Scholarium AI (Enhanced)');
         } else {
-          throw new Error("AI failed or returned quota error");
+          throw new Error("Backend failed to provide explanation");
         }
       } catch (err) {
         console.error("Explanation fetch failed:", err);
-        setExplanation(`### No direct matches found.
+        setExplanation(`### We encountered an issue.
         
-We couldn't find a clear-cut explanation on Wikipedia or Dev.to for this specific topic, and our AI capacity is currently at its limit.
-
-**Recommendations:**
-1. Try the **"Watch Tutorials"** button on the right for video explanations.
-2. Check the **"Library References"** for book chapters.
-3. Try a different subtopic and come back in a few minutes.`);
+Our AI system is currently recalibrating or at capacity. In the meantime, please check the **"Pro Study Sources"** or **"Watch Tutorials"** on the right for high-quality external resources.`);
         setSource('System Fallback');
       } finally {
         setLoading(false);
@@ -114,7 +57,7 @@ We couldn't find a clear-cut explanation on Wikipedia or Dev.to for this specifi
 
     loadExplanation();
 
-    // Fetch References
+    // Fetch References (Books and Articles)
     const fetchRefs = async () => {
       try {
         const devRes = await fetch(`https://dev.to/api/articles?tag=${tag}&per_page=4`);
@@ -184,6 +127,30 @@ We couldn't find a clear-cut explanation on Wikipedia or Dev.to for this specifi
         <div className="col-lg-4">
           <div className="sticky-top" style={{ top: '100px' }}>
             
+            {/* Pro Sources Section */}
+            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: '#fff' }}>
+              <div className="card-body p-4">
+                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
+                  <IoNewspaperOutline className="text-primary" size={20} /> Pro Study Sources
+                </h6>
+                <p className="small text-muted mb-3">Verified external articles for deeper study.</p>
+                <div className="d-flex flex-column gap-2">
+                  {proSources.map((src, i) => (
+                    <a 
+                      key={i} 
+                      href={src.url} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="btn btn-outline-primary btn-sm text-start py-2 d-flex justify-content-between align-items-center"
+                    >
+                      <span>Study on {src.name}</span>
+                      <IoExtensionPuzzleOutline size={14} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* YouTube Section */}
             <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: '#fff' }}>
               <div className="card-body p-4">

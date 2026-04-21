@@ -22,51 +22,68 @@ const Session = () => {
   const [sessionDone, setSessionDone] = useState(false);
   const [sessionId, setSessionId] = useState(null);
 
-  const generateMockQuestions = (topic) => [
-    { id: `q1_${Date.now()}`, prompt: `Explain the core concept of "${topic}" in your own words.`, type: 'short' },
-    { id: `q2_${Date.now()}`, prompt: `Which of the following best relates to ${topic}?`, type: 'mcq', options: ['A core fundamental concept', 'Something else entirely', 'Not applicable'], correct: 'A core fundamental concept' }
-  ];
+  const [loadingQuiz, setLoadingQuiz] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const decodedSkillName = decodeURIComponent(skillId);
     const currentTopicTitle = subtopics[currentSubtopicIndex]?.title || decodedSkillName;
     
-    api.startSession({ skill_name: currentTopicTitle, difficulty: 'beginner', user_id: 1 })
+    setLoadingQuiz(true);
+    setError(null);
+    
+    api.startSession({ 
+      skill_name: decodedSkillName, 
+      subtopic_title: currentTopicTitle,
+      difficulty: 'beginner', 
+      user_id: 1 
+    })
       .then(res => {
         setSessionId(res.data.session_id);
         if (res.data.practice?.questions) {
           setQuestions(res.data.practice.questions);
         } else {
-          setQuestions(generateMockQuestions(currentTopicTitle));
+          setError("The AI failed to generate a unique quiz. Please try again.");
         }
       })
       .catch(err => {
         console.error(err);
-        setQuestions(generateMockQuestions(currentTopicTitle));
-      });
+        setError("AI Rate Limit reached or Connection Error. Please try again in a few moments.");
+      })
+      .finally(() => setLoadingQuiz(false));
   }, [skillId, currentSubtopicIndex]);
 
   const [xpEarned, setXpEarned] = useState(null);
 
+  const [isEvaluating, setIsEvaluating] = useState(false);
+
   const handleAnswer = (answer) => {
+    if (isEvaluating || feedback) return;
+    
     const currentQ = questions[currentIndex];
+    setIsEvaluating(true);
     
     api.evaluateAnswer(sessionId, { question: currentQ.prompt, answer })
       .then(res => {
-        setFeedback(res.data);
-        setHistory([...history, res.data]);
-        
-        if (res.data.xp_earned > 0) {
-          setXpEarned(res.data.xp_earned);
-          setTimeout(() => setXpEarned(null), 2000);
+        // Ensure we are still on the same question
+        if (questions[currentIndex]?.prompt === currentQ.prompt) {
+          setFeedback(res.data);
+          setHistory(prev => [...prev, res.data]);
+          
+          if (res.data.xp_earned > 0) {
+            setXpEarned(res.data.xp_earned);
+            setTimeout(() => setXpEarned(null), 2000);
+          }
         }
       })
       .catch(err => {
         console.error(err);
-        // Fallback for demo if API fails
         const mockResult = { score: 80, verdict: 'pass', strengths: ['Good effort'], gaps: [] };
         setFeedback(mockResult);
-        setHistory([...history, mockResult]);
+        setHistory(prev => [...prev, mockResult]);
+      })
+      .finally(() => {
+        setIsEvaluating(false);
       });
   };
 
@@ -90,6 +107,28 @@ const Session = () => {
       navigate(-1);
     }
   };
+
+  if (loadingQuiz) {
+    return (
+      <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: '80vh' }}>
+        <div className="spinner-border text-primary mb-3" />
+        <p className="text-muted">Scholarium is generating your personalized quiz...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: '80vh' }}>
+        <div className="card p-5 text-center" style={{ maxWidth: '500px', borderRadius: '24px' }}>
+          <h3 className="text-danger mb-3">Quiz Unavailable</h3>
+          <p className="text-muted mb-4">{error}</p>
+          <button className="btn btn-primary w-100" onClick={() => window.location.reload()}>Retry</button>
+          <button className="btn btn-link mt-2" onClick={() => navigate(-1)}>Back to Roadmap</button>
+        </div>
+      </div>
+    );
+  }
 
   if (sessionDone) {
     const isLastSubtopic = currentSubtopicIndex >= subtopics.length - 1 || subtopics.length === 0;
@@ -159,6 +198,7 @@ const Session = () => {
             onAnswer={handleAnswer} 
             onNext={handleNext} 
             feedback={feedback} 
+            isEvaluating={isEvaluating}
           />
         </div>
         

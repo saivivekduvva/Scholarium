@@ -144,8 +144,26 @@ def get_explanation(request):
     if not skill_name or not subtopic_title:
         return Response({'error': 'skill_name and subtopic_title required'}, status=status.HTTP_400_BAD_REQUEST)
     
-    explanation = get_subtopic_explanation(skill_name, subtopic_title)
-    return Response({'explanation': explanation})
+    # Get other subtopics in this skill for context
+    try:
+        node = SkillNode.objects.get(skill_name=skill_name, goal__user=request.user)
+        all_subtopics = list(node.subtopics.values_list('title', flat=True))
+    except SkillNode.DoesNotExist:
+        all_subtopics = []
+
+    explanation = get_subtopic_explanation(skill_name, subtopic_title, all_subtopics)
+    
+    # Generate direct pro source links
+    query = subtopic_title.replace(' ', '+')
+    pro_sources = [
+        {"name": "GeeksforGeeks", "url": f"https://www.geeksforgeeks.org/search/{query}", "icon": "gfg"},
+        {"name": "Programiz", "url": f"https://www.programiz.com/search/{query}", "icon": "programiz"}
+    ]
+    
+    return Response({
+        'explanation': explanation,
+        'pro_sources': pro_sources
+    })
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -159,13 +177,19 @@ def save_path(request, id):
 @permission_classes([IsAuthenticated])
 def start_session(request):
     skill_name = request.data.get('skill_name')
+    subtopic_title = request.data.get('subtopic_title')
     difficulty = request.data.get('difficulty', 'beginner')
         
     node = get_object_or_404(SkillNode, skill_name=skill_name, goal__user=request.user)
     session = Session.objects.create(user=request.user, skill_node=node)
     
+    # Get subtopics for context
+    subtopics = list(node.subtopics.values('title', 'description'))
+    
     try:
-        practice = generate_practice(node.skill_name, difficulty)
+        # Use subtopic_title as the primary subject if provided, else fall back to skill_name
+        subject = subtopic_title if subtopic_title else node.skill_name
+        practice = generate_practice(subject, difficulty, subtopics)
         return Response({'session_id': session.id, 'practice': practice})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -6,8 +6,8 @@ def home(request):
     return HttpResponse("Scholarium Backend is Running 🚀")
 
 urlpatterns = [
-    path('', home),  # 👈 this fixes your 404
+    path('', home),
     path('admin/', admin.site.urls),
-    path('api/auth/', include('users.urls')),
     path('api/', include('agent.urls')),
+    path('api/auth/', include('users.urls')),
 ]

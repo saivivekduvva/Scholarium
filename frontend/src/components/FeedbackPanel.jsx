@@ -1,14 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
 const FeedbackPanel = ({ feedbackHistory }) => {
   const currentFeedback = feedbackHistory[feedbackHistory.length - 1];
-  
-  const chartData = feedbackHistory.map((f, i) => ({
-    question: i + 1,
-    score: f.score
-  }));
 
   return (
     <div className="card h-100 border-0 p-4" style={{ backgroundColor: 'var(--bg-page)', borderRadius: 'var(--radius-card)' }}>
@@ -36,22 +29,6 @@ const FeedbackPanel = ({ feedbackHistory }) => {
         </motion.div>
       ) : (
         <div className="text-muted small text-center mt-5">Submit an answer to see Scholarium's analysis.</div>
-      )}
-
-      {chartData.length > 0 && (
-        <div className="mt-auto pt-4 border-top" style={{ borderColor: 'var(--border)' }}>
-          <div className="small text-muted fw-bold mb-3">SCORE TIMELINE</div>
-          <div style={{ height: '120px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <XAxis dataKey="question" hide />
-                <YAxis domain={[0, 100]} hide />
-                <Tooltip />
-                <Line type="monotone" dataKey="score" stroke="var(--accent-primary)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
       )}
     </div>
   );
