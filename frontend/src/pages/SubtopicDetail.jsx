@@ -3,21 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { IoArrowBack, IoBookOutline, IoVideocamOutline, IoNewspaperOutline, IoExtensionPuzzleOutline } from 'react-icons/io5';
 import ReactMarkdown from 'react-markdown';
-import TurndownService from 'turndown';
 import api from '../services/api';
-
-const turndownService = new TurndownService({
-  headingStyle: 'atx',
-  codeBlockStyle: 'fenced'
-});
-
-// Custom rule to handle Wikipedia's specific code structures
-turndownService.addRule('wikiCode', {
-  filter: ['pre', 'code'],
-  replacement: function (content, node) {
-    return '\n```\n' + content + '\n```\n';
-  }
-});
 
 const SubtopicDetail = () => {
   const { skillName, subtopicTitle } = useParams();
