@@ -1,11 +1,32 @@
 from pymongo import MongoClient
 import os
+import urllib.parse
 from dotenv import load_dotenv
 
 load_dotenv()
 
-MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/scholarium_logs')
-client = MongoClient(MONGO_URI)
+def get_mongo_client():
+    uri = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/scholarium_logs')
+    
+    # If the URI looks like a standard mongodb+srv string, ensure password is encoded
+    if "://" in uri and "@" in uri:
+        try:
+            # Basic split to isolate the user:pass part
+            prefix, rest = uri.split("://", 1)
+            user_pass_part, host_part = rest.rsplit("@", 1)
+            
+            if ":" in user_pass_part:
+                user, password = user_pass_part.split(":", 1)
+                # Only encode if it's not already encoded (doesn't contain %)
+                if "%" not in password:
+                    encoded_password = urllib.parse.quote_plus(password)
+                    uri = f"{prefix}://{user}:{encoded_password}@{host_part}"
+        except Exception:
+            pass # Fallback to original URI if parsing fails
+            
+    return MongoClient(uri)
+
+client = get_mongo_client()
 db = client['scholarium_logs']
 
 conversations_col = db['ai_conversations']
