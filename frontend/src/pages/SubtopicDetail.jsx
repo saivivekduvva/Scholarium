@@ -71,8 +71,11 @@ const SubtopicDetail = () => {
         user_id: 1
       });
       if (res.data.practice?.questions) {
-        setQuestions(res.data.practice.questions.slice(0, 5)); // 5 questions for deep mastery
+        setQuestions(res.data.practice.questions.slice(0, 4)); // Exactly 4 random questions
         setQuizActive(true);
+        setQuizResult(null); // Clear previous results on fresh start
+        setAnswers([]);
+        setCurrentQIndex(0);
       }
     } catch (err) {
       alert("Failed to start assessment. AI Rate Limit might be reached.");
@@ -98,7 +101,7 @@ const SubtopicDetail = () => {
         setCurrentQIndex(currentQIndex + 1);
       } else {
         const correctCount = newAnswers.filter(a => a).length;
-        const passed = correctCount >= 4; // 4/5 required for advanced mastery
+        const passed = correctCount === questions.length; // Mastery requires a PERFECT score (4/4)
         setQuizResult({ passed, correctCount, total: questions.length });
         setQuizActive(false);
         
@@ -198,9 +201,21 @@ const SubtopicDetail = () => {
                       let btnStyle = { borderRadius: '16px', border: '2px solid rgba(79, 110, 247, 0.1)', background: 'white' };
                       if (feedback) {
                         if (isCorrect) {
-                          btnStyle = { ...btnStyle, borderColor: '#06C9A0', background: 'rgba(6, 201, 160, 0.05)', color: '#06C9A0' };
+                          btnStyle = { 
+                            ...btnStyle, 
+                            borderColor: '#06C9A0', 
+                            background: 'rgba(6, 201, 160, 0.05)', 
+                            color: '#06C9A0',
+                            boxShadow: '0 0 15px rgba(6, 201, 160, 0.4)' 
+                          };
                         } else if (isSelected) {
-                          btnStyle = { ...btnStyle, borderColor: '#F75C5C', background: 'rgba(247, 92, 92, 0.05)', color: '#F75C5C' };
+                          btnStyle = { 
+                            ...btnStyle, 
+                            borderColor: '#F75C5C', 
+                            background: 'rgba(247, 92, 92, 0.05)', 
+                            color: '#F75C5C',
+                            boxShadow: '0 0 15px rgba(247, 92, 92, 0.4)' 
+                          };
                         }
                       }
 
@@ -234,7 +249,7 @@ const SubtopicDetail = () => {
                       <div className="display-1 mb-4">✍️</div>
                       <h2 className="fw-bold mb-2">Not quite there yet</h2>
                       <p className="text-muted mb-4">You got {quizResult.correctCount} correct. Review the explanation again and try the assessment once more to master this topic.</p>
-                      <button onClick={() => { setQuizResult(null); setAnswers([]); setCurrentQIndex(0); }} className="btn btn-outline-primary px-5 py-3 rounded-pill fw-bold">Retry Assessment</button>
+                      <button onClick={startAssessment} className="btn btn-outline-primary px-5 py-3 rounded-pill fw-bold">Retry Assessment (Fresh Questions)</button>
                     </div>
                   )}
                 </div>

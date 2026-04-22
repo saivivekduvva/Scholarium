@@ -190,11 +190,14 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
     Return ONLY valid JSON."""
     
     context_str = json.dumps(context) if context else "No additional context."
+    import time
+    salt = time.time()
     user = f"""Topic: {skill}
     Difficulty: advanced
     Context: {context_str}
+    Salt: {salt} (Generate completely unique and fresh questions)
     
-    Generate 5 challenging multiple-choice questions.
+    Generate exactly 4 challenging, random, and highly-varied multiple-choice questions.
     Return JSON format: 
     {
         "questions": [
