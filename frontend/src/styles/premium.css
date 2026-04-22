@@ -1,0 +1,48 @@
+:root {
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-blur: 8px;
+  --card-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --card-hover-shadow: 0 20px 30px rgba(79, 110, 247, 0.2);
+  --accent-primary: #4F6EF7;
+  --accent-secondary: #8E2DE2;
+}
+
+.premium-card {
+  background: var(--card-bg) !important;
+  backdrop-filter: blur(var(--card-blur));
+  -webkit-backdrop-filter: blur(var(--card-blur));
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease !important;
+}
+
+.premium-card:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(2deg) scale(1.02) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+  border-color: rgba(79, 110, 247, 0.4) !important;
+}
+
+/* 3D Depth Effect for Card Content */
+.premium-card > * {
+  transform: translateZ(20px);
+}
+
+/* Glassmorphism for Sidebar/Other elements */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 28px;
+}
+
+/* Subtle Floating Animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}

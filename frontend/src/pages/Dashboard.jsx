@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/premium.css';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import GoalInput from '../components/GoalInput';
@@ -10,14 +11,11 @@ const Dashboard = () => {
   const [goals, setGoals] = useState([]);
   const [userStats, setUserStats] = useState(null);
 
+  // Fetch goals only; profile data is fetched lazily in Profile page to avoid unnecessary AI calls.
   useEffect(() => {
     api.getGoals()
       .then(res => setGoals(res.data))
-      .catch(err => console.error("Failed to fetch goals:", err));
-      
-    api.getProfile()
-      .then(res => setUserStats(res.data))
-      .catch(err => console.error("Failed to fetch profile:", err));
+      .catch(err => console.error('Failed to fetch goals:', err));
   }, []);
 
   const handleDeleteGoal = async (e, id) => {
@@ -131,14 +129,14 @@ const Dashboard = () => {
                   {goals.map(goal => (
                     <motion.div key={goal.id} variants={itemVariants} className="col-md-6">
                       <div 
-                        className="card h-100 border-0 shadow-sm p-4 roadmap-card" 
-                        style={{ borderRadius: '24px', transition: 'all 0.3s ease', cursor: 'pointer', background: 'white', position: 'relative' }}
+                        className="card h-100 border-0 shadow-sm p-4 roadmap-card premium-card"
+                        style={{ borderRadius: '24px', transition: 'transform 0.4s ease, box-shadow 0.4s ease', cursor: 'pointer', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)', position: 'relative' }}
                         onClick={() => navigate(`/graph/${goal.id}`)}
                       >
                         <button 
                           onClick={(e) => handleDeleteGoal(e, goal.id)}
                           className="btn btn-link text-muted p-0"
-                          style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 10 }}
+                          style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 20, cursor: 'pointer' }}
                           title="Delete Roadmap"
                         >
                           <IoTrashOutline size={18} />
