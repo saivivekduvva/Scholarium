@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { IoArrowBack, IoBookOutline, IoVideocamOutline, IoNewspaperOutline, IoExtensionPuzzleOutline } from 'react-icons/io5';
+import { IoArrowBack, IoBookOutline, IoVideocamOutline, IoNewspaperOutline, IoExtensionPuzzleOutline, IoCheckmarkCircle } from 'react-icons/io5';
 import ReactMarkdown from 'react-markdown';
 import api from '../services/api';
 

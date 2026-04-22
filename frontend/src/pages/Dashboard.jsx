@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import GoalInput from '../components/GoalInput';
 import api from '../services/api';
-import { IoRocketOutline, IoFlameOutline, IoSparklesOutline, IoBookOutline, IoArrowForward } from 'react-icons/io5';
+import { IoRocketOutline, IoFlameOutline, IoSparklesOutline, IoBookOutline, IoArrowForward, IoTrashOutline } from 'react-icons/io5';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +19,16 @@ const Dashboard = () => {
       .then(res => setUserStats(res.data))
       .catch(err => console.error("Failed to fetch profile:", err));
   }, []);
+
+  const handleDeleteGoal = async (e, id) => {
+    e.stopPropagation();
+    try {
+      await api.deleteGoal(id);
+      setGoals(goals.filter(g => g.id !== id));
+    } catch (err) {
+      console.error("Failed to delete goal:", err);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
