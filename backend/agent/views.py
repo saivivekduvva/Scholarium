@@ -35,6 +35,16 @@ def award_xp(user, amount, activity_type):
     user.last_activity_date = today
     user.save()
 
+def find_similar_goal(title, existing_titles):
+    # Simple check to prevent duplicates
+    if not existing_titles:
+        return None
+    title_lower = title.lower().strip()
+    for existing in existing_titles:
+        if existing.lower().strip() == title_lower:
+            return existing
+    return None
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def create_goal(request):
@@ -90,6 +100,9 @@ def create_goal(request):
         
         return Response({'goal': GoalSerializer(goal).data, 'graph': graph_data}, status=status.HTTP_201_CREATED)
     except Exception as e:
+        import traceback
+        print(f"ERROR creating goal: {str(e)}")
+        print(traceback.format_exc())
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
