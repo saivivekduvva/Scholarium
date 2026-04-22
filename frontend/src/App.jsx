@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard';
 import GraphView from './pages/GraphView';
 import Session from './pages/Session';
 import Profile from './pages/Profile';
-import Leaderboard from './pages/Leaderboard';
+import Settings from './pages/Settings';
 import SubtopicDetail from './pages/SubtopicDetail';
 import ErrorPage from './pages/ErrorPage';
 import LoginPage from './pages/LoginPage';
@@ -23,10 +23,10 @@ const Navbar = () => {
     <nav className="scholarium-navbar">
       <Link to="/" className="scholarium-brand">Scholarium</Link>
       <div>
-        <Link to="/leaderboard" className="me-3 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Leaderboard</Link>
-        <Link to="/" className="btn btn-primary" style={{ backgroundColor: 'var(--accent-primary)', border: 'none', borderRadius: '8px' }}>New Goal</Link>
-        <Link to="/profile" className="ms-3 text-decoration-none" style={{ color: 'var(--text-secondary)' }}>Profile</Link>
-        <button onClick={logout} className="btn ms-3" style={{ border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px' }}>Logout</button>
+        <Link to="/" className="me-4 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Home</Link>
+        <Link to="/settings" className="me-4 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Settings</Link>
+        <Link to="/profile" className="me-4 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Profile</Link>
+        <button onClick={logout} className="btn" style={{ border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px' }}>Logout</button>
       </div>
     </nav>
   );
@@ -60,7 +60,7 @@ function App() {
             <Route path="/session/:skillId" element={<ProtectedRoute><Session /></ProtectedRoute>} />
             <Route path="/subtopic/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             
             <Route path="/error" element={<ErrorPage />} />
           </Routes>

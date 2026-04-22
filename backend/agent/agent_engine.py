@@ -4,7 +4,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime
 import hashlib
-from .mongo_client import evaluations_col, conversations_col, llm_cache_col
+from .mongo_client import mongo_brain
 
 class RateLimitError(Exception):
     pass
@@ -21,7 +21,7 @@ genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
 gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
 
 def log_conversation(session_id, role, content):
-    conversations_col.update_one(
+    mongo_brain.conversations.update_one(
         {'session_id': session_id},
         {'$push': {'messages': {'role': role, 'content': content}}, '$setOnInsert': {'created_at': datetime.utcnow()}},
         upsert=True
@@ -43,7 +43,7 @@ def call_gemini(system: str, user: str) -> str:
 def call_llm(system: str, user: str) -> str:
     prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
     
-    cached = llm_cache_col.find_one({'prompt_hash': prompt_hash})
+    cached = mongo_brain.llm_cache.find_one({'prompt_hash': prompt_hash})
     if cached:
         return cached['response']
         
@@ -69,7 +69,7 @@ def call_llm(system: str, user: str) -> str:
                 raise RateLimitError(str(e))
             raise e
         
-    llm_cache_col.insert_one({
+    mongo_brain.llm_cache.insert_one({
         'prompt_hash': prompt_hash,
         'system': system,
         'user': user,
@@ -237,7 +237,7 @@ def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> 
     }}"""
     try:
         resp = call_llm(system, user)
-        evaluations_col.insert_one({
+        mongo_brain.evaluations.insert_one({
             'session_id': session_id,
             'skill': skill,
             'question': question,

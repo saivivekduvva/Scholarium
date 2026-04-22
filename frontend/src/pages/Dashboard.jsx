@@ -48,7 +48,7 @@ const Dashboard = () => {
       }}>
         <div className="container">
           <div className="row align-items-center">
-            <div className="col-lg-8">
+            <div className="col-lg-12">
               <motion.div
                 initial="hidden"
                 animate="visible"
@@ -69,7 +69,7 @@ const Dashboard = () => {
                   style={{ background: 'rgba(79, 110, 247, 0.08)', color: 'var(--accent-primary)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px' }}
                 >
                   <IoRocketOutline size={16} />
-                  <span>YOUR PERSONAL LEARNING ENGINE</span>
+                  <span>YOUR PERSONAL MASTERY HUB</span>
                 </motion.div>
                 
                 <motion.h1 
@@ -97,37 +97,8 @@ const Dashboard = () => {
                   }}
                   style={{ fontSize: '20px', color: '#64748B', maxWidth: '600px', lineHeight: 1.6, fontWeight: 500 }}
                 >
-                  You've already mastered <span style={{ color: '#0F172A', fontWeight: 700 }}>{goals.length} mastery roadmaps</span>. Ready to dive back in or explore something new?
+                  Focus on your goals. You have <span style={{ color: '#0F172A', fontWeight: 700 }}>{goals.length} active roadmaps</span> in progress.
                 </motion.p>
-              </motion.div>
-            </div>
-            
-            <div className="col-lg-4">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, rotate: -2 }} 
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ duration: 0.8, type: 'spring' }}
-                className="d-flex flex-column gap-3 mt-5 mt-lg-0"
-              >
-                <div className="card border-0 shadow-sm p-4 d-flex flex-row align-items-center gap-4" style={{ borderRadius: '24px', background: 'white' }}>
-                  <div className="p-3 rounded-4" style={{ background: 'rgba(239, 68, 68, 0.08)', color: '#EF4444' }}>
-                    <IoFlameOutline size={32} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>{userStats?.streak_count || 0}</div>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Day Streak</div>
-                  </div>
-                </div>
-                
-                <div className="card border-0 shadow-sm p-4 d-flex flex-row align-items-center gap-4" style={{ borderRadius: '24px', background: 'white' }}>
-                  <div className="p-3 rounded-4" style={{ background: 'rgba(245, 158, 11, 0.08)', color: '#F59E0B' }}>
-                    <IoSparklesOutline size={32} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '32px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>{userStats?.total_xp || 0}</div>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Total XP</div>
-                  </div>
-                </div>
               </motion.div>
             </div>
           </div>
@@ -143,7 +114,6 @@ const Dashboard = () => {
               
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>Current Mastery Roadmaps</h3>
-                {goals.length > 0 && <span className="text-primary small fw-bold" style={{ cursor: 'pointer' }}>View All</span>}
               </div>
 
               {goals.length > 0 ? (
@@ -152,9 +122,17 @@ const Dashboard = () => {
                     <motion.div key={goal.id} variants={itemVariants} className="col-md-6">
                       <div 
                         className="card h-100 border-0 shadow-sm p-4 roadmap-card" 
-                        style={{ borderRadius: '24px', transition: 'all 0.3s ease', cursor: 'pointer', background: 'white' }}
+                        style={{ borderRadius: '24px', transition: 'all 0.3s ease', cursor: 'pointer', background: 'white', position: 'relative' }}
                         onClick={() => navigate(`/graph/${goal.id}`)}
                       >
+                        <button 
+                          onClick={(e) => handleDeleteGoal(e, goal.id)}
+                          className="btn btn-link text-muted p-0"
+                          style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 10 }}
+                          title="Delete Roadmap"
+                        >
+                          <IoTrashOutline size={18} />
+                        </button>
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div className="p-2 rounded-3" style={{ background: 'rgba(79, 110, 247, 0.1)', color: 'var(--accent-primary)' }}>
                             <IoRocketOutline size={24} />

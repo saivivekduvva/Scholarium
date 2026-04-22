@@ -22,3 +22,11 @@ class ProfileView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+class DeleteAccountView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

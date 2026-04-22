@@ -34,10 +34,16 @@ class LearningPath(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Session(models.Model):
+    STATUS_CHOICES = [
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed')
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions', null=True, blank=True)
     skill_node = models.ForeignKey(SkillNode, on_delete=models.CASCADE, related_name='sessions')
     score = models.IntegerField(default=0)
-    completed_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ongoing')
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
 class Checkpoint(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='checkpoints', null=True, blank=True)
@@ -51,16 +57,5 @@ class Subtopic(models.Model):
     description = models.TextField(blank=True)
     duration_mins = models.IntegerField(default=30)
     is_studied = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class XPActivity(models.Model):
-    ACTIVITY_TYPES = [
-        ('subtopic_complete', 'Subtopic Complete'),
-        ('session_pass', 'Session Pass'),
-        ('goal_complete', 'Goal Complete')
-    ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='xp_activities')
-    amount = models.IntegerField()
-    activity_type = models.CharField(max_length=50, choices=ACTIVITY_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
 

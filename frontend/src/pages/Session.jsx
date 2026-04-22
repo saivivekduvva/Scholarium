@@ -54,7 +54,6 @@ const Session = () => {
   }, [skillId, currentSubtopicIndex]);
 
   const [xpEarned, setXpEarned] = useState(null);
-
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   const handleAnswer = (answer) => {
@@ -69,11 +68,6 @@ const Session = () => {
         if (questions[currentIndex]?.prompt === currentQ.prompt) {
           setFeedback(res.data);
           setHistory(prev => [...prev, res.data]);
-          
-          if (res.data.xp_earned > 0) {
-            setXpEarned(res.data.xp_earned);
-            setTimeout(() => setXpEarned(null), 2000);
-          }
         }
       })
       .catch(err => {

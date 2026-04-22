@@ -26,10 +26,35 @@ def get_mongo_client():
             
     return MongoClient(uri)
 
-client = get_mongo_client()
-db = client['scholarium_logs']
+class MongoBrain:
+    _instance = None
 
-conversations_col = db['ai_conversations']
-graphs_col = db['skill_graphs']
-evaluations_col = db['raw_evaluations']
-llm_cache_col = db['llm_cache']
+    @classmethod
+    def get_db(cls):
+        if cls._instance is None:
+            cls._instance = get_mongo_client()
+        return cls._instance['scholarium_logs']
+
+    @property
+    def conversations(self):
+        return self.get_db()['ai_conversations']
+
+    @property
+    def graphs(self):
+        return self.get_db()['skill_graphs']
+
+    @property
+    def evaluations(self):
+        return self.get_db()['raw_evaluations']
+
+    @property
+    def llm_cache(self):
+        return self.get_db()['llm_cache']
+
+mongo_brain = MongoBrain()
+
+# For backward compatibility with existing code
+conversations_col = None # These will be handled by the proxy or we update the views
+graphs_col = None
+evaluations_col = None
+llm_cache_col = None

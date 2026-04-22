@@ -7,33 +7,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from datetime import date, timedelta
-from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic, XPActivity
+from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
 from .agent_engine import generate_roadmap, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
-from .mongo_client import graphs_col
+from .mongo_client import mongo_brain
 
-def award_xp(user, amount, activity_type):
-    # 1. Create XPActivity record
-    XPActivity.objects.create(user=user, amount=amount, activity_type=activity_type)
-    
-    # 2. Update total XP
-    user.total_xp += amount
-    
-    # 3. Update Streak
-    today = date.today()
-    if user.last_activity_date:
-        if user.last_activity_date == today - timedelta(days=1):
-            # Consecutive day!
-            user.streak_count += 1
-        elif user.last_activity_date < today - timedelta(days=1):
-            # Streak broken
-            user.streak_count = 1
-    else:
-        # First activity ever
-        user.streak_count = 1
-        
-    user.last_activity_date = today
-    user.save()
+# XP Awarding logic removed as requested.
 
 def find_similar_goal(title, existing_titles):
     # Simple check to prevent duplicates
@@ -63,7 +42,7 @@ def create_goal(request):
     if similar_title:
         existing_goal = Goal.objects.get(title=similar_title, user=request.user)
         # Fetch its graph from Mongo
-        graph = graphs_col.find_one({'goal_id': existing_goal.id}, sort=[('created_at', -1)])
+        graph = mongo_brain.graphs.find_one({'goal_id': existing_goal.id}, sort=[('created_at', -1)])
         if graph:
             graph['_id'] = str(graph['_id'])
             return Response({
@@ -89,7 +68,7 @@ def create_goal(request):
             )
             
         # Save to MongoDB
-        graphs_col.insert_one({
+        mongo_brain.graphs.insert_one({
             'goal_id': goal.id,
             'graph_json': graph_data,
             'version': 1,
@@ -103,11 +82,20 @@ def create_goal(request):
         print(traceback.format_exc())
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_goal(request, id):
+    goal = get_object_or_404(Goal, pk=id, user=request.user)
+    goal.delete()
+    # Note: Cascading deletes will handle SkillNodes, but we should ideally clean up Mongo too
+    mongo_brain.graphs.delete_many({'goal_id': id})
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_graph(request, id):
     goal = get_object_or_404(Goal, pk=id, user=request.user)
-    graph = graphs_col.find_one({'goal_id': goal.id}, sort=[('created_at', -1)])
+    graph = mongo_brain.graphs.find_one({'goal_id': goal.id}, sort=[('created_at', -1)])
     if not graph:
         return Response({'error': 'Graph not found'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -242,6 +230,9 @@ def evaluate_session_answer(request, id):
         score = result.get('score', 0)
         
         session.score = score
+        session.status = 'completed'
+        from django.utils import timezone
+        session.completed_at = timezone.now()
         session.save()
         
         checkpoint, _ = Checkpoint.objects.get_or_create(
@@ -253,13 +244,7 @@ def evaluate_session_answer(request, id):
         checkpoint.proficiency = max(checkpoint.proficiency, score)
         checkpoint.save()
         
-        # Award XP for session passing
-        xp_earned = 0
-        if score >= 70:
-            xp_earned = 50
-            award_xp(session.user, xp_earned, 'session_pass')
-        
-        return Response({**result, 'xp_earned': xp_earned})
+        return Response(result)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -276,28 +261,7 @@ def get_progress(request, user_id):
 from django.db.models import Sum
 from users.models import User
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_leaderboard(request):
-    # XP earned this week (last 7 days)
-    last_week = date.today() - timedelta(days=7)
-    
-    from django.db.models.functions import Coalesce
-    
-    top_users = User.objects.annotate(
-        weekly_xp=Coalesce(Sum('xp_activities__amount', filter=models.Q(xp_activities__created_at__gte=last_week)), 0)
-    ).order_by('-weekly_xp', '-total_xp')[:10]
-    
-    leaderboard = []
-    for user in top_users:
-        leaderboard.append({
-            'username': user.username,
-            'weekly_xp': user.weekly_xp,
-            'avatar_url': getattr(user, 'avatar_url', None), # Safe access
-            'total_xp': user.total_xp
-        })
-        
-    return Response(leaderboard)
+# Leaderboard removed as requested.
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
