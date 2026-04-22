@@ -124,40 +124,36 @@ def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
         print(f"Error in find_similar_goal: {e}")
         return None
 
-def identify_skills(goal: str) -> dict:
-    system = """You are a skill decomposition expert for Scholarium. 
-    Break down the goal into a logical sequence of skills. 
-    For each skill, identify its prerequisites and estimate the time required to master it.
+def generate_roadmap(goal: str) -> dict:
+    system = """You are a curriculum and graph layout expert for Scholarium. 
+    Break down the goal into a logical sequence of skills (DAG).
+    Return a JSON object containing both the list of skills and the visual graph layout (React Flow format).
+    
+    Nodes must have: id, type: 'skillNode', data: { label: 'name', description: 'desc' }, position {x, y}.
+    Edges must have: id, source, target.
+    
+    Arrange the nodes logically from left to right (foundational to advanced).
+    
     Return ONLY valid JSON."""
     
     user = f"""Goal: {goal}
     Return JSON: {{
         "skills": [
-            {{
-                "id": "unique_id_string", 
-                "name": "Skill Name", 
-                "description": "Short description", 
-                "prerequisites": ["prereq_id_1"],
-                "estimated_hours": 5
-            }}
-        ]
+            {{ "id": "s1", "name": "Skill Name", "description": "Short description", "estimated_hours": 5 }}
+        ],
+        "graph": {{
+            "nodes": [
+                {{ "id": "s1", "type": "skillNode", "data": {{ "label": "Skill Name", "description": "Short description" }}, "position": {{ "x": 0, "y": 0 }} }}
+            ],
+            "edges": []
+        }}
     }}"""
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
     except Exception as e:
-        print(f"Error parsing identify_skills: {e}")
-        raise ValueError("Failed to parse JSON")
-
-def generate_graph_layout(skills: list) -> dict:
-    system = "You are a graph layout expert. Return ONLY valid JSON."
-    user = f"Skills: {json.dumps(skills)}\nReturn JSON with nodes and edges for a DAG.\nEach node: {{\"id\": \"id\", \"label\": \"name\", \"position\": {{\"x\": 0, \"y\": 0}}, \"data\": {{\"description\": \"desc\"}}}}.\nEach edge: {{\"id\": \"e1-2\", \"source\": \"id1\", \"target\": \"id2\"}}.\nFormat: {{\"nodes\": [], \"edges\": []}}"
-    try:
-        resp = call_llm(system, user)
-        return _parse_json(resp)
-    except Exception as e:
-        print(f"Error parsing generate_graph_layout: {e}")
-        raise ValueError("Failed to parse JSON")
+        print(f"Error in generate_roadmap: {e}")
+        raise ValueError("Failed to generate roadmap JSON")
 
 def expand_subtopics(skill_name: str) -> dict:
     system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 6-8 logically sequenced, UNIQUE subtopics.

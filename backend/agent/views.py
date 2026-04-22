@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from datetime import date, timedelta
 from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic, XPActivity
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
-from .agent_engine import identify_skills, generate_graph_layout, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
+from .agent_engine import generate_roadmap, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
 from .mongo_client import graphs_col
 
 def award_xp(user, amount, activity_type):
@@ -75,8 +75,9 @@ def create_goal(request):
     goal = Goal.objects.create(title=title, description=description, user=request.user, status='active')
     
     try:
-        skills_data = identify_skills(title)
-        skills_list = skills_data.get('skills', [])
+        roadmap = generate_roadmap(title)
+        skills_list = roadmap.get('skills', [])
+        graph_data = roadmap.get('graph', {'nodes': [], 'edges': []})
         
         # Save SkillNodes
         for skill in skills_list:
@@ -87,9 +88,6 @@ def create_goal(request):
                 estimated_hours=skill.get('estimated_hours', 1)
             )
             
-        # Generate Graph
-        graph_data = generate_graph_layout(skills_list)
-        
         # Save to MongoDB
         graphs_col.insert_one({
             'goal_id': goal.id,
