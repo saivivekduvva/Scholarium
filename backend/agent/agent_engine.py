@@ -47,16 +47,27 @@ def call_llm(system: str, user: str) -> str:
     if cached:
         return cached['response']
         
-    provider = os.environ.get('LLM_PROVIDER', 'claude').lower()
+    provider = os.environ.get('LLM_PROVIDER', 'gemini').lower()
     try:
-        if provider == 'gemini':
-            response_text = call_gemini(system, user)
-        else:
+        if provider == 'claude' and anthropic_client:
             response_text = call_claude(system, user)
+        else:
+            response_text = call_gemini(system, user)
     except Exception as e:
-        if '429' in str(e) or 'quota' in str(e).lower() or getattr(e, 'code', None) == 429:
-            raise RateLimitError(str(e))
-        raise e
+        # Emergency Fallback
+        if provider == 'claude':
+            print(f"Claude failed ({str(e)}), falling back to Gemini...")
+            response_text = call_gemini(system, user)
+        elif provider == 'gemini' and anthropic_client:
+            print(f"Gemini failed ({str(e)}), falling back to Claude...")
+            try:
+                response_text = call_claude(system, user)
+            except:
+                raise e
+        else:
+            if '429' in str(e) or 'quota' in str(e).lower():
+                raise RateLimitError(str(e))
+            raise e
         
     llm_cache_col.insert_one({
         'prompt_hash': prompt_hash,
