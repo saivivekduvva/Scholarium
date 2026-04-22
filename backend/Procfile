@@ -1,2 +1,2 @@
-web: python manage.py migrate --no-input --verbosity 3 && gunicorn scholarium_project.wsgi --bind 0.0.0.0:$PORT
-release: python manage.py migrate --no-input --verbosity 3 && python manage.py collectstatic --no-input
+web: python manage.py migrate --no-input && gunicorn scholarium_project.wsgi --bind 0.0.0.0:$PORT
+release: python manage.py migrate --no-input && python manage.py collectstatic --no-input
