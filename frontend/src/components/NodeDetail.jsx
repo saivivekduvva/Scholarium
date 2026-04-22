@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import XPToast from './XPToast';
 import { IoBookOutline, IoTimeOutline, IoCheckmarkCircle, IoRefreshOutline } from 'react-icons/io5';
 
 const subtopicsCache = {};
@@ -247,7 +246,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
         <div className="alert alert-info mt-4" style={{ borderRadius: '16px', fontSize: '13px' }}>
           💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
         </div>
-        <XPToast xp={xpEarned} visible={!!xpEarned} />
+
       </motion.div>
     </>
   );

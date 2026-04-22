@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import PracticeCard from '../components/PracticeCard';
 import FeedbackPanel from '../components/FeedbackPanel';
 import ProgressRing from '../components/ProgressRing';
-import XPToast from '../components/XPToast';
 import api from '../services/api';
 
 const Session = () => {
@@ -200,7 +199,7 @@ const Session = () => {
           <FeedbackPanel feedbackHistory={history} />
         </div>
       </div>
-      <XPToast xp={xpEarned} visible={!!xpEarned} />
+
     </motion.div>
   );
 };
