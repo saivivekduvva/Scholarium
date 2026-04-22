@@ -1,5 +1,6 @@
 import os
 import json
+import requests
 import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime
@@ -259,15 +260,39 @@ def generate_summary(user_id: int, checkpoints: list) -> str:
         return "Failed to generate summary."
 
 def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subtopics: list = None) -> str:
-    system = """You are a world-class technical educator for Scholarium. 
-    Your goal is to write a highly relevant, accurate, and deep explanation for a specific subtopic.
+    # 1. Scrape-First Strategy using Wikipedia
+    search_query = f"{skill_name} {subtopic_title}".replace(" ", "+")
+    wiki_url = f"https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch={search_query}&gsrlimit=1&prop=extracts|info&inprop=url&exsentences=7&explaintext=1&format=json"
+    
+    try:
+        resp = requests.get(wiki_url, headers={'User-Agent': 'ScholariumApp/1.0'}, timeout=5)
+        if resp.status_code == 200:
+            data = resp.json()
+            if 'query' in data and 'pages' in data['query']:
+                pages = data['query']['pages']
+                for page_id in pages:
+                    page = pages[page_id]
+                    extract = page.get('extract', '').strip()
+                    url = page.get('fullurl', '')
+                    title = page.get('title', '')
+                    
+                    if extract and len(extract) > 100:
+                        markdown_response = f"### {title}\n\n"
+                        markdown_response += f"{extract}\n\n"
+                        markdown_response += f"**Reference:** [Wikipedia: {title}]({url})\n"
+                        return markdown_response
+    except Exception as e:
+        print(f"Wikipedia scrape failed: {e}")
+
+    # 2. LLM Fallback Strategy
+    system = """You are a technical educator for Scholarium.
     
     STRICT RULES:
-    1. RELEVANCE: Only talk about the specific subtopic. Do NOT drift into advanced topics or unrelated frameworks unless they are absolutely necessary for the core concept.
-    2. CONTEXT BOUNDARIES: You are given a list of other subtopics in this skill. DO NOT explain those other topics; stay within your specific boundary.
-    3. NO HALLUCINATIONS: If the skill is 'Java' and subtopic is 'Intro', do not talk about 'Spring' or 'Hibernate'.
-    4. FORMATTING: Use clean Markdown, bold headers, and high-quality code examples.
-    5. STRUCTURE: Start with a high-level overview, followed by core details, and end with a practical example."""
+    1. RELEVANCE: Only talk about the specific subtopic.
+    2. CONCISE: Keep the explanation clear-cut and strictly UNDER 350 WORDS.
+    3. NO HALLUCINATIONS: Stay strictly within the technical bounds.
+    4. FORMATTING: Use clean Markdown, bold headers, and short code examples if needed.
+    5. REFERENCES: At the end of the explanation, provide 2-3 reference links (e.g., official docs, MDN, Wikipedia) for further reading."""
     
     context_str = ", ".join(context_subtopics) if context_subtopics else "No other topics provided."
     user = f"""Skill: {skill_name}
@@ -275,7 +300,7 @@ def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subto
     
     Context (Other subtopics in this skill - DO NOT EXPLAIN THESE): {context_str}
     
-    Write a comprehensive, professional explanation for '{subtopic_title}' only."""
+    Write a clear-cut explanation for '{subtopic_title}' only (under 350 words). Include 2-3 reference links."""
     
     try:
         return call_llm(system, user)
