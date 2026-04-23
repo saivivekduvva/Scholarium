@@ -10,12 +10,24 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const username = localStorage.getItem('username');
-    if (token && username) {
-      setUser({ username });
-    }
-    setLoading(false);
+    const fetchUser = async () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          const response = await api.getProfile();
+          setUser(response.data);
+        } catch (error) {
+          console.error('Failed to fetch profile', error);
+          // If profile fetch fails, token might be invalid
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('username');
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+    fetchUser();
   }, []);
 
   const login = async (username, password) => {

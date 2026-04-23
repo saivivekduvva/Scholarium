@@ -7,10 +7,17 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from datetime import date, timedelta
+from users.models import User
 from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
 from .agent_engine import generate_roadmap, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
 from .mongo_client import mongo_brain
+
+def award_xp(user, amount, reason):
+    # Placeholder for XP logic. For now, just log it.
+    print(f"AWARDING {amount} XP to {user.username} for {reason}")
+    # In a real app, you'd update a Profile model or similar here.
+    pass
 
 # XP Awarding logic removed as requested.
 
@@ -251,15 +258,20 @@ def evaluate_session_answer(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_progress(request, user_id):
-    sessions = Session.objects.filter(user=request.user)
-    checkpoints = Checkpoint.objects.filter(user=request.user)
-    return Response({
-        'sessions': SessionSerializer(sessions, many=True).data,
-        'checkpoints': CheckpointSerializer(checkpoints, many=True).data
-    })
+    try:
+        sessions = Session.objects.filter(user=request.user)
+        checkpoints = Checkpoint.objects.filter(user=request.user)
+        return Response({
+            'sessions': SessionSerializer(sessions, many=True).data,
+            'checkpoints': CheckpointSerializer(checkpoints, many=True).data
+        })
+    except Exception as e:
+        import traceback
+        print(f"ERROR in get_progress: {str(e)}")
+        print(traceback.format_exc())
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 from django.db.models import Sum
-from users.models import User
 
 # Leaderboard removed as requested.
 

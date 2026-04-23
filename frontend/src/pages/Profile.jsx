@@ -10,26 +10,27 @@ const Profile = () => {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    // Mock user_id = 1
-    api.getProgress(1)
-      .then(res => {
-        setData(res.data);
-      })
-      .catch(err => {
-        console.error(err);
-        // Fallback for UI if DB empty
-        setData({
-          checkpoints: [
-            { skill_name: 'Python', proficiency: 85 },
-            { skill_name: 'Django', proficiency: 60 },
-            { skill_name: 'React', proficiency: 40 },
-          ],
-          sessions: [
-            { completed_at: '2025-05-14T10:00:00Z', score: 85 }
-          ]
+    if (user?.id) {
+      api.getProgress(user.id)
+        .then(res => {
+          setData(res.data);
+        })
+        .catch(err => {
+          console.error(err);
+          // Fallback for UI if DB empty or error
+          setData({
+            checkpoints: [],
+            sessions: []
+          });
         });
+    } else {
+      // If user not loaded yet or no id, show empty state
+      setData({
+        checkpoints: [],
+        sessions: []
       });
-  }, []);
+    }
+  }, [user]);
 
   if (!data) {
     return <div className="text-center py-5">Loading profile...</div>;

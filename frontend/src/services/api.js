@@ -27,7 +27,10 @@ api.interceptors.response.use(
       }
     }
     if (error.response && error.response.status === 500) {
-      window.location.href = '/error';
+      const url = error.config?.url || '';
+      if (!url.includes('progress') && !url.includes('profile')) {
+        window.location.href = '/error';
+      }
     }
     return Promise.reject(error);
   }
