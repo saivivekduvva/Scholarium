@@ -269,7 +269,11 @@ def get_progress(request, user_id):
         import traceback
         print(f"ERROR in get_progress: {str(e)}")
         print(traceback.format_exc())
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Return empty data gracefully instead of 500 to prevent frontend crashes
+        return Response({
+            'sessions': [],
+            'checkpoints': []
+        })
 
 from django.db.models import Sum
 

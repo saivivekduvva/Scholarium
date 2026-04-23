@@ -16,7 +16,10 @@ const GraphView = () => {
   useEffect(() => {
     Promise.all([
       api.getGraph(goalId),
-      api.getProgress(1)
+      api.getProgress(1).catch(err => {
+        console.error("Progress fetch failed, falling back to empty:", err);
+        return { data: { checkpoints: [] } };
+      })
     ])
       .then(([graphRes, progressRes]) => {
         const rawGraph = graphRes.data;
