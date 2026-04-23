@@ -118,36 +118,37 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
           position: 'fixed', left: 0, right: 0, margin: '0 auto', top: '5vh', bottom: '5vh',
           width: '92%', maxWidth: '800px',
           backgroundColor: 'var(--bg-surface)', boxShadow: '0 32px 80px rgba(0,0,0,0.2)',
-          zIndex: 1001, padding: 'clamp(20px, 5vw, 40px)', overflowY: 'auto', borderRadius: '24px'
+          zIndex: 1001, padding: 'clamp(20px, 5vw, 40px)', overflowY: 'auto', borderRadius: '24px',
+          border: '1px solid var(--border)', transition: 'background-color 0.3s ease, color 0.3s ease'
         }}
       >
-        <button onClick={onClose} className="btn-close float-end"></button>
-        <h4 className="mb-1" style={{ fontFamily: 'Outfit', fontWeight: 700 }}>Scholarium — {skillName}</h4>
+        <button onClick={onClose} className="btn-close float-end" style={{ filter: 'var(--theme-invert)' }}></button>
+        <h4 className="mb-1" style={{ fontFamily: 'Outfit', fontWeight: 700, color: 'var(--text-primary)' }}>Scholarium — {skillName}</h4>
         <span className="badge mb-4" style={{ backgroundColor: 'var(--accent-primary)' }}>{node.data.status || 'Active'}</span>
         
         <div className="mb-4">
-          <label className="form-label text-muted small">Proficiency</label>
-          <div className="progress" style={{ height: '8px' }}>
+          <label className="form-label text-muted small" style={{ color: 'var(--text-muted)' }}>Proficiency</label>
+          <div className="progress" style={{ height: '8px', backgroundColor: 'var(--border)' }}>
             <div className="progress-bar" style={{ width: `${currentProgress}%`, backgroundColor: 'var(--accent-secondary)' }}></div>
           </div>
-          <div className="text-end small text-muted mt-1 fw-bold">{currentProgress}% Mastery</div>
+          <div className="text-end small text-muted mt-1 fw-bold" style={{ color: 'var(--text-muted)' }}>{currentProgress}% Mastery</div>
         </div>
 
-        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-4 pb-3 border-bottom">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-4 pb-3 border-bottom" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <h5 className="mb-0 fw-bold" style={{ color: '#0F172A' }}>Curriculum Flow</h5>
-            <p className="text-muted small mb-0">Master each module to reach full proficiency</p>
+            <h5 className="mb-0 fw-bold" style={{ color: 'var(--text-primary)' }}>Curriculum Flow</h5>
+            <p className="text-muted small mb-0" style={{ color: 'var(--text-muted)' }}>Master each module to reach full proficiency</p>
           </div>
           <div className="d-flex flex-wrap align-items-center gap-2">
             <button 
               className={`btn btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill ${isRefreshing ? 'disabled' : ''}`}
-              style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', color: '#64748B' }}
+              style={{ fontSize: '11px', fontWeight: 700, backgroundColor: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
               onClick={refreshSubtopics}
             >
               <IoRefreshOutline className={isRefreshing ? 'spin' : ''} size={14} />
               {isRefreshing ? 'Refining...' : 'Refresh'}
             </button>
-            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold" style={{ fontSize: '12px' }}>
+            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold" style={{ fontSize: '12px', background: 'var(--border)', color: 'var(--accent-primary)' }}>
               {subtopics?.length || 0} Modules
             </span>
           </div>
@@ -158,7 +159,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
         ) : !subtopics ? (
           <div className="py-5 text-center">
             <div className="spinner-border text-primary mb-3" />
-            <p className="text-muted">Analyzing curriculum structure...</p>
+            <p className="text-muted" style={{ color: 'var(--text-muted)' }}>Analyzing curriculum structure...</p>
           </div>
         ) : (
           <div className="position-relative ps-4 ms-2">
@@ -166,7 +167,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
             <div 
               style={{ 
                 position: 'absolute', left: '0', top: '10px', bottom: '10px', width: '2px', 
-                background: 'linear-gradient(to bottom, var(--accent-primary), rgba(79, 110, 247, 0.1))',
+                background: 'linear-gradient(to bottom, var(--accent-primary), var(--border))',
                 borderRadius: '2px'
               }} 
             />
@@ -194,8 +195,8 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
                       style={{ 
                         position: 'absolute', left: '-33px', top: '50%', transform: 'translateY(-50%)',
                         width: '20px', height: '20px', borderRadius: '50%',
-                        backgroundColor: isDone ? '#06C9A0' : 'white',
-                        border: `4px solid ${isDone ? '#e6fcf5' : '#f1f5f9'}`,
+                        backgroundColor: isDone ? '#06C9A0' : 'var(--bg-surface)',
+                        border: `4px solid ${isDone ? 'rgba(6, 201, 160, 0.2)' : 'var(--border)'}`,
                         boxShadow: isDone ? '0 0 0 4px rgba(6, 201, 160, 0.1)' : 'none',
                         zIndex: 2, transition: 'all 0.3s ease'
                       }}
@@ -206,8 +207,8 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
                       onClick={() => handleToggleSubtopic(st, i)}
                       className="p-4"
                       style={{ 
-                        backgroundColor: isDone ? 'rgba(6, 201, 160, 0.02)' : 'white', 
-                        border: `1px solid ${isDone ? '#06C9A0' : 'rgba(0,0,0,0.04)'}`,
+                        backgroundColor: isDone ? 'rgba(6, 201, 160, 0.05)' : 'var(--bg-surface)', 
+                        border: `1px solid ${isDone ? '#06C9A0' : 'var(--border)'}`,
                         borderRadius: '24px',
                         cursor: 'pointer',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
@@ -217,17 +218,17 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
                       <div className="row align-items-center">
                         <div className="col-md-8">
                           <div className="d-flex align-items-center gap-2 mb-1">
-                            <span className="fw-bold" style={{ fontSize: '16px', color: '#0F172A' }}>{st.title}</span>
+                            <span className="fw-bold" style={{ fontSize: '16px', color: 'var(--text-primary)' }}>{st.title}</span>
                             {isDone && <IoCheckmarkCircle className="text-success" size={18} />}
                           </div>
-                          <p className="text-muted small mb-0 d-flex align-items-center gap-2">
+                          <p className="text-muted small mb-0 d-flex align-items-center gap-2" style={{ color: 'var(--text-muted)' }}>
                             <IoTimeOutline size={14} /> {st.duration_mins} mins &bull; {st.description || 'Module ' + (i+1)}
                           </p>
                         </div>
                         <div className="col-md-4 text-md-end mt-3 mt-md-0">
                           <button 
                             className={`btn btn-sm px-4 py-2 rounded-pill fw-bold ${isDone ? 'btn-light text-muted' : 'btn-primary shadow-sm'}`} 
-                            style={{ fontSize: '12px' }}
+                            style={{ fontSize: '12px', ...(isDone ? { backgroundColor: 'var(--border)', color: 'var(--text-muted)', border: 'none' } : {}) }}
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
@@ -245,7 +246,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
           </div>
         )}
 
-        <div className="alert alert-info mt-4" style={{ borderRadius: '16px', fontSize: '13px' }}>
+        <div className="alert alert-info mt-4" style={{ borderRadius: '16px', fontSize: '13px', backgroundColor: 'var(--border)', color: 'var(--text-primary)', border: 'none' }}>
           💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
         </div>
 

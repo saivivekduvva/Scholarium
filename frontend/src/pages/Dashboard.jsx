@@ -44,17 +44,19 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 120px)', backgroundColor: '#F8FAFC', paddingBottom: '80px' }}>
+    <div style={{ minHeight: 'calc(100vh - 120px)', backgroundColor: 'var(--bg-page)', paddingBottom: '80px', transition: 'background-color 0.3s ease' }}>
       
       {/* Premium Hero Header Section */}
       <div style={{ 
         position: 'relative', 
         overflow: 'hidden',
-        background: 'radial-gradient(circle at top right, rgba(79, 110, 247, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(142, 45, 226, 0.03), transparent 30%), #FFFFFF',
-        borderBottom: '1px solid #E2E8F0', 
-        padding: '80px 0 60px 0' 
+        background: 'var(--bg-surface)',
+        borderBottom: '1px solid var(--border)', 
+        padding: '80px 0 60px 0',
+        transition: 'background-color 0.3s ease'
       }}>
-        <div className="container">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.4, background: 'radial-gradient(circle at top right, var(--accent-primary), transparent 40%), radial-gradient(circle at bottom left, var(--accent-secondary), transparent 30%)', zIndex: 0 }}></div>
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div className="row align-items-center">
             <div className="col-lg-12">
               <motion.div
@@ -74,7 +76,7 @@ const Dashboard = () => {
                     visible: { opacity: 1, y: 0 } 
                   }}
                   className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4"
-                  style={{ background: 'rgba(79, 110, 247, 0.08)', color: 'var(--accent-primary)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px' }}
+                  style={{ background: 'var(--border)', color: 'var(--accent-primary)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px' }}
                 >
                   <IoRocketOutline size={16} />
                   <span>YOUR PERSONAL MASTERY HUB</span>
@@ -85,7 +87,7 @@ const Dashboard = () => {
                     hidden: { opacity: 0, y: 20 }, 
                     visible: { opacity: 1, y: 0 } 
                   }}
-                  style={{ fontSize: '56px', fontWeight: 800, color: '#0F172A', marginBottom: '16px', lineHeight: 1.1, letterSpacing: '-1px' }}
+                  style={{ fontSize: '56px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '16px', lineHeight: 1.1, letterSpacing: '-1px' }}
                 >
                   Welcome back,<br />
                   <span style={{ 
@@ -103,9 +105,9 @@ const Dashboard = () => {
                     hidden: { opacity: 0, y: 20 }, 
                     visible: { opacity: 1, y: 0 } 
                   }}
-                  style={{ fontSize: '20px', color: '#64748B', maxWidth: '600px', lineHeight: 1.6, fontWeight: 500 }}
+                  style={{ fontSize: '20px', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: 1.6, fontWeight: 500 }}
                 >
-                  Focus on your goals. You have <span style={{ color: '#0F172A', fontWeight: 700 }}>{goals.length} active roadmaps</span> in progress.
+                  Focus on your goals. You have <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{goals.length} active roadmaps</span> in progress.
                 </motion.p>
               </motion.div>
             </div>
@@ -121,7 +123,7 @@ const Dashboard = () => {
             <motion.div variants={containerVariants} initial="hidden" animate="visible">
               
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>Current Mastery Roadmaps</h3>
+                <h3 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>Current Mastery Roadmaps</h3>
               </div>
 
               {goals.length > 0 ? (
@@ -130,32 +132,32 @@ const Dashboard = () => {
                     <motion.div key={goal.id} variants={itemVariants} className="col-md-6">
                       <div 
                         className="card h-100 border-0 shadow-sm p-4 roadmap-card premium-card"
-                        style={{ borderRadius: '24px', transition: 'transform 0.4s ease, box-shadow 0.4s ease', cursor: 'pointer', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)', position: 'relative' }}
+                        style={{ borderRadius: '24px', transition: 'all 0.4s ease', cursor: 'pointer', background: 'var(--bg-glass)', backdropFilter: 'blur(8px)', position: 'relative', border: '1px solid var(--border) !important' }}
                         onClick={() => navigate(`/graph/${goal.id}`)}
                       >
                         <div className="d-flex justify-content-between align-items-start mb-3">
-                          <div className="p-2 rounded-3" style={{ background: 'rgba(79, 110, 247, 0.1)', color: 'var(--accent-primary)' }}>
+                          <div className="p-2 rounded-3" style={{ background: 'var(--border)', color: 'var(--accent-primary)' }}>
                             <IoRocketOutline size={24} />
                           </div>
                           <div className="d-flex align-items-center gap-2">
-                            <span className={`badge rounded-pill px-3 py-2 ${goal.status === 'active' ? 'bg-light text-primary' : 'bg-success-subtle text-success'}`} style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>
+                            <span className={`badge rounded-pill px-3 py-2 ${goal.status === 'active' ? 'bg-primary-subtle text-primary' : 'bg-success-subtle text-success'}`} style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>
                               {goal.status}
                             </span>
                             <button 
                               onClick={(e) => handleDeleteGoal(e, goal.id)}
                               className="btn btn-link text-muted p-0 ms-1"
-                              style={{ zIndex: 20, cursor: 'pointer' }}
+                              style={{ zIndex: 20, cursor: 'pointer', color: 'var(--text-muted)' }}
                               title="Delete Roadmap"
                             >
                               <IoTrashOutline size={18} />
                             </button>
                           </div>
                         </div>
-                        <h4 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>{goal.title}</h4>
-                        <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <h4 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>{goal.title}</h4>
+                        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                           {goal.description || 'Mastering the fundamentals and advanced concepts...'}
                         </p>
-                        <div className="mt-auto d-flex align-items-center justify-content-between pt-3 border-top" style={{ borderColor: '#F1F5F9' }}>
+                        <div className="mt-auto d-flex align-items-center justify-content-between pt-3 border-top" style={{ borderColor: 'var(--border)' }}>
                           <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--accent-primary)' }}>Continue Learning</span>
                           <IoArrowForward size={18} className="text-primary" />
                         </div>
@@ -164,7 +166,7 @@ const Dashboard = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-5 bg-white rounded-4 border border-dashed shadow-sm">
+                <div className="text-center py-5 bg-white rounded-4 border border-dashed shadow-sm" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
                   <IoBookOutline size={48} className="text-muted mb-3" />
                   <h5 className="text-muted">No roadmaps yet</h5>
                   <p className="text-muted small">Start your first goal to see it here.</p>
@@ -180,10 +182,10 @@ const Dashboard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="card border-0 shadow-lg p-4" 
-              style={{ borderRadius: '28px', background: 'white', position: 'sticky', top: '100px' }}
+              style={{ borderRadius: '28px', background: 'var(--bg-surface)', border: '1px solid var(--border)', position: 'sticky', top: '100px' }}
             >
-              <h4 style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>New Roadmap</h4>
-              <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '24px' }}>Describe your goal, and our AI will build a personalized study path for you.</p>
+              <h4 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>New Roadmap</h4>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '24px' }}>Describe your goal, and our AI will build a personalized study path for you.</p>
               
               <div className="goal-input-wrapper mt-2">
                 <GoalInput />
@@ -202,7 +204,7 @@ const Dashboard = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         .roadmap-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 12px 24px rgba(79, 110, 247, 0.12) !important;
+          box-shadow: var(--shadow-card) !important;
         }
         .roadmap-card:hover h4 {
           color: var(--accent-primary) !important;

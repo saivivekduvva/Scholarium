@@ -20,7 +20,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
+    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: 'var(--bg-page)', transition: 'background-color 0.3s ease' }}>
       {/* High-level Bubbly Background */}
       {[...Array(8)].map((_, i) => (
         <motion.div
@@ -40,7 +40,7 @@ const RegisterPage = () => {
             width: 100 + Math.random() * 300,
             height: 100 + Math.random() * 300,
             borderRadius: '50%',
-            background: i % 2 === 0 ? 'rgba(79,110,247,0.1)' : 'rgba(142,45,226,0.08)',
+            background: i % 2 === 0 ? 'rgba(79,110,247,0.08)' : 'rgba(142,45,226,0.06)',
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
             filter: 'blur(40px)',
@@ -55,50 +55,50 @@ const RegisterPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
-            background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            borderRadius: '24px', border: '1px solid rgba(0, 0, 0, 0.05)', padding: '48px', width: '100%', maxWidth: '420px',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.05)', color: '#1e293b'
+            background: 'var(--bg-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: '24px', border: '1px solid var(--border)', padding: '48px', width: '100%', maxWidth: '420px',
+            boxShadow: 'var(--shadow-card)', color: 'var(--text-primary)'
           }}
         >
           <div className="text-center mb-4">
-            <div className="d-inline-block px-3 py-1 rounded-pill mb-3" style={{ background: 'rgba(79,110,247,0.1)', color: '#4F6EF7', fontSize: '12px', fontWeight: 700 }}>JOIN SCHOLARIUM</div>
-            <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '32px', color: '#0f172a' }}>Create Account</h2>
+            <div className="d-inline-block px-3 py-1 rounded-pill mb-3" style={{ background: 'var(--border)', color: 'var(--accent-primary)', fontSize: '12px', fontWeight: 700 }}>JOIN SCHOLARIUM</div>
+            <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '32px', color: 'var(--text-primary)' }}>Create Account</h2>
           </div>
           
           {error && <div className="alert alert-danger" style={{ fontSize: '14px', borderRadius: '8px' }}>{error}</div>}
           
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label" style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Username</label>
+              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Username</label>
               <input 
                 type="text" 
                 className="form-control" 
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)} 
                 required 
-                style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px 16px', borderRadius: '12px' }} 
+                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
               />
             </div>
             <div className="mb-3">
-              <label className="form-label" style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Email</label>
+              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Email</label>
               <input 
                 type="email" 
                 className="form-control" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
-                style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px 16px', borderRadius: '12px' }} 
+                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
               />
             </div>
             <div className="mb-5">
-              <label className="form-label" style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Password</label>
+              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Password</label>
               <input 
                 type="password" 
                 className="form-control" 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
-                style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px 16px', borderRadius: '12px' }} 
+                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
               />
             </div>
             <motion.button 
@@ -111,8 +111,8 @@ const RegisterPage = () => {
               Sign Up
             </motion.button>
           </form>
-          <div className="text-center mt-4" style={{ color: '#64748b', fontSize: '14px' }}>
-            Already have an account? <Link to="/login" style={{ color: '#4F6EF7', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
+          <div className="text-center mt-4" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
+            Already have an account? <Link to="/login" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
           </div>
         </motion.div>
       </div>

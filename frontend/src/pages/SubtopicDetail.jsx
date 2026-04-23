@@ -120,10 +120,10 @@ const SubtopicDetail = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh', backgroundColor: 'var(--bg-page)', transition: 'background-color 0.3s ease' }}>
         <div className="text-center">
           <div className="spinner-border text-primary mb-3" role="status" />
-          <p className="text-muted">AI is crafting your perfect explanation...</p>
+          <p className="text-muted" style={{ color: 'var(--text-muted)' }}>AI is crafting your perfect explanation...</p>
         </div>
       </div>
     );
@@ -134,11 +134,12 @@ const SubtopicDetail = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="container py-5"
-      style={{ maxWidth: '1100px' }}
+      style={{ maxWidth: '1100px', backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)', transition: 'all 0.3s ease' }}
     >
       <button 
         onClick={() => navigate(-1)} 
         className="btn btn-link text-decoration-none text-muted mb-4 p-0 d-flex align-items-center gap-2"
+        style={{ color: 'var(--text-muted)' }}
       >
         <IoArrowBack /> Back to Roadmap
       </button>
@@ -146,12 +147,12 @@ const SubtopicDetail = () => {
       <div className="row g-5">
         {/* Main Content */}
         <div className="col-lg-8">
-          <h1 className="display-5 fw-bold mb-2" style={{ fontFamily: 'Outfit' }}>{subtopicTitle}</h1>
+          <h1 className="display-5 fw-bold mb-2" style={{ fontFamily: 'Outfit', color: 'var(--text-primary)' }}>{subtopicTitle}</h1>
           <div className="d-flex flex-wrap align-items-center gap-3 mb-5">
-            <p className="text-primary fw-medium m-0">{skillName} &bull; Deep Dive</p>
+            <p className="text-primary fw-medium m-0" style={{ color: 'var(--accent-primary)' }}>{skillName} &bull; Deep Dive</p>
             <div 
               className="d-flex align-items-center gap-2 px-3 py-1 rounded-pill" 
-              style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', fontSize: '12px', color: 'var(--accent-primary)' }}
+              style={{ backgroundColor: 'var(--border)', border: '1px solid var(--border)', fontSize: '12px', color: 'var(--accent-primary)' }}
             >
               <IoExtensionPuzzleOutline size={14} />
               <span className="fw-bold">Source: {source}</span>
@@ -163,18 +164,18 @@ const SubtopicDetail = () => {
             )}
           </div>
 
-          <div className="prose bg-white p-5 rounded-4 shadow-sm border mb-5" style={{ borderColor: 'var(--border)', minHeight: '600px' }}>
+          <div className="prose p-5 rounded-4 shadow-sm border mb-5" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)', minHeight: '600px', color: 'var(--text-primary)' }}>
             <ReactMarkdown>{explanation}</ReactMarkdown>
           </div>
 
           {/* Mastery Assessment Section */}
-          <section id="assessment" className="mt-5 pt-5 border-top">
-            <div className="card border-0 shadow-lg p-5" style={{ borderRadius: '32px', background: 'linear-gradient(135deg, #f8faff 0%, #ffffff 100%)', border: '1px solid rgba(79, 110, 247, 0.1) !important' }}>
+          <section id="assessment" className="mt-5 pt-5 border-top" style={{ borderColor: 'var(--border)' }}>
+            <div className="card border-0 shadow-lg p-5" style={{ borderRadius: '32px', background: 'var(--bg-surface)', border: '1px solid var(--border) !important' }}>
               {!quizActive && !quizResult ? (
                 <div className="text-center py-4">
                   <div className="display-6 mb-3">🎓</div>
-                  <h3 className="fw-bold mb-3">Ready to prove your mastery?</h3>
-                  <p className="text-muted mb-5 mx-auto" style={{ maxWidth: '450px' }}>
+                  <h3 className="fw-bold mb-3" style={{ color: 'var(--text-primary)' }}>Ready to prove your mastery?</h3>
+                  <p className="text-muted mb-5 mx-auto" style={{ maxWidth: '450px', color: 'var(--text-muted)' }}>
                     Complete a quick 3-question assessment to verify your understanding of {subtopicTitle} and unlock the next step in your roadmap.
                   </p>
                   <button 
@@ -190,15 +191,15 @@ const SubtopicDetail = () => {
                 <div>
                   <div className="d-flex justify-content-between align-items-center mb-5">
                     <span className="badge bg-primary px-3 py-2">QUESTION {currentQIndex + 1} OF {questions.length}</span>
-                    <span className="text-muted small fw-bold">SUBTOPIC MASTERY TEST</span>
+                    <span className="text-muted small fw-bold" style={{ color: 'var(--text-muted)' }}>SUBTOPIC MASTERY TEST</span>
                   </div>
-                  <h4 className="fw-bold mb-5" style={{ lineHeight: 1.4 }}>{questions[currentQIndex].prompt}</h4>
+                  <h4 className="fw-bold mb-5" style={{ lineHeight: 1.4, color: 'var(--text-primary)' }}>{questions[currentQIndex].prompt}</h4>
                   <div className="d-flex flex-column gap-3">
                     {questions[currentQIndex].options.map((opt, i) => {
                       const isSelected = feedback?.selected === i;
                       const isCorrect = questions[currentQIndex].correct_option === i;
                       
-                      let btnStyle = { borderRadius: '16px', border: '2px solid rgba(79, 110, 247, 0.1)', background: 'white' };
+                      let btnStyle = { borderRadius: '16px', border: '2px solid var(--border)', background: 'var(--bg-surface)', color: 'var(--text-primary)' };
                       if (feedback) {
                         if (isCorrect) {
                           btnStyle = { 
@@ -240,15 +241,15 @@ const SubtopicDetail = () => {
                   {quizResult.passed ? (
                     <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
                       <div className="display-1 text-success mb-4">🏆</div>
-                      <h2 className="fw-bold mb-2">Mastery Verified!</h2>
-                      <p className="text-muted mb-4">You got {quizResult.correctCount} out of {quizResult.total} correct. Scholarium has marked this subtopic as mastered.</p>
+                      <h2 className="fw-bold mb-2" style={{ color: 'var(--text-primary)' }}>Mastery Verified!</h2>
+                      <p className="text-muted mb-4" style={{ color: 'var(--text-muted)' }}>You got {quizResult.correctCount} out of {quizResult.total} correct. Scholarium has marked this subtopic as mastered.</p>
                       <button onClick={() => navigate(-1)} className="btn btn-primary px-5 py-3 rounded-pill fw-bold">Continue Journey &rarr;</button>
                     </motion.div>
                   ) : (
                     <div>
                       <div className="display-1 mb-4">✍️</div>
-                      <h2 className="fw-bold mb-2">Not quite there yet</h2>
-                      <p className="text-muted mb-4">You got {quizResult.correctCount} correct. Review the explanation again and try the assessment once more to master this topic.</p>
+                      <h2 className="fw-bold mb-2" style={{ color: 'var(--text-primary)' }}>Not quite there yet</h2>
+                      <p className="text-muted mb-4" style={{ color: 'var(--text-muted)' }}>You got {quizResult.correctCount} correct. Review the explanation again and try the assessment once more to master this topic.</p>
                       <button onClick={startAssessment} className="btn btn-outline-primary px-5 py-3 rounded-pill fw-bold">Retry Assessment (Fresh Questions)</button>
                     </div>
                   )}
@@ -263,12 +264,12 @@ const SubtopicDetail = () => {
           <div className="sticky-top" style={{ top: '100px' }}>
             
             {/* Pro Sources Section */}
-            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: '#fff' }}>
+            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
               <div className="card-body p-4">
-                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
+                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <IoNewspaperOutline className="text-primary" size={20} /> Pro Study Sources
                 </h6>
-                <p className="small text-muted mb-3">Verified external articles for deeper study.</p>
+                <p className="small text-muted mb-3" style={{ color: 'var(--text-muted)' }}>Verified external articles for deeper study.</p>
                 <div className="d-flex flex-column gap-2">
                   {proSources.map((src, i) => (
                     <a 
@@ -287,12 +288,12 @@ const SubtopicDetail = () => {
             </div>
 
             {/* YouTube Section */}
-            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: '#fff' }}>
+            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
               <div className="card-body p-4">
-                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
+                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <IoVideocamOutline className="text-danger" size={20} /> Video Tutorials
                 </h6>
-                <p className="small text-muted mb-4">Curated video content to visualize concepts.</p>
+                <p className="small text-muted mb-4" style={{ color: 'var(--text-muted)' }}>Curated video content to visualize concepts.</p>
                 <a 
                   href={`https://www.youtube.com/results?search_query=${query}+tutorial`} 
                   target="_blank" 
@@ -305,21 +306,21 @@ const SubtopicDetail = () => {
             </div>
 
             {/* Books Section */}
-            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: '#fff' }}>
+            <div className="card border-0 rounded-4 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
               <div className="card-body p-4">
-                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
+                <h6 className="fw-bold mb-3 d-flex align-items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <IoBookOutline className="text-success" size={20} /> Library References
                 </h6>
                 <div className="d-flex flex-column gap-3">
                   {scrapedData.books.length > 0 ? scrapedData.books.map((b, i) => (
                     <div key={i}>
-                      <div className="fw-bold text-dark small">{b.title}</div>
-                      <div className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
+                      <div className="fw-bold small" style={{ color: 'var(--text-primary)' }}>{b.title}</div>
+                      <div className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                         <span>{b.author_name?.[0] || 'Unknown Author'}</span> &bull; <span style={{ color: '#00843d' }}>OpenLibrary</span>
                       </div>
                       <a href={`https://openlibrary.org${b.key}`} target="_blank" rel="noreferrer" className="small text-primary text-decoration-none" style={{ fontSize: '11px' }}>View Details</a>
                     </div>
-                  )) : <p className="small text-muted">No books found.</p>}
+                  )) : <p className="small text-muted" style={{ color: 'var(--text-muted)' }}>No books found.</p>}
                 </div>
               </div>
             </div>

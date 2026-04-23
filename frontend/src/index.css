@@ -1,14 +1,14 @@
 :root {
-  --bg-page: #F0F4FF;
+  --bg-page: #F8FAFC;
   --bg-surface: #FFFFFF;
   --bg-glass: rgba(255, 255, 255, 0.72);
   --accent-primary: #4F6EF7;
   --accent-secondary: #06C9A0;
   --accent-warn: #F7A94F;
   --accent-danger: #F75C5C;
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
   --border: rgba(79, 110, 247, 0.14);
   --shadow-card: 0 4px 32px rgba(79, 110, 247, 0.10);
   --shadow-node: 0 2px 16px rgba(79, 110, 247, 0.18);
@@ -18,12 +18,27 @@
   --glass-border: rgba(255, 255, 255, 0.4);
 }
 
+[data-theme='dark'] {
+  --bg-page: #020617;
+  --bg-surface: #0F172A;
+  --bg-glass: rgba(15, 23, 42, 0.72);
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.3);
+  --shadow-node: 0 2px 16px rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
 body {
   font-family: 'Sora', sans-serif;
-  background: #F8FAFC;
+  background-color: var(--bg-page);
   color: var(--text-primary);
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {

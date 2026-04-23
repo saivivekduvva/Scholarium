@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, AuthContext } from './context/AuthContext';
@@ -12,27 +12,55 @@ import SubtopicDetail from './pages/SubtopicDetail';
 import ErrorPage from './pages/ErrorPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import { IoSunnyOutline, IoMoonOutline } from 'react-icons/io5';
 
 // A component to render the Navbar only when authenticated
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('scholarium-theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('scholarium-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   if (!user) return null;
 
   return (
-    <nav className="navbar navbar-expand-lg scholarium-navbar" style={{ backgroundColor: 'white', padding: '12px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+    <nav className="navbar navbar-expand-lg scholarium-navbar" style={{ backgroundColor: 'var(--bg-surface)', padding: '12px 24px', borderBottom: '1px solid var(--border)', transition: 'all 0.3s ease' }}>
       <div className="container-fluid px-0">
         <Link to="/" className="navbar-brand scholarium-brand m-0" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent-primary)', textDecoration: 'none' }}>Scholarium</Link>
-        <button 
-          className="navbar-toggler border-0 shadow-none" 
-          type="button" 
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''} bg-white`} style={{ zIndex: 1000 }}>
-          <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1 gap-lg-3 mt-3 mt-lg-0">
+        
+        <div className="d-flex align-items-center gap-2 ms-auto me-3 me-lg-0 order-lg-last">
+          <button 
+            onClick={toggleTheme}
+            className="btn d-flex align-items-center justify-content-center"
+            style={{ 
+              width: '40px', height: '40px', borderRadius: '12px', 
+              backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)', 
+              border: '1px solid var(--border)', padding: 0
+            }}
+            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+          >
+            {theme === 'light' ? <IoMoonOutline size={20} /> : <IoSunnyOutline size={20} />}
+          </button>
+          
+          <button 
+            className="navbar-toggler border-0 shadow-none p-0 ms-2" 
+            type="button" 
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        </div>
+
+        <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} style={{ zIndex: 1000 }}>
+          <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1 gap-lg-3 mt-3 mt-lg-0 me-lg-3">
             <li className="nav-item">
               <Link to="/" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Home</Link>
             </li>
@@ -46,7 +74,7 @@ const Navbar = () => {
               <button 
                 onClick={() => { setIsOpen(false); logout(); }} 
                 className="btn w-100" 
-                style={{ border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px', fontWeight: 600 }}
+                style={{ border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px', fontWeight: 600 }}
               >
                 Logout
               </button>
