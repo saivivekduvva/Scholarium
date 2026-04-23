@@ -27,16 +27,23 @@ class SetupAdminView(APIView):
     permission_classes = (AllowAny,)
     
     def get(self, request):
-        # Only allow this if a secret token is provided to prevent misuse
         token = request.query_params.get('token')
-        if token != 'supersecret': # Change this to something unique
+        if token != 'supersecret':
             return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
             
+        # Run migrations automatically
+        from django.core.management import call_command
+        try:
+            call_command('migrate', interactive=False)
+            migration_status = "Migrations successful. "
+        except Exception as e:
+            migration_status = f"Migration failed: {str(e)}. "
+
         User = get_user_model()
         if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-            return Response({'status': 'Admin created: username=admin, password=admin123'})
-        return Response({'status': 'Admin already exists'})
+            return Response({'status': f'{migration_status}Admin created: username=admin, password=admin123'})
+        return Response({'status': f'{migration_status}Admin already exists'})
 
 class DeleteAccountView(APIView):
     permission_classes = (IsAuthenticated,)
