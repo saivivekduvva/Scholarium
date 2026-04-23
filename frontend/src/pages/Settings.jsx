@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const Settings = () => {
   const { user, logout } = useContext(AuthContext);
@@ -12,13 +13,8 @@ const Settings = () => {
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/delete-account/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
-      if (response.ok) {
+      const response = await api.deleteAccount();
+      if (response.status === 204 || response.status === 200) {
         logout();
         navigate('/login');
       } else {
@@ -26,7 +22,7 @@ const Settings = () => {
       }
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert("An error occurred. Please try again later.");
+      alert(error.response?.data?.error || "An error occurred. Please try again later.");
     } finally {
       setIsDeleting(false);
     }

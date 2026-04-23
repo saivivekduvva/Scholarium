@@ -115,7 +115,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
         transition={{ duration: 0.2, ease: 'easeOut' }}
         className="node-detail-modal"
         style={{
-          position: 'fixed', left: '50%', transform: 'translateX(-50%)', top: '5vh', bottom: '5vh',
+          position: 'fixed', left: 0, right: 0, margin: '0 auto', top: '5vh', bottom: '5vh',
           width: '92%', maxWidth: '800px',
           backgroundColor: 'var(--bg-surface)', boxShadow: '0 32px 80px rgba(0,0,0,0.2)',
           zIndex: 1001, padding: 'clamp(20px, 5vw, 40px)', overflowY: 'auto', borderRadius: '24px'

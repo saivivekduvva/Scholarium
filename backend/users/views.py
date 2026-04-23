@@ -49,6 +49,12 @@ class DeleteAccountView(APIView):
     permission_classes = (IsAuthenticated,)
     
     def delete(self, request):
-        user = request.user
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            user = request.user
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            import traceback
+            print(f"ERROR deleting account: {str(e)}")
+            print(traceback.format_exc())
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
