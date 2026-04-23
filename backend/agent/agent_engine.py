@@ -19,7 +19,7 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+gemini_model = genai.GenerativeModel('gemini-flash-latest')
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
@@ -160,7 +160,9 @@ def generate_roadmap(goal: str) -> dict:
         resp = call_llm(system, user)
         return _parse_json(resp)
     except Exception as e:
-        print(f"Error in generate_roadmap: {e}")
+        prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
+        mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
+        print(f"Error in generate_roadmap: {e}, purged cache.")
         raise ValueError("Failed to generate roadmap JSON")
 
 def expand_subtopics(skill_name: str) -> dict:
@@ -181,7 +183,9 @@ def expand_subtopics(skill_name: str) -> dict:
         print(f"Rate limit hit in expand_subtopics: {e}")
         raise e
     except Exception as e:
-        print(f"Error parsing expand_subtopics: {e}")
+        prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
+        mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
+        print(f"Error parsing expand_subtopics: {e}, purged cache.")
         raise ValueError("Failed to parse JSON")
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
