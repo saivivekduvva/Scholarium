@@ -133,21 +133,23 @@ const Dashboard = () => {
                         style={{ borderRadius: '24px', transition: 'transform 0.4s ease, box-shadow 0.4s ease', cursor: 'pointer', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)', position: 'relative' }}
                         onClick={() => navigate(`/graph/${goal.id}`)}
                       >
-                        <button 
-                          onClick={(e) => handleDeleteGoal(e, goal.id)}
-                          className="btn btn-link text-muted p-0"
-                          style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 20, cursor: 'pointer' }}
-                          title="Delete Roadmap"
-                        >
-                          <IoTrashOutline size={18} />
-                        </button>
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div className="p-2 rounded-3" style={{ background: 'rgba(79, 110, 247, 0.1)', color: 'var(--accent-primary)' }}>
                             <IoRocketOutline size={24} />
                           </div>
-                          <span className={`badge rounded-pill px-3 py-2 ${goal.status === 'active' ? 'bg-light text-primary' : 'bg-success-subtle text-success'}`} style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>
-                            {goal.status}
-                          </span>
+                          <div className="d-flex align-items-center gap-2">
+                            <span className={`badge rounded-pill px-3 py-2 ${goal.status === 'active' ? 'bg-light text-primary' : 'bg-success-subtle text-success'}`} style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700 }}>
+                              {goal.status}
+                            </span>
+                            <button 
+                              onClick={(e) => handleDeleteGoal(e, goal.id)}
+                              className="btn btn-link text-muted p-0 ms-1"
+                              style={{ zIndex: 20, cursor: 'pointer' }}
+                              title="Delete Roadmap"
+                            >
+                              <IoTrashOutline size={18} />
+                            </button>
+                          </div>
                         </div>
                         <h4 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>{goal.title}</h4>
                         <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -183,7 +185,7 @@ const Dashboard = () => {
               <h4 style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>New Roadmap</h4>
               <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '24px' }}>Describe your goal, and our AI will build a personalized study path for you.</p>
               
-              <div style={{ transform: 'scale(1.05)', transformOrigin: 'top center' }}>
+              <div className="goal-input-wrapper mt-2">
                 <GoalInput />
               </div>
 

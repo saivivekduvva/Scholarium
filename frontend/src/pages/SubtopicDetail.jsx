@@ -147,7 +147,7 @@ const SubtopicDetail = () => {
         {/* Main Content */}
         <div className="col-lg-8">
           <h1 className="display-5 fw-bold mb-2" style={{ fontFamily: 'Outfit' }}>{subtopicTitle}</h1>
-          <div className="d-flex align-items-center gap-3 mb-5">
+          <div className="d-flex flex-wrap align-items-center gap-3 mb-5">
             <p className="text-primary fw-medium m-0">{skillName} &bull; Deep Dive</p>
             <div 
               className="d-flex align-items-center gap-2 px-3 py-1 rounded-pill" 

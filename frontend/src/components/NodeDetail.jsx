@@ -113,10 +113,12 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="node-detail-modal"
         style={{
-          position: 'fixed', left: '10%', right: '10%', top: '5vh', bottom: '5vh',
+          position: 'fixed', left: '50%', transform: 'translateX(-50%)', top: '5vh', bottom: '5vh',
+          width: '92%', maxWidth: '800px',
           backgroundColor: 'var(--bg-surface)', boxShadow: '0 32px 80px rgba(0,0,0,0.2)',
-          zIndex: 1001, padding: '40px', overflowY: 'auto', borderRadius: '24px'
+          zIndex: 1001, padding: 'clamp(20px, 5vw, 40px)', overflowY: 'auto', borderRadius: '24px'
         }}
       >
         <button onClick={onClose} className="btn-close float-end"></button>
@@ -131,19 +133,19 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
           <div className="text-end small text-muted mt-1 fw-bold">{currentProgress}% Mastery</div>
         </div>
 
-        <div className="d-flex justify-content-between align-items-end mb-4 pb-2 border-bottom">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-4 pb-3 border-bottom">
           <div>
             <h5 className="mb-0 fw-bold" style={{ color: '#0F172A' }}>Curriculum Flow</h5>
             <p className="text-muted small mb-0">Master each module to reach full proficiency</p>
           </div>
-          <div className="d-flex align-items-center gap-3">
+          <div className="d-flex flex-wrap align-items-center gap-2">
             <button 
               className={`btn btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill ${isRefreshing ? 'disabled' : ''}`}
               style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', color: '#64748B' }}
               onClick={refreshSubtopics}
             >
               <IoRefreshOutline className={isRefreshing ? 'spin' : ''} size={14} />
-              {isRefreshing ? 'Refining...' : 'Refresh Curriculum'}
+              {isRefreshing ? 'Refining...' : 'Refresh'}
             </button>
             <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold" style={{ fontSize: '12px' }}>
               {subtopics?.length || 0} Modules
