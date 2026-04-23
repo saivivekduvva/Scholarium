@@ -32,54 +32,46 @@ const Navbar = () => {
   if (!user) return null;
 
   return (
-    <nav className="navbar navbar-expand-lg scholarium-navbar" style={{ backgroundColor: 'var(--bg-surface)', padding: '12px 24px', borderBottom: '1px solid var(--border)', transition: 'all 0.3s ease' }}>
+    <nav className="navbar navbar-expand-lg scholarium-navbar">
       <div className="container-fluid px-0">
-        <Link to="/" className="navbar-brand scholarium-brand m-0" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent-primary)', textDecoration: 'none' }}>Scholarium</Link>
+        <Link to="/" className="navbar-brand scholarium-brand m-0">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          scholarium
+        </Link>
         
         <div className="d-flex align-items-center gap-2 ms-auto me-3 me-lg-0 order-lg-last">
-          <button 
-            onClick={toggleTheme}
-            className="btn d-flex align-items-center justify-content-center"
-            style={{ 
-              width: '40px', height: '40px', borderRadius: '12px', 
-              backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)', 
-              border: '1px solid var(--border)', padding: 0
-            }}
-            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-          >
-            {theme === 'light' ? <IoMoonOutline size={20} /> : <IoSunnyOutline size={20} />}
-          </button>
-          
           <button 
             className="navbar-toggler border-0 shadow-none p-0 ms-2" 
             type="button" 
             onClick={() => setIsOpen(!isOpen)}
+            style={{ filter: 'var(--theme-invert, invert(1))' }}
           >
             <span className="navbar-toggler-icon"></span>
           </button>
         </div>
 
-        <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} style={{ zIndex: 1000 }}>
-          <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1 gap-lg-3 mt-3 mt-lg-0 me-lg-3">
+        <div className={`collapse navbar-collapse justify-content-center ${isOpen ? 'show' : ''}`} style={{ zIndex: 1000 }}>
+          <ul className="navbar-nav align-items-lg-center gap-1 gap-lg-4 mt-3 mt-lg-0">
             <li className="nav-item">
-              <Link to="/" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Home</Link>
+              <Link to="/" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px' }} onClick={() => setIsOpen(false)}>Home</Link>
             </li>
             <li className="nav-item">
-              <Link to="/settings" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Settings</Link>
+              <Link to="/settings" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px' }} onClick={() => setIsOpen(false)}>Settings</Link>
             </li>
             <li className="nav-item">
-              <Link to="/profile" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Profile</Link>
-            </li>
-            <li className="nav-item mt-2 mt-lg-0">
-              <button 
-                onClick={() => { setIsOpen(false); logout(); }} 
-                className="btn w-100" 
-                style={{ border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px', fontWeight: 600 }}
-              >
-                Logout
-              </button>
+              <Link to="/profile" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px' }} onClick={() => setIsOpen(false)}>Profile</Link>
             </li>
           </ul>
+        </div>
+        
+        <div className={`collapse navbar-collapse flex-grow-0 ${isOpen ? 'show' : ''}`}>
+          <button 
+            onClick={() => { setIsOpen(false); logout(); }} 
+            className="btn btn-sm px-4 py-2 mt-3 mt-lg-0" 
+            style={{ backgroundColor: 'var(--accent-secondary)', color: '#000', borderRadius: '100px', fontWeight: 600, fontSize: '14px' }}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </nav>

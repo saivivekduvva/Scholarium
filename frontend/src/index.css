@@ -1,67 +1,82 @@
 :root {
+  /* Defaulting to the dark premium theme */
+  --bg-page: #1D1C2A;
+  --bg-surface: rgba(255, 255, 255, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --accent-primary: #A79FE1; /* Soft Lavender */
+  --accent-secondary: #F4E87C; /* Soft Yellow */
+  --accent-warn: #F7A94F;
+  --accent-danger: #F75C5C;
+  --text-primary: #FDFDFD;
+  --text-secondary: #A1A0AB;
+  --text-muted: #6B6A7A;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-node: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --radius-card: 24px;
+  --radius-node: 20px;
+  --glass-bg: rgba(29, 28, 42, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --gradient-bg: radial-gradient(circle at 50% 0%, #353755 0%, #1D1C2A 100%);
+}
+
+[data-theme='light'] {
+  /* Minimal Light Mode Fallback */
   --bg-page: #F8FAFC;
   --bg-surface: #FFFFFF;
   --bg-glass: rgba(255, 255, 255, 0.72);
-  --accent-primary: #4F6EF7;
-  --accent-secondary: #06C9A0;
-  --accent-warn: #F7A94F;
-  --accent-danger: #F75C5C;
   --text-primary: #0F172A;
   --text-secondary: #475569;
-  --text-muted: #64748B;
-  --border: rgba(79, 110, 247, 0.14);
-  --shadow-card: 0 4px 32px rgba(79, 110, 247, 0.10);
-  --shadow-node: 0 2px 16px rgba(79, 110, 247, 0.18);
-  --radius-card: 18px;
-  --radius-node: 16px;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.4);
-}
-
-[data-theme='dark'] {
-  --bg-page: #020617;
-  --bg-surface: #0F172A;
-  --bg-glass: rgba(15, 23, 42, 0.72);
-  --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
   --text-muted: #94A3B8;
-  --border: rgba(255, 255, 255, 0.1);
-  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.3);
-  --shadow-node: 0 2px 16px rgba(0, 0, 0, 0.4);
-  --glass-bg: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.05);
+  --shadow-node: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --gradient-bg: linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%);
 }
 
 body {
-  font-family: 'Sora', sans-serif;
-  background-color: var(--bg-page);
+  font-family: 'Inter', sans-serif;
+  background: var(--gradient-bg);
+  background-attachment: fixed;
   color: var(--text-primary);
   margin: 0;
   padding: 0;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background 0.5s ease, color 0.5s ease;
+  min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
+  font-family: 'Newsreader', serif;
+  font-weight: 400;
   margin: 0;
 }
 
 .scholarium-navbar {
-  background: var(--bg-surface);
-  padding: 16px 32px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 12px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 100px;
+  box-shadow: var(--shadow-card);
+  margin: 24px auto;
+  max-width: 90%;
 }
 
 .scholarium-brand {
-  font-family: 'Outfit', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--accent-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Premium Graph Background */
