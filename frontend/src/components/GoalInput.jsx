@@ -21,13 +21,9 @@ const GoalInput = () => {
       const isDuplicate = response.data.is_duplicate;
       
       if (isDuplicate) {
-        // If it's a duplicate, don't make them wait for the analyzer
         navigate(`/graph/${goalId}`);
       } else {
-        // New goal, show the full analyzer experience
-        setTimeout(() => {
-          navigate(`/graph/${goalId}`);
-        }, 8500); 
+        navigate(`/graph/${goalId}`);
       }
     } catch (error) {
       console.error(error);
@@ -36,7 +32,12 @@ const GoalInput = () => {
   };
 
   if (loading) {
-    return <GoalAnalyzer goalTitle={goal} />;
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border mb-3" style={{ color: 'var(--accent-primary)' }} />
+        <p className="text-muted">Building your personalized study path...</p>
+      </div>
+    );
   }
 
   return (

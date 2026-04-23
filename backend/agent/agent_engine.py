@@ -19,7 +19,7 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
+gemini_model = genai.GenerativeModel('gemini-flash-lite')
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
@@ -210,15 +210,15 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
     
     Generate exactly 4 challenging, random, and highly-varied multiple-choice questions.
     Return JSON format: 
-    {
+    {{
         "questions": [
-            {
+            {{
                 "prompt": "Rigorous, technical question...", 
                 "options": ["Nuanced A", "Nuanced B", "Nuanced C", "Nuanced D"], 
                 "correct_option": 0
-            }
+            }}
         ]
-    }"""
+    }}"""
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)

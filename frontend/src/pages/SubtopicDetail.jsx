@@ -21,6 +21,7 @@ const SubtopicDetail = () => {
   const [answers, setAnswers] = useState([]);
   const [quizResult, setQuizResult] = useState(null);
   const [isStudied, setIsStudied] = useState(false);
+  const [nextSubtopic, setNextSubtopic] = useState(null);
 
   const rawQuery = `${subtopicTitle} ${skillName}`;
   const query = rawQuery.replace(/\s+/g, '+');
@@ -59,6 +60,20 @@ const SubtopicDetail = () => {
       } catch (err) { console.error(err); }
     };
     fetchRefs();
+
+    const fetchNextSubtopic = async () => {
+      try {
+        const res = await api.expandSkill(1, skillName, false);
+        if (res.data && res.data.subtopics) {
+          const subs = res.data.subtopics;
+          const currentIndex = subs.findIndex(s => s.title === subtopicTitle);
+          if (currentIndex !== -1 && currentIndex < subs.length - 1) {
+            setNextSubtopic(subs[currentIndex + 1].title);
+          }
+        }
+      } catch (err) { console.error("Could not fetch next subtopic", err); }
+    };
+    fetchNextSubtopic();
   }, [skillName, subtopicTitle, query, tag]);
 
   const startAssessment = async () => {
@@ -167,6 +182,25 @@ const SubtopicDetail = () => {
           <div className="prose p-5 rounded-4 shadow-sm border mb-5" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)', minHeight: '600px', color: 'var(--text-primary)' }}>
             <ReactMarkdown>{explanation}</ReactMarkdown>
           </div>
+
+          {nextSubtopic && (
+            <div className="mb-5 p-4 rounded-4 border d-flex justify-content-between align-items-center" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
+              <div>
+                <p className="text-muted small mb-1">Up Next</p>
+                <h5 className="mb-0 fw-bold" style={{ color: 'var(--text-primary)' }}>{nextSubtopic}</h5>
+              </div>
+              <button 
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(nextSubtopic)}`);
+                }}
+                className="btn btn-primary px-4 py-2"
+                style={{ borderRadius: '12px', fontWeight: 600 }}
+              >
+                Go to Next &rarr;
+              </button>
+            </div>
+          )}
 
           {/* Mastery Assessment Section */}
           <section id="assessment" className="mt-5 pt-5 border-top" style={{ borderColor: 'var(--border)' }}>
