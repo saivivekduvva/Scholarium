@@ -50,8 +50,15 @@ const Profile = () => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      style={{ minHeight: '80vh', color: 'var(--text-primary)', transition: 'all 0.3s ease' }}
+      style={{ minHeight: '80vh', color: 'var(--text-primary)', transition: 'all 0.3s ease', position: 'relative' }}
     >
+      <button 
+        onClick={() => window.history.back()}
+        className="btn btn-link text-decoration-none p-0 mb-4 d-flex align-items-center gap-2"
+        style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '15px' }}
+      >
+        <span>&larr;</span> Go Back
+      </button>
       <div className="d-flex align-items-center mb-5">
         <div 
           style={{ 

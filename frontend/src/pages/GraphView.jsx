@@ -155,43 +155,19 @@ const GraphView = () => {
         )}
       </AnimatePresence>
       
-      {/* Path Builder Floating Toolbar */}
-      <motion.div 
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 1, type: 'spring', damping: 20 }}
-        className="floating-toolbar d-flex align-items-center gap-4 px-4 py-3"
+      <button 
+        onClick={() => window.history.back()}
+        className="btn btn-sm shadow-sm"
         style={{
-          position: 'fixed', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
-          borderRadius: '40px', zIndex: 100
+          position: 'absolute', top: '24px', left: '24px', zIndex: 100,
+          background: 'var(--bg-surface)', color: 'var(--text-primary)',
+          border: '1px solid var(--border)', borderRadius: '12px',
+          padding: '8px 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px'
         }}
       >
-        <div className="d-flex align-items-center gap-2">
-          <div className="p-2 rounded-circle" style={{ background: 'rgba(79, 110, 247, 0.1)', color: 'var(--accent-primary)' }}>
-            <IoRocketOutline size={20} />
-          </div>
-          <span style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A' }}>Mastery Path</span>
-        </div>
-        
-        <div style={{ width: '1px', height: '24px', background: '#E2E8F0' }} />
-        
-        <div className="d-flex gap-2">
-          <button 
-            className="btn btn-sm btn-light px-3 py-2" 
-            style={{ borderRadius: '20px', fontWeight: 700, fontSize: '13px', border: '1px solid #E2E8F0' }} 
-            onClick={handleAutoSequence}
-          >
-            Auto-Sequence
-          </button>
-          <button 
-            className="btn btn-sm px-4 py-2" 
-            style={{ background: 'var(--accent-primary)', color: 'white', borderRadius: '20px', fontWeight: 700, fontSize: '13px', boxShadow: '0 4px 12px rgba(79, 110, 247, 0.2)' }} 
-            onClick={handleStartLearning}
-          >
-            Start Learning &rarr;
-          </button>
-        </div>
-      </motion.div>
+        <span>&larr;</span> Back to Dashboard
+      </button>
+
     </motion.div>
   );
 };

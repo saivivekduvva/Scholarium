@@ -35,6 +35,13 @@ const Settings = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
+        <button 
+          onClick={() => window.history.back()}
+          className="btn btn-link text-decoration-none p-0 mb-4 d-flex align-items-center gap-2"
+          style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '15px' }}
+        >
+          <span>&larr;</span> Go Back
+        </button>
         <h1 className="mb-4" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>Account Settings</h1>
         
         <div className="p-4 mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-card)' }}>
