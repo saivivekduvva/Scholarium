@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, AuthContext } from './context/AuthContext';
@@ -16,17 +16,43 @@ import RegisterPage from './pages/RegisterPage';
 // A component to render the Navbar only when authenticated
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
 
   return (
-    <nav className="scholarium-navbar">
-      <Link to="/" className="scholarium-brand">Scholarium</Link>
-      <div>
-        <Link to="/" className="me-4 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Home</Link>
-        <Link to="/settings" className="me-4 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Settings</Link>
-        <Link to="/profile" className="me-4 text-decoration-none" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Profile</Link>
-        <button onClick={logout} className="btn" style={{ border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px' }}>Logout</button>
+    <nav className="navbar navbar-expand-lg scholarium-navbar" style={{ backgroundColor: 'white', padding: '12px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+      <div className="container-fluid px-0">
+        <Link to="/" className="navbar-brand scholarium-brand m-0" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent-primary)', textDecoration: 'none' }}>Scholarium</Link>
+        <button 
+          className="navbar-toggler border-0 shadow-none" 
+          type="button" 
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''} bg-white`} style={{ zIndex: 1000 }}>
+          <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1 gap-lg-3 mt-3 mt-lg-0">
+            <li className="nav-item">
+              <Link to="/" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Home</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/settings" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Settings</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/profile" className="nav-link" style={{ color: 'var(--text-secondary)', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Profile</Link>
+            </li>
+            <li className="nav-item mt-2 mt-lg-0">
+              <button 
+                onClick={() => { setIsOpen(false); logout(); }} 
+                className="btn w-100" 
+                style={{ border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'transparent', color: 'var(--text-secondary)', borderRadius: '8px', fontWeight: 600 }}
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   );

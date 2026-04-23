@@ -42,11 +42,7 @@ const Profile = () => {
     fullMark: 100,
   }));
 
-  let avgScore = 0;
-  if (data.sessions && data.sessions.length > 0) {
-    const total = data.sessions.reduce((acc, curr) => acc + (curr.score || 0), 0);
-    avgScore = Math.round(total / data.sessions.length);
-  }
+
 
   return (
     <motion.div 
@@ -72,26 +68,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="row g-4 mb-5">
-        <div className="col-md-4">
-          <div className="card border-0 p-4 text-center" style={{ backgroundColor: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)', borderRadius: 'var(--radius-card)' }}>
-            <h3 style={{ color: 'var(--accent-primary)', fontSize: '48px', margin: 0 }}>{data.checkpoints?.length || 0}</h3>
-            <div className="text-muted small fw-bold">SKILLS MASTERED</div>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="card border-0 p-4 text-center" style={{ backgroundColor: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)', borderRadius: 'var(--radius-card)' }}>
-            <h3 style={{ color: 'var(--accent-secondary)', fontSize: '48px', margin: 0 }}>{data.sessions?.length || 0}</h3>
-            <div className="text-muted small fw-bold">SESSIONS COMPLETED</div>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="card border-0 p-4 text-center" style={{ backgroundColor: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)', borderRadius: 'var(--radius-card)' }}>
-            <h3 style={{ color: 'var(--accent-warn)', fontSize: '48px', margin: 0 }}>{avgScore}</h3>
-            <div className="text-muted small fw-bold">AVG SCORE</div>
-          </div>
-        </div>
-      </div>
+
 
       <div className="row g-4">
         <div className="col-md-6">

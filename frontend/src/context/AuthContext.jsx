@@ -36,7 +36,15 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
       localStorage.setItem('username', username);
-      setUser({ username });
+      
+      try {
+        const profileRes = await api.getProfile();
+        setUser(profileRes.data);
+      } catch (err) {
+        console.error("Failed to fetch full profile after login", err);
+        setUser({ username });
+      }
+
       navigate('/');
       return { success: true };
     } catch (error) {
