@@ -29,7 +29,6 @@ const Settings = () => {
   };
 
   return (
-  return (
     <div className="container py-5" style={{ color: 'var(--text-primary)', transition: 'all 0.3s ease' }}>
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
