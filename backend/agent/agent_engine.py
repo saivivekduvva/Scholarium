@@ -19,7 +19,7 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-flash-latest')
+gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
