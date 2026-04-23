@@ -23,6 +23,21 @@ class ProfileView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+class SetupAdminView(APIView):
+    permission_classes = (AllowAny,)
+    
+    def get(self, request):
+        # Only allow this if a secret token is provided to prevent misuse
+        token = request.query_params.get('token')
+        if token != 'supersecret': # Change this to something unique
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        User = get_user_model()
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+            return Response({'status': 'Admin created: username=admin, password=admin123'})
+        return Response({'status': 'Admin already exists'})
+
 class DeleteAccountView(APIView):
     permission_classes = (IsAuthenticated,)
     
