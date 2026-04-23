@@ -19,7 +19,7 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
@@ -30,7 +30,7 @@ def log_conversation(session_id, role, content):
 
 def call_claude(system: str, user: str) -> str:
     msg = anthropic_client.messages.create(
-        model="claude-3-sonnet-20240229", # Using widely available sonnet or standard
+        model="claude-3-sonnet-20240229",
         max_tokens=2048,
         system=system,
         messages=[{"role": "user", "content": user}]
@@ -38,8 +38,15 @@ def call_claude(system: str, user: str) -> str:
     return msg.content[0].text
 
 def call_gemini(system: str, user: str) -> str:
-    response = gemini_model.generate_content(f"{system}\n\n{user}")
-    return response.text
+    # Adding a small retry loop for robustness
+    import time
+    for attempt in range(3):
+        try:
+            response = gemini_model.generate_content(f"{system}\n\n{user}")
+            return response.text
+        except Exception as e:
+            if attempt == 2: raise e
+            time.sleep(2 ** attempt) # Exponential backoff
 
 def call_llm(system: str, user: str) -> str:
     prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
@@ -263,31 +270,7 @@ def generate_summary(user_id: int, checkpoints: list) -> str:
         return "Failed to generate summary."
 
 def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subtopics: list = None) -> str:
-    # 1. Scrape-First Strategy using Wikipedia
-    search_query = f"{skill_name} {subtopic_title}".replace(" ", "+")
-    wiki_url = f"https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch={search_query}&gsrlimit=1&prop=extracts|info&inprop=url&exsentences=7&explaintext=1&format=json"
-    
-    try:
-        resp = requests.get(wiki_url, headers={'User-Agent': 'ScholariumApp/1.0'}, timeout=5)
-        if resp.status_code == 200:
-            data = resp.json()
-            if 'query' in data and 'pages' in data['query']:
-                pages = data['query']['pages']
-                for page_id in pages:
-                    page = pages[page_id]
-                    extract = page.get('extract', '').strip()
-                    url = page.get('fullurl', '')
-                    title = page.get('title', '')
-                    
-                    if extract and len(extract) > 100:
-                        markdown_response = f"### {title}\n\n"
-                        markdown_response += f"{extract}\n\n"
-                        markdown_response += f"**Reference:** [Wikipedia: {title}]({url})\n"
-                        return markdown_response
-    except Exception as e:
-        print(f"Wikipedia scrape failed: {e}")
-
-    # 2. LLM Fallback Strategy
+    # LLM Only Strategy (Wikipedia Scrape Removed as per user request)
     system = """You are a technical educator for Scholarium.
     
     STRICT RULES:
