@@ -178,11 +178,20 @@ def get_explanation(request):
     # Get other subtopics in this skill for context
     try:
         node = SkillNode.objects.get(skill_name=skill_name, goal__user=request.user)
-        all_subtopics = list(node.subtopics.values_list('title', flat=True))
+        subtopic = Subtopic.objects.get(title=subtopic_title, skill_node=node)
+        
+        if subtopic.explanation:
+            explanation = subtopic.explanation
+        else:
+            all_subtopics = list(node.subtopics.values_list('title', flat=True))
+            explanation = get_subtopic_explanation(skill_name, subtopic_title, all_subtopics)
+            subtopic.explanation = explanation
+            subtopic.save()
     except SkillNode.DoesNotExist:
-        all_subtopics = []
-
-    explanation = get_subtopic_explanation(skill_name, subtopic_title, all_subtopics)
+        return Response({'error': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Subtopic.DoesNotExist:
+        # Fallback if subtopic doesn't exist in DB yet
+        explanation = get_subtopic_explanation(skill_name, subtopic_title, [])
     
     # Generate direct pro source links
     query = subtopic_title.replace(' ', '+')

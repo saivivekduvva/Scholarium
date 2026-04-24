@@ -57,5 +57,6 @@ class Subtopic(models.Model):
     description = models.TextField(blank=True)
     duration_mins = models.IntegerField(default=30)
     is_studied = models.BooleanField(default=False)
+    explanation = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
