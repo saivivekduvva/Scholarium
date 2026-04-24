@@ -43,7 +43,7 @@ const ContactPage = () => {
                 boxShadow: '10px 10px 0px #4F6EF7',
                 backgroundColor: 'white'
               }}>
-                <img src="/saivivek.jpg" alt="Duvva Sai Vivek" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src="/saivivek.jpeg" alt="Duvva Sai Vivek" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <h4 style={{ fontWeight: 800, marginBottom: '5px' }}>Duvva Sai Vivek</h4>
               <p className="text-muted small">Founder, Scholarium</p>
@@ -60,7 +60,7 @@ const ContactPage = () => {
                 boxShadow: '10px 10px 0px #F4E87C',
                 backgroundColor: 'white'
               }}>
-                <img src="/mokshagna.jpg" alt="Mokshagna BC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src="/mokshagna.jpeg" alt="Mokshagna BC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <h4 style={{ fontWeight: 800, marginBottom: '5px' }}>Mokshagna BC</h4>
               <p className="text-muted small">Co-Founder, Scholarium</p>
