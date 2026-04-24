@@ -232,32 +232,45 @@ def generate_roadmap(goal: str) -> dict:
             raise ValueError("Failed to generate roadmap JSON")
 
 def expand_subtopics(skill_name: str) -> dict:
-    system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 6-8 logically sequenced, UNIQUE subtopics.
+    system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 5-7 logically sequenced, UNIQUE subtopics.
     
     RULES:
     1. NO DUPLICATES: Every subtopic must have a unique title.
     2. LOGICAL FLOW: Order from foundational to advanced.
-    3. CONTENT: For EACH subtopic, provide a clear explanation (exactly 100-120 words) in Markdown.
-    4. REFERENCES: For EACH subtopic, include 2 high-quality external reference URLs.
-    5. LIMIT: Generate exactly 3-4 subtopics per skill.
+    3. DESCRIPTION: Provide a brief summary (20-30 words) for each subtopic.
+    4. LIMIT: Generate exactly 5-7 subtopics per skill.
     
     Return ONLY valid JSON."""
-    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Short summary\", \"duration_mins\": 30, \"full_explanation\": \"100-word Markdown content...\", \"references\": [\"https://...\"] }}]}}"
+    
+    user = f"""Skill: {skill_name}
+    Return JSON format: 
+    {{
+        "subtopics": [
+            {{ 
+                "title": "Subtopic Name", 
+                "description": "Short summary of focus...", 
+                "duration_mins": 30
+            }}
+        ]
+    }}"""
     try:
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        if "quota" in str(e).lower() or "429" in str(e):
+        if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
             raise ValueError("AI_QUOTA_EXHAUSTED")
-        raise e
-    except RateLimitError as e:
-        print(f"Rate limit hit in expand_subtopics: {e}")
-        raise e
-    except Exception as e:
+            
+        # Purge cache and retry once for parsing/model errors
         prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
         mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
-        print(f"Error parsing expand_subtopics: {e}, purged cache.")
-        raise ValueError("Failed to parse JSON")
+        print(f"Error in expand_subtopics: {e}. Purged cache. Retrying...")
+        
+        try:
+            resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
+            return _parse_json(resp)
+        except Exception as e2:
+            print(f"Final failure in expand_subtopics for {skill_name}: {e2}")
+            raise ValueError("Failed to parse subtopics JSON")
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
     system = """You are a friendly and encouraging tutor for Scholarium. 
