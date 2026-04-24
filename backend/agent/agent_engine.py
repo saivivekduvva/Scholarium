@@ -19,7 +19,7 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-flash-latest')
+gemini_model = genai.GenerativeModel('gemini-2.0-flash')
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
@@ -37,18 +37,44 @@ def call_claude(system: str, user: str) -> str:
     )
     return msg.content[0].text
 
-def call_gemini(system: str, user: str) -> str:
+def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
     # Adding a small retry loop for robustness
     import time
     for attempt in range(3):
         try:
-            response = gemini_model.generate_content(f"{system}\n\n{user}")
+            safety_settings = [
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            ]
+            
+            gen_config = {}
+            if json_mode:
+                gen_config["response_mime_type"] = "application/json"
+            
+            response = gemini_model.generate_content(
+                f"{system}\n\n{user}",
+                safety_settings=safety_settings,
+                generation_config=gen_config
+            )
+            
+            # Check if response was blocked
+            if not response.parts:
+                # If blocked, log it and retry or fail
+                print(f"Gemini BLOCKED response for prompt. Safety info: {response.candidates[0].safety_ratings if response.candidates else 'No candidates'}")
+                raise ValueError("AI_SAFETY_BLOCK")
+                
             return response.text
         except Exception as e:
-            if attempt == 2: raise e
-            time.sleep(2 ** attempt) # Exponential backoff
+            if "quota" in str(e).lower() or "429" in str(e):
+                raise RateLimitError("AI Quota Exhausted")
+            if attempt == 2: 
+                print(f"Gemini call failed after 3 attempts: {e}")
+                raise e
+            time.sleep(1.5 ** attempt) # Exponential backoff
 
-def call_llm(system: str, user: str) -> str:
+def call_llm(system: str, user: str, json_mode: bool = False) -> str:
     prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
     
     cached = mongo_brain.llm_cache.find_one({'prompt_hash': prompt_hash})
@@ -60,12 +86,22 @@ def call_llm(system: str, user: str) -> str:
         if provider == 'claude' and anthropic_client:
             response_text = call_claude(system, user)
         else:
-            response_text = call_gemini(system, user)
+            response_text = call_gemini(system, user, json_mode=json_mode)
+        
+        # Cache successful responses
+        mongo_brain.llm_cache.insert_one({
+            'prompt_hash': prompt_hash,
+            'system': system,
+            'user': user,
+            'response': response_text,
+            'created_at': datetime.utcnow()
+        })
+        return response_text
     except Exception as e:
         # Emergency Fallback
         if provider == 'claude':
             print(f"Claude failed ({str(e)}), falling back to Gemini...")
-            response_text = call_gemini(system, user)
+            response_text = call_gemini(system, user, json_mode=json_mode)
         elif provider == 'gemini' and anthropic_client:
             print(f"Gemini failed ({str(e)}), falling back to Claude...")
             try:
@@ -88,15 +124,34 @@ def call_llm(system: str, user: str) -> str:
     return response_text
 
 def _parse_json(text: str) -> dict:
-    # Clean markdown block if present
+    """Robustly parse JSON from LLM response, handling markdown blocks and conversational filler."""
     text = text.strip()
+    
+    # Try to find the first '{' and last '}'
+    start_index = text.find('{')
+    end_index = text.rfind('}')
+    
+    if start_index != -1 and end_index != -1 and end_index > start_index:
+        json_str = text[start_index:end_index+1]
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError:
+            # If substring fails, maybe it was a fragmented JSON or had internal backticks
+            pass
+
+    # Fallback to existing cleaning logic if indices didn't work or parse failed
     if text.startswith('```json'):
         text = text[7:]
     elif text.startswith('```'):
         text = text[3:]
     if text.endswith('```'):
         text = text[:-3]
-    return json.loads(text.strip())
+    
+    try:
+        return json.loads(text.strip())
+    except json.JSONDecodeError as e:
+        print(f"FAILED TO PARSE JSON. RAW TEXT:\n{text}\n")
+        raise e
 
 def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
     """
@@ -142,10 +197,11 @@ def generate_roadmap(goal: str) -> dict:
     
     Arrange the nodes logically from left to right (foundational to advanced).
     
-    Return ONLY valid JSON."""
+    CRITICAL: RETURN ONLY VALID JSON. NO CONVERSATIONAL TEXT."""
     
     user = f"""Goal: {goal}
-    Return JSON: {{
+    Return JSON format: 
+    {{
         "skills": [
             {{ "id": "s1", "name": "Skill Name", "description": "Short description", "estimated_hours": 5 }}
         ],
@@ -157,15 +213,23 @@ def generate_roadmap(goal: str) -> dict:
         }}
     }}"""
     try:
-        resp = call_llm(system, user)
+        resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        if "quota" in str(e).lower() or "429" in str(e):
+        if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
             raise ValueError("AI_QUOTA_EXHAUSTED")
+        
+        # If it's a parse error or safety block, purge cache and try one more time without cache
         prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
         mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
-        print(f"Error in generate_roadmap: {e}, purged cache.")
-        raise ValueError("Failed to generate roadmap JSON")
+        
+        print(f"Error in generate_roadmap: {e}. Purged cache. Retrying once...")
+        try:
+            resp = call_llm(system + " (IMPORTANT: BE CONCISE, ONLY JSON)", user, json_mode=True)
+            return _parse_json(resp)
+        except Exception as e2:
+            print(f"Final failure in generate_roadmap: {e2}")
+            raise ValueError("Failed to generate roadmap JSON")
 
 def expand_subtopics(skill_name: str) -> dict:
     system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 6-8 logically sequenced, UNIQUE subtopics.
@@ -180,7 +244,7 @@ def expand_subtopics(skill_name: str) -> dict:
     Return ONLY valid JSON."""
     user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Short summary\", \"duration_mins\": 30, \"full_explanation\": \"100-word Markdown content...\", \"references\": [\"https://...\"] }}]}}"
     try:
-        resp = call_llm(system, user)
+        resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
         if "quota" in str(e).lower() or "429" in str(e):
@@ -227,7 +291,7 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
         ]
     }}"""
     try:
-        resp = call_llm(system, user)
+        resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
         print(f"Error parsing generate_practice: {e}")
@@ -258,7 +322,7 @@ def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> 
         "next_step": "Encouraging advice for next time"
     }}"""
     try:
-        resp = call_llm(system, user)
+        resp = call_llm(system, user, json_mode=True)
         mongo_brain.evaluations.insert_one({
             'session_id': session_id,
             'skill': skill,

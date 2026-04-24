@@ -27,6 +27,8 @@ const GoalInput = () => {
       }
     } catch (error) {
       console.error(error);
+      const msg = error.response?.data?.error || "Failed to generate roadmap. Please try again.";
+      alert(msg);
       setLoading(false);
     }
   };

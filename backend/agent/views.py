@@ -58,12 +58,13 @@ def create_goal(request):
                 'is_duplicate': True 
             }, status=status.HTTP_200_OK)
     
-    goal = Goal.objects.create(title=title, description=description, user=request.user, status='active')
-    
     try:
         roadmap = generate_roadmap(title)
         skills_list = roadmap.get('skills', [])
         graph_data = roadmap.get('graph', {'nodes': [], 'edges': []})
+        
+        # Only create the goal if we successfully got a roadmap
+        goal = Goal.objects.create(title=title, description=description, user=request.user, status='active')
         
         # Save SkillNodes
         for skill in skills_list:
@@ -89,7 +90,7 @@ def create_goal(request):
         import traceback
         print(f"ERROR creating goal: {str(e)}")
         print(traceback.format_exc())
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': f"Failed to generate curriculum: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
