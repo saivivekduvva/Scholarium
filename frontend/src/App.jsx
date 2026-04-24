@@ -67,8 +67,8 @@ const Navbar = () => {
         <div className={`collapse navbar-collapse flex-grow-0 ${isOpen ? 'show' : ''}`}>
           <button 
             onClick={() => { setIsOpen(false); logout(); }} 
-            className="btn btn-sm px-4 py-2 mt-3 mt-lg-0" 
-            style={{ backgroundColor: 'var(--accent-secondary)', color: '#000', borderRadius: '100px', fontWeight: 600, fontSize: '14px' }}
+            className="btn btn-outline-dark px-4 py-2 mt-3 mt-lg-0" 
+            style={{ borderRadius: '100px', fontWeight: 600, fontSize: '14px' }}
           >
             Logout
           </button>

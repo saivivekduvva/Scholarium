@@ -1,82 +1,78 @@
 :root {
-  /* Defaulting to the dark premium theme */
-  --bg-page: #1D1C2A;
-  --bg-surface: rgba(255, 255, 255, 0.03);
-  --bg-glass: rgba(255, 255, 255, 0.05);
-  --accent-primary: #A79FE1; /* Soft Lavender */
-  --accent-secondary: #F4E87C; /* Soft Yellow */
+  /* Akademia Light Playful Theme */
+  --bg-page: #F5F3EF;
+  --bg-surface: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --accent-primary: #1A1A1A; /* Sharp Black */
+  --accent-secondary: #4F6EF7; /* Vibrant Blue */
+  --accent-highlight: #F4E87C; /* Sunny Yellow */
   --accent-warn: #F7A94F;
   --accent-danger: #F75C5C;
-  --text-primary: #FDFDFD;
-  --text-secondary: #A1A0AB;
-  --text-muted: #6B6A7A;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-node: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --radius-card: 24px;
-  --radius-node: 20px;
-  --glass-bg: rgba(29, 28, 42, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --gradient-bg: radial-gradient(circle at 50% 0%, #353755 0%, #1D1C2A 100%);
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted: #7A7A7A;
+  --border: #1A1A1A;
+  --shadow-card: 8px 8px 0px #1A1A1A;
+  --shadow-node: 4px 4px 0px #1A1A1A;
+  --radius-card: 32px;
+  --radius-node: 24px;
+  --glass-bg: #FFFFFF;
+  --glass-border: #1A1A1A;
+  --gradient-bg: radial-gradient(#00000010 1px, transparent 0);
 }
 
-[data-theme='light'] {
-  /* Minimal Light Mode Fallback */
-  --bg-page: #F8FAFC;
+[data-theme='dark'] {
+  /* Keeping Dark mode somewhat similar but consistent with Akademia if needed, 
+     but user wants the Akademia colors everywhere. */
+  --bg-page: #F5F3EF;
   --bg-surface: #FFFFFF;
-  --bg-glass: rgba(255, 255, 255, 0.72);
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
-  --border: rgba(0, 0, 0, 0.08);
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.05);
-  --shadow-node: 0 4px 24px rgba(0, 0, 0, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --gradient-bg: linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%);
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted: #7A7A7A;
+  --border: #1A1A1A;
+  --shadow-card: 8px 8px 0px #1A1A1A;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--gradient-bg);
-  background-attachment: fixed;
+  background-color: var(--bg-page);
+  background-image: var(--gradient-bg);
+  background-size: 24px 24px;
   color: var(--text-primary);
   margin: 0;
   padding: 0;
-  transition: background 0.5s ease, color 0.5s ease;
+  transition: all 0.3s ease;
   min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Newsreader', serif;
-  font-weight: 400;
+  font-family: 'Inter', sans-serif; /* Akademia uses bold Inter/Sans-serif */
+  font-weight: 800;
   margin: 0;
 }
 
 .scholarium-navbar {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 12px 32px;
+  background: transparent;
+  padding: 24px 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid var(--glass-border);
-  border-radius: 100px;
-  box-shadow: var(--shadow-card);
-  margin: 24px auto;
-  max-width: 90%;
+  border-bottom: none;
+  margin: 0;
+  max-width: 100%;
 }
 
 .scholarium-brand {
   font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 900;
   color: var(--text-primary);
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  letter-spacing: -1px;
 }
 
 /* Premium Graph Background */
