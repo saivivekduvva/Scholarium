@@ -19,7 +19,14 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-2.0-flash')
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+
+# Debug Log for Environment Keys
+gemini_key = os.environ.get('GEMINI_API_KEY')
+if gemini_key:
+    print(f"DEBUG: GEMINI_API_KEY is loaded. Starts with: {gemini_key[:5]}...")
+else:
+    print("DEBUG: CRITICAL ERROR - GEMINI_API_KEY is NOT loaded in environment!")
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
@@ -67,12 +74,15 @@ def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
                 
             return response.text
         except Exception as e:
-            if "quota" in str(e).lower() or "429" in str(e):
-                raise RateLimitError("AI Quota Exhausted")
+            err_msg = str(e).lower()
+            if "429" in err_msg or "quota" in err_msg or "rate limit" in err_msg:
+                print(f"RATE LIMIT DETECTED: {e}")
+                raise RateLimitError("AI Quota Exhausted (429)")
+            
             if attempt == 2: 
-                print(f"Gemini call failed after 3 attempts: {e}")
+                print(f"Gemini call failed after 3 attempts. Raw Error: {e}")
                 raise e
-            time.sleep(1.5 ** attempt) # Exponential backoff
+            time.sleep(1.5 ** attempt)
 
 def call_llm(system: str, user: str, json_mode: bool = False) -> str:
     prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
@@ -109,8 +119,10 @@ def call_llm(system: str, user: str, json_mode: bool = False) -> str:
             except:
                 raise e
         else:
-            if '429' in str(e) or 'quota' in str(e).lower():
-                raise RateLimitError(str(e))
+            err_msg = str(e).lower()
+            if '429' in err_msg or 'quota' in err_msg or 'rate limit' in err_msg:
+                raise RateLimitError(f"AI Quota Exhausted: {e}")
+            raise e
             raise e
         
     mongo_brain.llm_cache.insert_one({
