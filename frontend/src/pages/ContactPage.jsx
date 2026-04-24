@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const ContactPage = () => {
+  const { user } = useContext(AuthContext);
+
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -12,18 +15,21 @@ const ContactPage = () => {
       backgroundSize: '24px 24px',
       color: '#1A1A1A',
       fontFamily: 'Inter, sans-serif',
-      position: 'relative'
+      position: 'relative',
+      paddingTop: user ? '80px' : '0' // Add padding if global navbar is present
     }}>
-      <nav className="d-flex justify-content-between align-items-center px-5 py-4">
-        <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
-        </Link>
-        <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
-          <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-          <span style={{ cursor: 'pointer' }}>Resources</span>
-        </div>
-        <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600 }}>Get in touch</Link>
-      </nav>
+      {!user && (
+        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
+          <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
+          </Link>
+          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
+            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
+            <span style={{ cursor: 'pointer' }}>Resources</span>
+          </div>
+          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600 }}>Get in touch</Link>
+        </nav>
+      )}
 
       <div className="container py-5">
         <div className="text-center mb-5">
@@ -91,7 +97,7 @@ const ContactPage = () => {
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               </div>
               <h5 style={{ fontWeight: 800 }}>PHONE</h5>
-              <p style={{ opacity: 0.7 }}>+91 91234 56789</p>
+              <p style={{ opacity: 0.7 }}>+91 80197 92969</p>
             </div>
 
             <div className="text-center">
