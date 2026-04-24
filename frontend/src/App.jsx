@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
+import Roadmaps from './pages/Roadmaps';
 import GraphView from './pages/GraphView';
 import Session from './pages/Session';
 import Profile from './pages/Profile';
@@ -12,7 +13,6 @@ import SubtopicDetail from './pages/SubtopicDetail';
 import ErrorPage from './pages/ErrorPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import { IoSunnyOutline, IoMoonOutline } from 'react-icons/io5';
 
 // A component to render the Navbar only when authenticated
 const Navbar = () => {
@@ -24,10 +24,6 @@ const Navbar = () => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('scholarium-theme', theme);
   }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
 
   if (!user) return null;
 
@@ -53,13 +49,16 @@ const Navbar = () => {
         <div className={`collapse navbar-collapse justify-content-center ${isOpen ? 'show' : ''}`} style={{ zIndex: 1000 }}>
           <ul className="navbar-nav align-items-lg-center gap-1 gap-lg-4 mt-3 mt-lg-0">
             <li className="nav-item">
-              <Link to="/" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px' }} onClick={() => setIsOpen(false)}>Home</Link>
+              <Link to="/" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Home</Link>
             </li>
             <li className="nav-item">
-              <Link to="/settings" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px' }} onClick={() => setIsOpen(false)}>Settings</Link>
+              <Link to="/roadmaps" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Roadmaps</Link>
             </li>
             <li className="nav-item">
-              <Link to="/profile" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px' }} onClick={() => setIsOpen(false)}>Profile</Link>
+              <Link to="/profile" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Profile</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/settings" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Settings</Link>
             </li>
           </ul>
         </div>
@@ -102,6 +101,7 @@ function App() {
             
             {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/roadmaps" element={<ProtectedRoute><Roadmaps /></ProtectedRoute>} />
             <Route path="/graph/:goalId" element={<ProtectedRoute><GraphView /></ProtectedRoute>} />
             <Route path="/session/:skillId" element={<ProtectedRoute><Session /></ProtectedRoute>} />
             <Route path="/subtopic/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
