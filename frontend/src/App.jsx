@@ -69,13 +69,23 @@ const Navbar = () => {
         </div>
         
         <div className={`collapse navbar-collapse flex-grow-0 ${isOpen ? 'show' : ''}`}>
-          <button 
-            onClick={() => { setIsOpen(false); logout(); }} 
-            className="btn btn-outline-dark px-4 py-2 mt-3 mt-lg-0" 
-            style={{ borderRadius: '100px', fontWeight: 600, fontSize: '14px' }}
-          >
-            Logout
-          </button>
+          <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-3 mt-3 mt-lg-0">
+            <Link 
+              to="/contact" 
+              className="btn btn-outline-dark px-4 py-2" 
+              style={{ borderRadius: '100px', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}
+              onClick={() => setIsOpen(false)}
+            >
+              Get in touch
+            </Link>
+            <button 
+              onClick={() => { setIsOpen(false); logout(); }} 
+              className="btn btn-dark px-4 py-2" 
+              style={{ borderRadius: '100px', fontWeight: 600, fontSize: '14px' }}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </nav>
