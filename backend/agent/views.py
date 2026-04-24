@@ -137,11 +137,17 @@ def expand_skill(request, id):
                 continue
             seen_titles.add(title.lower())
             
+            explanation = st.get('full_explanation', '')
+            refs = st.get('references', [])
+            if refs:
+                explanation += "\n\n### References\n" + "\n".join([f"- {r}" for r in refs])
+
             created_subtopics.append(Subtopic.objects.create(
                 skill_node=node,
                 title=title,
                 description=st.get('description', ''),
-                duration_mins=st.get('duration_mins', 30)
+                duration_mins=st.get('duration_mins', 30),
+                explanation=explanation
             ))
             
         return Response({'subtopics': SubtopicSerializer(created_subtopics, many=True).data})

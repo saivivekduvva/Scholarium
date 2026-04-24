@@ -171,11 +171,12 @@ def expand_subtopics(skill_name: str) -> dict:
     RULES:
     1. NO DUPLICATES: Every subtopic must have a unique title and distinct focus.
     2. LOGICAL FLOW: Order them from foundational to advanced.
-    3. PRECISION: Use exact technical terms.
-    4. VARIETY: Cover different facets of the skill (Theory, Application, Tools).
+    3. FULL CONTENT: For EACH subtopic, provide a comprehensive explanation (approx 300 words) in Markdown format.
+    4. REFERENCES: For EACH subtopic, include 2-3 high-quality external reference URLs.
+    5. LIMIT: Generate exactly 5-6 subtopics per skill.
     
     Return ONLY valid JSON."""
-    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Detailed focus\", \"duration_mins\": 30 }}]}}"
+    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Short summary\", \"duration_mins\": 30, \"full_explanation\": \"Full 300-word Markdown content...\", \"references\": [\"https://...\"] }}]}}"
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
