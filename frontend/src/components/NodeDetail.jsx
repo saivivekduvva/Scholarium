@@ -26,7 +26,8 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
       })
       .catch(err => {
         console.error(err);
-        setErrorMsg("Failed to refresh curriculum. Please try again.");
+        const msg = err.response?.data?.error || "Failed to refresh curriculum. Please try again.";
+        setErrorMsg(msg);
       })
       .finally(() => setIsRefreshing(false));
   };
@@ -57,7 +58,8 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
           if (err.response && err.response.status === 429) {
             setErrorMsg("AI is thinking too fast! Please wait a moment before expanding more skills.");
           } else {
-            setErrorMsg("Failed to load subtopics. The AI might be taking a break.");
+            const msg = err.response?.data?.error || "Failed to load subtopics. The AI might be taking a break.";
+            setErrorMsg(msg);
           }
         });
     }
