@@ -160,6 +160,8 @@ def generate_roadmap(goal: str) -> dict:
         resp = call_llm(system, user)
         return _parse_json(resp)
     except Exception as e:
+        if "quota" in str(e).lower() or "429" in str(e):
+            raise ValueError("AI_QUOTA_EXHAUSTED")
         prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
         mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
         print(f"Error in generate_roadmap: {e}, purged cache.")
@@ -169,17 +171,21 @@ def expand_subtopics(skill_name: str) -> dict:
     system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 6-8 logically sequenced, UNIQUE subtopics.
     
     RULES:
-    1. NO DUPLICATES: Every subtopic must have a unique title and distinct focus.
-    2. LOGICAL FLOW: Order them from foundational to advanced.
-    3. CONTENT: For EACH subtopic, provide a clear explanation (approx 200 words) in Markdown.
-    4. REFERENCES: For EACH subtopic, include 2-3 high-quality external reference URLs.
-    5. LIMIT: Generate exactly 4-5 subtopics per skill to keep it concise.
+    1. NO DUPLICATES: Every subtopic must have a unique title.
+    2. LOGICAL FLOW: Order from foundational to advanced.
+    3. CONTENT: For EACH subtopic, provide a clear explanation (exactly 100-120 words) in Markdown.
+    4. REFERENCES: For EACH subtopic, include 2 high-quality external reference URLs.
+    5. LIMIT: Generate exactly 3-4 subtopics per skill.
     
     Return ONLY valid JSON."""
-    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Short summary\", \"duration_mins\": 30, \"full_explanation\": \"200-word Markdown content...\", \"references\": [\"https://...\"] }}]}}"
+    user = f"Skill: {skill_name}\nReturn JSON: {{\"subtopics\": [{{ \"title\": \"Subtopic Name\", \"description\": \"Short summary\", \"duration_mins\": 30, \"full_explanation\": \"100-word Markdown content...\", \"references\": [\"https://...\"] }}]}}"
     try:
         resp = call_llm(system, user)
         return _parse_json(resp)
+    except Exception as e:
+        if "quota" in str(e).lower() or "429" in str(e):
+            raise ValueError("AI_QUOTA_EXHAUSTED")
+        raise e
     except RateLimitError as e:
         print(f"Rate limit hit in expand_subtopics: {e}")
         raise e

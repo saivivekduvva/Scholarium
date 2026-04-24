@@ -84,6 +84,8 @@ def create_goal(request):
         
         return Response({'goal': GoalSerializer(goal).data, 'graph': graph_data}, status=status.HTTP_201_CREATED)
     except Exception as e:
+        if str(e) == "AI_QUOTA_EXHAUSTED":
+            return Response({'error': 'AI Quota Exhausted. Please wait a minute and try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         import traceback
         print(f"ERROR creating goal: {str(e)}")
         print(traceback.format_exc())
@@ -156,6 +158,8 @@ def expand_skill(request, id):
     except RateLimitError as e:
         return Response({'error': 'AI is rate limited'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e:
+        if str(e) == "AI_QUOTA_EXHAUSTED":
+            return Response({'error': 'AI Quota Exhausted. Please wait a minute and try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
