@@ -40,7 +40,7 @@ const LoginPage = () => {
           <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
           <span style={{ cursor: 'pointer' }}>Resources</span>
         </div>
-        <button className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600 }}>Get in touch</button>
+        <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
       </nav>
 
       <div className="container" style={{ paddingTop: '10vh' }}>
