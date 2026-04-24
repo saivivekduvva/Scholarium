@@ -20,101 +20,103 @@ const RegisterPage = () => {
   };
 
   return (
-    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: 'var(--bg-page)', transition: 'background-color 0.3s ease' }}>
-      {/* High-level Bubbly Background */}
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 10 + Math.random() * 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          style={{
-            position: 'absolute',
-            width: 100 + Math.random() * 300,
-            height: 100 + Math.random() * 300,
-            borderRadius: '50%',
-            background: i % 2 === 0 ? 'rgba(79,110,247,0.08)' : 'rgba(142,45,226,0.06)',
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            filter: 'blur(40px)',
-            zIndex: 0
-          }}
-        />
-      ))}
+    <div style={{ 
+      minHeight: '100vh', 
+      width: '100%', 
+      backgroundColor: '#F5F3EF',
+      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundSize: '24px 24px',
+      color: '#1A1A1A',
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+      overflowX: 'hidden'
+    }}>
+      
+      <nav className="d-flex justify-content-between align-items-center px-5 py-4">
+        <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
+        <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
+          <span>About</span>
+          <span>Programmes</span>
+          <span>Resources</span>
+        </div>
+        <button className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600 }}>Get in touch</button>
+      </nav>
 
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          style={{
-            background: 'var(--bg-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            borderRadius: '24px', border: '1px solid var(--border)', padding: '48px', width: '100%', maxWidth: '420px',
-            boxShadow: 'var(--shadow-card)', color: 'var(--text-primary)'
-          }}
-        >
-          <div className="text-center mb-4">
-            <div className="d-inline-block px-3 py-1 rounded-pill mb-3" style={{ background: 'var(--border)', color: 'var(--accent-primary)', fontSize: '12px', fontWeight: 700 }}>JOIN SCHOLARIUM</div>
-            <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '32px', color: 'var(--text-primary)' }}>Create Account</h2>
-          </div>
-          
-          {error && <div className="alert alert-danger" style={{ fontSize: '14px', borderRadius: '8px' }}>{error}</div>}
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Username</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
-                required 
-                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
-              />
+      <div className="container" style={{ paddingTop: '5vh' }}>
+        <div className="text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-5"
+          >
+            <h1 style={{ fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 800, letterSpacing: '-2px' }}>Start your</h1>
+            <div style={{ 
+              width: '140px', height: '70px', 
+              backgroundImage: 'url(/pill-2.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+              borderRadius: '100px', border: '3px solid #1A1A1A'
+            }} />
+            <h1 style={{ fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 800, letterSpacing: '-2px' }}>intellectual</h1>
+            <h1 style={{ fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 800, letterSpacing: '-2px' }}>journey</h1>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mx-auto"
+            style={{ maxWidth: '480px' }}
+          >
+            <div style={{ 
+              backgroundColor: 'white', 
+              border: '2px solid #1A1A1A', 
+              borderRadius: '32px',
+              padding: '32px',
+              boxShadow: '8px 8px 0px #1A1A1A'
+            }}>
+              <h4 className="fw-bold mb-4">Create Account</h4>
+              {error && <div className="alert alert-danger p-2 small mb-3">{error}</div>}
+              
+              <form onSubmit={handleSubmit}>
+                <div className="d-flex flex-column gap-3">
+                  <input 
+                    type="text" 
+                    placeholder="Username" 
+                    className="form-control"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    style={{ borderRadius: '100px', padding: '16px 24px', border: '2px solid #EEE' }}
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Email Address" 
+                    className="form-control"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ borderRadius: '100px', padding: '16px 24px', border: '2px solid #EEE' }}
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Password" 
+                    className="form-control"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ borderRadius: '100px', padding: '16px 24px', border: '2px solid #EEE' }}
+                  />
+                  <button 
+                    type="submit" 
+                    className="btn btn-dark w-100 py-3 mt-2" 
+                    style={{ borderRadius: '100px', fontWeight: 700, fontSize: '18px' }}
+                  >
+                    Join Scholarium &rarr;
+                  </button>
+                </div>
+              </form>
+              <div className="mt-4 small">
+                Already have an account? <Link to="/login" style={{ color: '#4F6EF7', fontWeight: 700 }}>Sign in</Link>
+              </div>
             </div>
-            <div className="mb-3">
-              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Email</label>
-              <input 
-                type="email" 
-                className="form-control" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
-              />
-            </div>
-            <div className="mb-5">
-              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Password</label>
-              <input 
-                type="password" 
-                className="form-control" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
-                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
-              />
-            </div>
-            <motion.button 
-              whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(79,110,247,0.2)' }}
-              whileTap={{ scale: 0.98 }}
-              type="submit" 
-              className="btn w-100" 
-              style={{ background: 'linear-gradient(135deg, #4F6EF7 0%, #8E2DE2 100%)', color: 'white', border: 'none', borderRadius: '12px', padding: '14px', fontWeight: 600, fontSize: '16px' }}
-            >
-              Sign Up
-            </motion.button>
-          </form>
-          <div className="text-center mt-4" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-            Already have an account? <Link to="/login" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

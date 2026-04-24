@@ -19,91 +19,145 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: 'var(--bg-page)', transition: 'background-color 0.3s ease' }}>
-      {/* High-level Bubbly Background */}
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 10 + Math.random() * 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          style={{
-            position: 'absolute',
-            width: 100 + Math.random() * 300,
-            height: 100 + Math.random() * 300,
-            borderRadius: '50%',
-            background: i % 2 === 0 ? 'rgba(79,110,247,0.08)' : 'rgba(142,45,226,0.06)',
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            filter: 'blur(40px)',
-            zIndex: 0
-          }}
-        />
-      ))}
+    <div style={{ 
+      minHeight: '100vh', 
+      width: '100%', 
+      backgroundColor: '#F5F3EF', // Paper-like off-white
+      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundSize: '24px 24px',
+      color: '#1A1A1A',
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+      overflowX: 'hidden'
+    }}>
+      
+      {/* Top Navigation Bar */}
+      <nav className="d-flex justify-content-between align-items-center px-5 py-4">
+        <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
+        <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
+          <span>About</span>
+          <span>Programmes</span>
+          <span>Resources</span>
+        </div>
+        <button className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600 }}>Get in touch</button>
+      </nav>
 
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          style={{
-            background: 'var(--bg-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            borderRadius: '24px', border: '1px solid var(--border)', padding: '48px', width: '100%', maxWidth: '420px',
-            boxShadow: 'var(--shadow-card)', color: 'var(--text-primary)'
-          }}
-        >
-          <div className="text-center mb-4">
-            <div className="d-inline-block px-3 py-1 rounded-pill mb-3" style={{ background: 'var(--border)', color: 'var(--accent-primary)', fontSize: '12px', fontWeight: 700 }}>SCHOLARIUM</div>
-            <h2 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '32px', color: 'var(--text-primary)' }}>Welcome Back</h2>
-          </div>
-          
-          {error && <div className="alert alert-danger" style={{ fontSize: '14px', borderRadius: '8px' }}>{error}</div>}
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Username</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
-                required 
-                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
-              />
+      <div className="container" style={{ paddingTop: '10vh' }}>
+        <div className="text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-2"
+          >
+            <h1 style={{ fontSize: 'clamp(40px, 8vw, 90px)', fontWeight: 800, letterSpacing: '-2px' }}>Discover</h1>
+            <div style={{ 
+              width: '180px', height: '90px', 
+              backgroundImage: 'url(/pill-1.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+              borderRadius: '100px', border: '3px solid #1A1A1A'
+            }} />
+            <h1 style={{ fontSize: 'clamp(40px, 8vw, 90px)', fontWeight: 800, letterSpacing: '-2px' }}>wisdom</h1>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-5"
+          >
+            <h1 style={{ fontSize: 'clamp(40px, 8vw, 90px)', fontWeight: 800, letterSpacing: '-2px' }}>curriculums</h1>
+            <div style={{ display: 'flex', gap: '-10px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#F4E87C', border: '3px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '24px', zIndex: 2 }}>&</div>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#4F6EF7', border: '3px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginLeft: '-15px', zIndex: 1 }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              </div>
             </div>
-            <div className="mb-5">
-              <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>Password</label>
-              <input 
-                type="password" 
-                className="form-control" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
-                style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px' }} 
-              />
+            <h1 style={{ fontSize: 'clamp(40px, 8vw, 90px)', fontWeight: 800, letterSpacing: '-2px' }}>mastery</h1>
+            <div style={{ 
+              width: '100px', height: '100px', 
+              backgroundImage: 'url(/pill-2.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+              borderRadius: '50%', border: '3px solid #1A1A1A'
+            }} />
+          </motion.div>
+
+          <p className="mx-auto text-muted mb-5" style={{ maxWidth: '500px', fontSize: '18px' }}>
+            Ready to unlock your potential? Our AI-driven roadmap adapts to your goals in real-time.
+          </p>
+
+          {/* Login Box inspired by the Email Box */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mx-auto"
+            style={{ maxWidth: '480px' }}
+          >
+            <div style={{ 
+              backgroundColor: 'white', 
+              border: '2px solid #1A1A1A', 
+              borderRadius: '32px',
+              padding: '32px',
+              boxShadow: '8px 8px 0px #1A1A1A'
+            }}>
+              <h4 className="fw-bold mb-4">Welcome Back</h4>
+              {error && <div className="alert alert-danger p-2 small mb-3">{error}</div>}
+              
+              <form onSubmit={handleSubmit}>
+                <div className="d-flex flex-column gap-3">
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type="text" 
+                      placeholder="Username" 
+                      className="form-control"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      style={{ 
+                        borderRadius: '100px', 
+                        padding: '16px 24px', 
+                        border: '2px solid #EEE',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type="password" 
+                      placeholder="Password" 
+                      className="form-control"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      style={{ 
+                        borderRadius: '100px', 
+                        padding: '16px 24px', 
+                        border: '2px solid #EEE',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <button 
+                    type="submit" 
+                    className="btn btn-dark w-100 py-3 mt-2" 
+                    style={{ borderRadius: '100px', fontWeight: 700, fontSize: '18px' }}
+                  >
+                    Sign In &rarr;
+                  </button>
+                </div>
+              </form>
+              <div className="mt-4 small">
+                Don't have an account? <Link to="/register" style={{ color: '#4F6EF7', fontWeight: 700 }}>Join now</Link>
+              </div>
             </div>
-            <motion.button 
-              whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(79,110,247,0.2)' }}
-              whileTap={{ scale: 0.98 }}
-              type="submit" 
-              className="btn w-100" 
-              style={{ background: 'linear-gradient(135deg, #4F6EF7 0%, #8E2DE2 100%)', color: 'white', border: 'none', borderRadius: '12px', padding: '14px', fontWeight: 600, fontSize: '16px' }}
-            >
-              Sign In
-            </motion.button>
-          </form>
-          <div className="text-center mt-4" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-            Don't have an account? <Link to="/register" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>Create one</Link>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
+
+      {/* Decorative Badges */}
+      <div style={{ position: 'absolute', bottom: '10%', right: '5%', transform: 'rotate(15deg)', background: '#000', color: '#FFF', padding: '10px 20px', borderRadius: '100px', fontWeight: 800 }}>
+        Personalized Learning
+      </div>
+      <div style={{ position: 'absolute', top: '25%', left: '10%', opacity: 0.1 }}>
+        <svg width="100" height="100" viewBox="0 0 100 100"><path d="M10 50 Q 50 10 90 50 T 170 50" fill="none" stroke="black" strokeWidth="2" strokeDasharray="5,5" /></svg>
+      </div>
+
     </div>
   );
 };
