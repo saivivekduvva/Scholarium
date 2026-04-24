@@ -237,11 +237,11 @@ def generate_roadmap(goal: str) -> dict:
         
         print(f"Error in generate_roadmap: {e}. Purged cache. Retrying once...")
         try:
-            resp = call_llm(system + " (IMPORTANT: BE CONCISE, ONLY JSON)", user, json_mode=True)
+            resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
             return _parse_json(resp)
         except Exception as e2:
-            print(f"Final failure in generate_roadmap: {e2}")
-            raise ValueError("Failed to generate roadmap JSON")
+            print(f"Final failure in generate_roadmap for goal '{goal}': {e2}")
+            raise ValueError(f"AI Generation Error: {str(e2)}")
 
 def expand_subtopics(skill_name: str) -> dict:
     system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 5-7 logically sequenced, UNIQUE subtopics.
@@ -282,7 +282,7 @@ def expand_subtopics(skill_name: str) -> dict:
             return _parse_json(resp)
         except Exception as e2:
             print(f"Final failure in expand_subtopics for {skill_name}: {e2}")
-            raise ValueError("Failed to parse subtopics JSON")
+            raise ValueError(f"Curriculum Generation Error: {str(e2)}")
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
     system = """You are a friendly and encouraging tutor for Scholarium. 
