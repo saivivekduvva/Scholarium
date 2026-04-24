@@ -13,6 +13,7 @@ import SubtopicDetail from './pages/SubtopicDetail';
 import ErrorPage from './pages/ErrorPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AboutPage from './pages/AboutPage';
 
 // A component to render the Navbar only when authenticated
 const Navbar = () => {
@@ -59,6 +60,9 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <Link to="/settings" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>Settings</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/about" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>About</Link>
             </li>
           </ul>
         </div>
@@ -108,6 +112,7 @@ function App() {
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/error" element={<ErrorPage />} />
           </Routes>
         </AnimatePresence>
