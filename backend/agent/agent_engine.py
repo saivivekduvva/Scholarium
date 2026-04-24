@@ -21,12 +21,6 @@ except (ImportError, Exception):
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
 gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
 
-# Debug Log for Environment Keys
-gemini_key = os.environ.get('GEMINI_API_KEY')
-if gemini_key:
-    print(f"DEBUG: GEMINI_API_KEY is loaded. Starts with: {gemini_key[:5]}...")
-else:
-    print("DEBUG: CRITICAL ERROR - GEMINI_API_KEY is NOT loaded in environment!")
 
 def log_conversation(session_id, role, content):
     mongo_brain.conversations.update_one(
