@@ -33,14 +33,16 @@ const GraphView = () => {
         }
 
         const prereqs = {}; 
-        rawGraph.nodes.forEach(n => prereqs[n.id] = []);
+        rawGraph.nodes.forEach(n => prereqs[String(n.id)] = []);
         rawGraph.edges.forEach(e => {
-          if (!prereqs[e.target]) prereqs[e.target] = [];
-          prereqs[e.target].push(e.source);
+          const target = String(e.target);
+          const source = String(e.source);
+          if (!prereqs[target]) prereqs[target] = [];
+          prereqs[target].push(source);
         });
 
         const nodesById = {};
-        rawGraph.nodes.forEach(n => nodesById[n.id] = n);
+        rawGraph.nodes.forEach(n => nodesById[String(n.id)] = n);
 
         const computedNodes = rawGraph.nodes.map(node => {
           const prof = cpMap[node.data.label] || 0;
@@ -49,7 +51,7 @@ const GraphView = () => {
           if (prof >= 80) {
             status = 'done';
           } else {
-            const reqs = prereqs[node.id];
+            const reqs = prereqs[String(node.id)] || [];
             if (reqs.length === 0) {
               status = 'active'; 
             } else {
