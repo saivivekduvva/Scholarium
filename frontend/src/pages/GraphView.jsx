@@ -157,12 +157,13 @@ const GraphView = () => {
       
       <button 
         onClick={() => window.history.back()}
-        className="btn btn-sm shadow-sm"
+        className="btn btn-sm"
         style={{
           position: 'absolute', top: '24px', left: '24px', zIndex: 100,
           background: 'var(--bg-surface)', color: 'var(--text-primary)',
-          border: '1px solid var(--border)', borderRadius: '12px',
-          padding: '8px 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px'
+          border: '3px solid var(--border)', borderRadius: '12px',
+          padding: '10px 20px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
+          boxShadow: '4px 4px 0px var(--border)'
         }}
       >
         <span>&larr;</span> Back to Dashboard

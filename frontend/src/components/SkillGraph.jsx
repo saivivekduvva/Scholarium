@@ -95,26 +95,27 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
         fitView
         minZoom={0.2}
         maxZoom={1.5}
+        style={{ background: 'var(--bg-page)' }}
       >
-        <Background variant="dots" gap={24} size={1} color="#cbd5e1" />
+        <Background variant="dots" gap={30} size={1} color="rgba(0,0,0,0.1)" />
         <MiniMap 
           nodeColor={(node) => {
             if (node.data.status === 'done') return '#06C9A0';
             if (node.data.status === 'active') return '#4F6EF7';
-            return '#e2e8f0';
+            return 'rgba(0,0,0,0.05)';
           }}
-          maskColor="rgba(240, 244, 255, 0.6)"
-          style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }}
+          maskColor="rgba(245, 243, 239, 0.8)"
+          style={{ borderRadius: '16px', border: '3px solid var(--border)', background: 'white' }}
         />
         <Controls 
           style={{ 
             display: 'flex', 
             flexDirection: 'column', 
             gap: '4px',
-            borderRadius: '8px',
+            borderRadius: '12px',
             overflow: 'hidden',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+            border: '3px solid var(--border)',
+            boxShadow: '4px 4px 0px var(--border)'
           }} 
         />
       </ReactFlow>
