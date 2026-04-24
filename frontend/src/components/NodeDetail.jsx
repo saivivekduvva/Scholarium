@@ -126,13 +126,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
         <h4 className="mb-1" style={{ fontFamily: 'Outfit', fontWeight: 700, color: 'var(--text-primary)' }}>Scholarium — {skillName}</h4>
         <span className="badge mb-4" style={{ backgroundColor: 'var(--accent-primary)' }}>{node.data.status || 'Active'}</span>
         
-        <div className="mb-4">
-          <label className="form-label text-muted small" style={{ color: 'var(--text-muted)' }}>Proficiency</label>
-          <div className="progress" style={{ height: '8px', backgroundColor: 'var(--border)' }}>
-            <div className="progress-bar" style={{ width: `${currentProgress}%`, backgroundColor: 'var(--accent-secondary)' }}></div>
-          </div>
-          <div className="text-end small text-muted mt-1 fw-bold" style={{ color: 'var(--text-muted)' }}>{currentProgress}% Mastery</div>
-        </div>
+        {/* Removed Proficiency Bar as requested */}
 
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-4 pb-3 border-bottom" style={{ borderColor: 'var(--border)' }}>
           <div>
@@ -167,7 +161,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
             <div 
               style={{ 
                 position: 'absolute', left: '0', top: '10px', bottom: '10px', width: '2px', 
-                background: 'linear-gradient(to bottom, var(--accent-primary), var(--border))',
+                background: 'var(--border)',
                 borderRadius: '2px'
               }} 
             />

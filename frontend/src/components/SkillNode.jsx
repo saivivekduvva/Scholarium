@@ -34,21 +34,7 @@ const SkillNode = ({ data, selected }) => {
         {data.description || 'Master this fundamental concept to progress.'}
       </div>
 
-      {/* Mastery Progress Bar */}
-      <div className="w-100 mt-2">
-        <div className="d-flex justify-content-between align-items-center mb-1">
-          <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8' }}>MASTERY</span>
-          <span style={{ fontSize: '10px', fontWeight: 800, color: status === 'done' ? 'var(--accent-secondary)' : 'var(--accent-primary)' }}>{progress}%</span>
-        </div>
-        <div className="progress" style={{ height: '6px', borderRadius: '3px', backgroundColor: '#f1f5f9' }}>
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            className={`progress-bar ${status === 'done' ? 'bg-success' : 'bg-primary'}`}
-            style={{ borderRadius: '3px' }}
-          />
-        </div>
-      </div>
+      {/* Removed Mastery Progress Bar as requested */}
       
       <Handle type="source" position={Position.Bottom} style={{ visibility: 'hidden' }} />
     </motion.div>
