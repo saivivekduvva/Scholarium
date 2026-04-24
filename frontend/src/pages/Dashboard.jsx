@@ -29,25 +29,6 @@ const Dashboard = () => {
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflowX: 'hidden' }}>
       
-      {/* Hero Image Background */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100vh',
-          backgroundImage: 'url(/hero-bg.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.6,
-          zIndex: -1,
-          maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)'
-        }}
-      />
-
       <div className="container" style={{ paddingTop: '12vh', position: 'relative', zIndex: 10 }}>
         {/* Main Hero Typography */}
         <motion.div 

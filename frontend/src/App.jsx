@@ -18,7 +18,7 @@ import { IoSunnyOutline, IoMoonOutline } from 'react-icons/io5';
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('scholarium-theme') || 'light');
+  const [theme, setTheme] = useState(localStorage.getItem('scholarium-theme') || 'dark');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
