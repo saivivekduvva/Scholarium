@@ -19,7 +19,7 @@ try:
 except (ImportError, Exception):
     anthropic_client = None
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('models/gemini-1.5-flash')
+gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
 
 # Debug Log for Environment Keys
 gemini_key = os.environ.get('GEMINI_API_KEY')
