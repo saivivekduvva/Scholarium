@@ -8,6 +8,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const { register } = useContext(AuthContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +17,9 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
     const result = await register(username, email, password);
-    if (!result.success) {
+    if (result.success) {
+      setSuccess(true);
+    } else {
       setError(result.error);
     }
   };
@@ -76,8 +79,15 @@ const RegisterPage = () => {
             }}>
               <h4 className="fw-bold mb-4">Create Account</h4>
               {error && <div className="alert alert-danger p-2 small mb-3">{error}</div>}
+              {success && (
+                <div className="alert alert-success border-0 rounded-4 p-4 mb-4" style={{ backgroundColor: 'rgba(6, 201, 160, 0.1)', color: '#06C9A0' }}>
+                  <h5 className="fw-bold mb-2">Check your inbox! 📧</h5>
+                  <p className="small mb-0">We've sent a verification link to <strong>{email}</strong>. Please verify your account to continue.</p>
+                </div>
+              )}
               
-              <form onSubmit={handleSubmit}>
+              {!success && (
+                <form onSubmit={handleSubmit}>
                 <div className="d-flex flex-column gap-3">
                   <input 
                     type="text" 
@@ -133,7 +143,8 @@ const RegisterPage = () => {
                     Join Scholarium &rarr;
                   </button>
                 </div>
-              </form>
+                </form>
+              )}
               <div className="mt-4 small">
                 Already have an account? <Link to="/login" style={{ color: '#4F6EF7', fontWeight: 700 }}>Sign in</Link>
               </div>

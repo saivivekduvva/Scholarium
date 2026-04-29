@@ -10,6 +10,7 @@ import Session from './pages/Session';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import SubtopicDetail from './pages/SubtopicDetail';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import ErrorPage from './pages/ErrorPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -113,6 +114,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
             
             {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

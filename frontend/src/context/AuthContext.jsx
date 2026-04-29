@@ -56,8 +56,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, email, password) => {
     try {
       await api.register({ username, email, password });
-      // After register, auto login
-      return await login(username, password);
+      return { success: true, requiresVerification: true };
     } catch (error) {
       console.error('Registration failed', error);
       const errorData = error.response?.data;
