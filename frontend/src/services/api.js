@@ -54,4 +54,5 @@ export default {
   getExplanation: (skill_name, subtopic_title, goal_id) => api.post('subtopics/explanation/', { skill_name, subtopic_title, goal_id }),
   markSubtopicMastered: (skill_name, subtopic_title, goal_id) => api.post('subtopic/complete/', { skill_name, subtopic_title, goal_id }),
   getProfile: () => api.get('auth/profile/'),
+  verifyEmail: (data) => api.post('auth/verify-email/', data),
 };

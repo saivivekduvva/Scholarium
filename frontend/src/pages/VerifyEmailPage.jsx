@@ -11,7 +11,7 @@ const VerifyEmailPage = () => {
   useEffect(() => {
     const verify = async () => {
       try {
-        await api.post('users/verify-email/', { token });
+        await api.verifyEmail({ token });
         setStatus('success');
       } catch (err) {
         console.error("Verification failed", err);
