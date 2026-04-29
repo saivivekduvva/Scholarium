@@ -1,3 +1,4 @@
+import threading
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -23,8 +24,13 @@ class RegisterSerializer(serializers.ModelSerializer):
             name=validated_data.get('name', '')
         )
         
-        # Trigger verification email
-        from .email_utils import send_verification_email
-        send_verification_email(user)
-        
+        # Trigger verification email in background
+        try:
+            from .email_utils import send_verification_email
+            thread = threading.Thread(target=send_verification_email, args=(user,))
+            thread.daemon = True
+            thread.start()
+        except Exception as e:
+            print(f"Error starting email thread: {str(e)}")
+            
         return user
