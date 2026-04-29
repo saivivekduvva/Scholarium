@@ -20,32 +20,40 @@ def generate_verification_token(user):
     )
 
 def send_verification_email(user):
-    token_obj = generate_verification_token(user)
-    
-    # Construct verification link
-    # In production, use the actual domain from settings or request
-    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
-    verification_link = f"{frontend_url}/verify-email/{token_obj.token}"
-    
-    subject = "Scholarium — Verify your email address"
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Scholarium <noreply@scholarium.com>')
-    to_email = [user.email]
-    
-    # Render templates
-    context = {
-        'username': user.username,
-        'VERIFICATION_LINK': verification_link
-    }
-    
-    text_content = render_to_string('emails/verification_email.txt', context)
-    html_content = render_to_string('emails/verification_email.html', context)
-    
-    email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-    email.attach_alternative(html_content, "text/html")
-    
     try:
+        # Check if API key is configured
+        api_key = getattr(settings, 'EMAIL_HOST_PASSWORD', '')
+        if not api_key:
+            print("WARNING: RESEND_API_KEY is not set. Email will not be sent.")
+            return False
+
+        token_obj = generate_verification_token(user)
+        
+        # Construct verification link
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+        verification_link = f"{frontend_url}/verify-email/{token_obj.token}"
+        
+        subject = "Scholarium — Verify your email address"
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Scholarium <onboarding@resend.dev>')
+        to_email = [user.email]
+        
+        # Render templates
+        context = {
+            'username': user.username,
+            'VERIFICATION_LINK': verification_link
+        }
+        
+        text_content = render_to_string('emails/verification_email.txt', context)
+        html_content = render_to_string('emails/verification_email.html', context)
+        
+        email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+        email.attach_alternative(html_content, "text/html")
+        
         email.send()
         return True
     except Exception as e:
+        import traceback
         print(f"FAILED to send email: {str(e)}")
+        print(traceback.format_exc())
         return False
+
