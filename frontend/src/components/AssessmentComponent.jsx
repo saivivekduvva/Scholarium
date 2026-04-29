@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import api from '../services/api';
 
-const AssessmentComponent = ({ skillName, subtopicTitle, onMasteryAchieved, navigateBack }) => {
+const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchieved, navigateBack }) => {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [active, setActive] = useState(false);
@@ -19,6 +19,7 @@ const AssessmentComponent = ({ skillName, subtopicTitle, onMasteryAchieved, navi
         skill_name: skillName,
         subtopic_title: subtopicTitle,
         difficulty: 'advanced', // Enforce high difficulty for mastery
+        goal_id: goalId
       });
       if (res.data.practice?.questions) {
         setQuestions(res.data.practice.questions.slice(0, 4));
@@ -54,7 +55,7 @@ const AssessmentComponent = ({ skillName, subtopicTitle, onMasteryAchieved, navi
         setActive(false);
         
         if (passed) {
-          api.markSubtopicMastered(skillName, subtopicTitle)
+          api.markSubtopicMastered(skillName, subtopicTitle, goalId)
             .then(() => onMasteryAchieved())
             .catch(err => console.error('Error marking mastery:', err));
         }

@@ -50,6 +50,7 @@ def generate_roadmap(goal: str) -> dict:
     
     Arrange the nodes logically from left to right (foundational to advanced).
     
+    CRITICAL: The 'name' in the skills list MUST EXACTLY MATCH the 'label' in the graph nodes for each corresponding ID.
     CRITICAL: RETURN ONLY VALID JSON. NO CONVERSATIONAL TEXT."""
     
     user = f"""Goal: {goal}

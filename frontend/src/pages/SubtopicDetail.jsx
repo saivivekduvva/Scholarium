@@ -13,7 +13,7 @@ import AssessmentComponent from '../components/AssessmentComponent';
 import ResourceSidebar from '../components/ResourceSidebar';
 
 const SubtopicDetail = () => {
-  const { skillName, subtopicTitle } = useParams();
+  const { goalId, skillName, subtopicTitle } = useParams();
   const navigate = useNavigate();
 
   // State
@@ -33,7 +33,7 @@ const SubtopicDetail = () => {
       setLoading(true);
       try {
         // Fetch explanation
-        const res = await api.getExplanation(skillName, subtopicTitle);
+        const res = await api.getExplanation(skillName, subtopicTitle, goalId);
         if (res.data.explanation && !res.data.explanation.includes("Failed")) {
           setExplanation(res.data.explanation);
           setProSources(res.data.pro_sources || []);
@@ -46,12 +46,9 @@ const SubtopicDetail = () => {
         const bookData = await resourceService.fetchOpenLibraryBooks(query);
         setBooks(bookData);
 
-        // Fetch next subtopic (using 0 or dynamic goal ID if available, for now maintaining minimal change)
-        // Note: In a full refactor, the goal ID should be passed via context or route params.
-        const roadmapRes = await api.getGoals(); 
-        const currentGoal = roadmapRes.data.find(g => g.status === 'active'); // Heuristic
-        if (currentGoal) {
-          const subsRes = await api.expandSkill(currentGoal.id, skillName, false);
+        // Use goalId from params instead of heuristic
+        if (goalId) {
+          const subsRes = await api.expandSkill(goalId, skillName, false);
           if (subsRes.data?.subtopics) {
             const subs = subsRes.data.subtopics;
             const currentIndex = subs.findIndex(s => s.title === subtopicTitle);
@@ -131,7 +128,7 @@ const SubtopicDetail = () => {
               <button 
                 onClick={() => {
                   window.scrollTo(0, 0);
-                  navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(nextSubtopic)}`);
+                  navigate(`/subtopic/${goalId}/${encodeURIComponent(skillName)}/${encodeURIComponent(nextSubtopic)}`);
                 }}
                 className="btn btn-primary px-4 py-2"
                 style={{ borderRadius: '12px', fontWeight: 600 }}
@@ -147,6 +144,7 @@ const SubtopicDetail = () => {
               <AssessmentComponent 
                 skillName={skillName} 
                 subtopicTitle={subtopicTitle} 
+                goalId={goalId}
                 onMasteryAchieved={() => setIsStudied(true)}
                 navigateBack={() => navigate(-1)}
               />

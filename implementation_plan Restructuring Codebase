@@ -1,0 +1,62 @@
+# Scholarium Codebase Refactor Plan
+
+This plan outlines a series of safe refactors to improve the maintainability, readability, and professional structure of the Scholarium codebase.
+
+## Goal
+Clean up and restructure the codebase without changing functionality, output, UX behavior, business logic, model behavior, or API contracts.
+
+## User Review Required
+
+> [!IMPORTANT]
+> I will be extracting logic into new files (e.g., `llm_service.py`, `AssessmentComponent.jsx`). This changes the internal file structure but not the external behavior.
+
+## Proposed Changes
+
+### [Backend] Agent Module
+
+#### [MODIFY] [agent_engine.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/agent_engine.py)
+- Remove low-level LLM call logic (`call_claude`, `call_gemini`, `call_llm`).
+- Remove JSON parsing logic (`_parse_json`).
+- Remove redundant `raise e` and internal imports.
+- Focus this file on domain-specific AI logic (roadmap generation, subtopic expansion, etc.).
+
+#### [NEW] [llm_service.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/llm_service.py)
+- Centralize LLM provider setup (Anthropic, Gemini).
+- Implement `call_llm` with integrated caching and retry logic.
+- Define a custom `RateLimitError` here.
+
+#### [NEW] [utils.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/utils.py)
+- Move `_parse_json` and other common utilities here.
+
+#### [MODIFY] [views.py](file:///c:/Users/saivi/Downloads/Scholarium/backend/agent/views.py)
+- Remove duplicate `find_similar_goal`.
+- Clean up redundant imports.
+- Improve error handling consistency.
+
+---
+
+### [Frontend] Subtopic Detail
+
+#### [MODIFY] [SubtopicDetail.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/pages/SubtopicDetail.jsx)
+- Decompose into smaller, focused components.
+- Move external API calls to `resourceService.js`.
+- Remove hardcoded `user_id: 1`.
+
+#### [NEW] [AssessmentComponent.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/components/AssessmentComponent.jsx)
+- Handles the quiz UI and state logic.
+
+#### [NEW] [ResourceSidebar.jsx](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/components/ResourceSidebar.jsx)
+- Handles the external resources (Pro sources, YouTube, Books).
+
+#### [NEW] [resourceService.js](file:///c:/Users/saivi/Downloads/Scholarium/frontend/src/services/resourceService.js)
+- Centralize calls to Dev.to and OpenLibrary.
+
+## Verification Plan
+
+### Automated Tests
+- I will verify that the backend still starts correctly (`python manage.py check`).
+- I will verify that the frontend builds without errors.
+
+### Manual Verification
+- I will use the browser tool to verify that the Subtopic Detail page still renders correctly and the quiz functionality works as before.
+- I will verify that goal creation and roadmap generation still function correctly.

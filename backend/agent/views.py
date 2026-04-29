@@ -114,7 +114,12 @@ def expand_skill(request, id):
         return Response({'error': 'skill_name required'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        node = SkillNode.objects.get(skill_name=skill_name, goal__user=request.user)
+        # Use goal_id to scope the search and perform case-insensitive matching
+        node = SkillNode.objects.get(
+            skill_name__iexact=skill_name.strip(), 
+            goal_id=id, 
+            goal__user=request.user
+        )
         force_refresh = request.data.get('force_refresh', False)
         
         if force_refresh:
@@ -180,9 +185,19 @@ def get_explanation(request):
         return Response({'error': 'skill_name and subtopic_title required'}, status=status.HTTP_400_BAD_REQUEST)
     
     # Get other subtopics in this skill for context
+    goal_id = request.data.get('goal_id')
+    
+    # Get other subtopics in this skill for context
     try:
-        node = SkillNode.objects.get(skill_name=skill_name, goal__user=request.user)
-        subtopic = Subtopic.objects.get(title=subtopic_title, skill_node=node)
+        if goal_id:
+            node = SkillNode.objects.get(skill_name__iexact=skill_name.strip(), goal_id=goal_id, goal__user=request.user)
+        else:
+            # Fallback for legacy calls
+            node = SkillNode.objects.filter(skill_name__iexact=skill_name.strip(), goal__user=request.user).first()
+            if not node:
+                raise SkillNode.DoesNotExist
+                
+        subtopic = Subtopic.objects.get(title__iexact=subtopic_title.strip(), skill_node=node)
         
         if subtopic.explanation:
             explanation = subtopic.explanation
@@ -223,8 +238,13 @@ def start_session(request):
     skill_name = request.data.get('skill_name')
     subtopic_title = request.data.get('subtopic_title')
     difficulty = request.data.get('difficulty', 'beginner')
+    goal_id = request.data.get('goal_id')
         
-    node = get_object_or_404(SkillNode, skill_name=skill_name, goal__user=request.user)
+    if goal_id:
+        node = get_object_or_404(SkillNode, skill_name__iexact=skill_name.strip(), goal_id=goal_id, goal__user=request.user)
+    else:
+        node = get_object_or_404(SkillNode, skill_name__iexact=skill_name.strip(), goal__user=request.user)
+        
     session = Session.objects.create(user=request.user, skill_node=node)
     
     # Get subtopics for context
@@ -302,12 +322,22 @@ def mark_subtopic_mastered(request):
     skill_name = request.data.get('skill_name')
     subtopic_title = request.data.get('subtopic_title')
     
+    goal_id = request.data.get('goal_id')
+    
     try:
-        subtopic = Subtopic.objects.get(
-            title=subtopic_title, 
-            skill_node__skill_name=skill_name, 
-            skill_node__goal__user=request.user
-        )
+        if goal_id:
+            subtopic = Subtopic.objects.get(
+                title__iexact=subtopic_title.strip(), 
+                skill_node__skill_name__iexact=skill_name.strip(), 
+                skill_node__goal_id=goal_id,
+                skill_node__goal__user=request.user
+            )
+        else:
+            subtopic = Subtopic.objects.get(
+                title__iexact=subtopic_title.strip(), 
+                skill_node__skill_name__iexact=skill_name.strip(), 
+                skill_node__goal__user=request.user
+            )
         if not subtopic.is_studied:
             subtopic.is_studied = True
             subtopic.save()

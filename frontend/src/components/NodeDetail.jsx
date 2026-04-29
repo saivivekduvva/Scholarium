@@ -6,7 +6,7 @@ import { IoBookOutline, IoTimeOutline, IoCheckmarkCircle, IoRefreshOutline } fro
 
 const subtopicsCache = {};
 
-const NodeDetail = ({ node, onClose, onUpdate }) => {
+const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
   const [subtopics, setSubtopics] = useState(null);
   const [xpEarned, setXpEarned] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -19,7 +19,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
   const refreshSubtopics = () => {
     setIsRefreshing(true);
     setErrorMsg(null);
-    api.expandSkill(1, skillName, true) // force=true
+    api.expandSkill(goalId, skillName, true) // force=true
       .then(res => {
         subtopicsCache[skillName] = res.data.subtopics;
         setSubtopics(res.data.subtopics);
@@ -48,7 +48,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
       setSubtopics(null);
       setErrorMsg(null);
       
-      api.expandSkill(1, skillName) // mocked ID
+      api.expandSkill(goalId, skillName)
         .then(res => {
           subtopicsCache[skillName] = res.data.subtopics;
           setSubtopics(res.data.subtopics);
@@ -227,7 +227,7 @@ const NodeDetail = ({ node, onClose, onUpdate }) => {
                             style={{ fontSize: '12px', ...(isDone ? { backgroundColor: 'var(--border)', color: 'var(--text-muted)', border: 'none' } : {}) }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/subtopic/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
+                              navigate(`/subtopic/${goalId}/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
                             }}
                           >
                             {isDone ? 'Review Module' : 'Launch Learning'} &rarr;

@@ -151,6 +151,7 @@ const GraphView = () => {
         {selectedNodeId && selectedNode && (
           <NodeDetail 
             node={selectedNode} 
+            goalId={goalId}
             onClose={() => setSelectedNodeId(null)} 
             onUpdate={updateNodeProgress}
           />

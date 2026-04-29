@@ -51,7 +51,7 @@ export default {
   evaluateAnswer: (id, data) => api.post(`session/evaluate/${id}/`, data),
   getProgress: (user_id) => api.get(`progress/${user_id}/`),
   getSummary: (id) => api.get(`summary/${id}/`),
-  getExplanation: (skill_name, subtopic_title) => api.post('subtopics/explanation/', { skill_name, subtopic_title }),
-  markSubtopicMastered: (skill_name, subtopic_title) => api.post('subtopic/complete/', { skill_name, subtopic_title }),
+  getExplanation: (skill_name, subtopic_title, goal_id) => api.post('subtopics/explanation/', { skill_name, subtopic_title, goal_id }),
+  markSubtopicMastered: (skill_name, subtopic_title, goal_id) => api.post('subtopic/complete/', { skill_name, subtopic_title, goal_id }),
   getProfile: () => api.get('auth/profile/'),
 };

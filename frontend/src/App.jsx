@@ -119,7 +119,7 @@ function App() {
             <Route path="/roadmaps" element={<ProtectedRoute><Roadmaps /></ProtectedRoute>} />
             <Route path="/graph/:goalId" element={<ProtectedRoute><GraphView /></ProtectedRoute>} />
             <Route path="/session/:skillId" element={<ProtectedRoute><Session /></ProtectedRoute>} />
-            <Route path="/subtopic/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
+            <Route path="/subtopic/:goalId/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             
