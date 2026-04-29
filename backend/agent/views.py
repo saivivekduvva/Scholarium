@@ -6,11 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from datetime import date, timedelta
-from users.models import User
 from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
 from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
-from .agent_engine import generate_roadmap, expand_subtopics, generate_practice, evaluate_answer, generate_summary, RateLimitError, get_subtopic_explanation
+from .agent_engine import (
+    generate_roadmap, expand_subtopics, generate_practice, 
+    evaluate_answer, generate_summary, RateLimitError, 
+    get_subtopic_explanation, find_similar_goal as find_similar_goal_ai
+)
 from .mongo_client import mongo_brain
 
 def award_xp(user, amount, reason):
@@ -21,15 +23,6 @@ def award_xp(user, amount, reason):
 
 # XP Awarding logic removed as requested.
 
-def find_similar_goal(title, existing_titles):
-    # Simple check to prevent duplicates
-    if not existing_titles:
-        return None
-    title_lower = title.lower().strip()
-    for existing in existing_titles:
-        if existing.lower().strip() == title_lower:
-            return existing
-    return None
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -44,7 +37,7 @@ def create_goal(request):
 
     # Check for similar goals first
     existing_titles = list(Goal.objects.filter(user=request.user).values_list('title', flat=True))
-    similar_title = find_similar_goal(title, existing_titles)
+    similar_title = find_similar_goal_ai(title, existing_titles)
 
     if similar_title:
         existing_goal = Goal.objects.get(title=similar_title, user=request.user)
@@ -294,8 +287,6 @@ def get_progress(request, user_id):
             'sessions': [],
             'checkpoints': []
         })
-
-from django.db.models import Sum
 
 # Leaderboard removed as requested.
 

@@ -1,163 +1,10 @@
-import os
 import json
-import requests
-import google.generativeai as genai
-from dotenv import load_dotenv
-from datetime import datetime
 import hashlib
+import time
+from datetime import datetime
 from .mongo_client import mongo_brain
-
-class RateLimitError(Exception):
-    pass
-
-load_dotenv()
-
-# Setup Providers
-try:
-    import anthropic
-    anthropic_client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY', 'dummy'))
-except (ImportError, Exception):
-    anthropic_client = None
-genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-flash-lite-latest')
-
-
-def log_conversation(session_id, role, content):
-    mongo_brain.conversations.update_one(
-        {'session_id': session_id},
-        {'$push': {'messages': {'role': role, 'content': content}}, '$setOnInsert': {'created_at': datetime.utcnow()}},
-        upsert=True
-    )
-
-def call_claude(system: str, user: str) -> str:
-    msg = anthropic_client.messages.create(
-        model="claude-3-sonnet-20240229",
-        max_tokens=2048,
-        system=system,
-        messages=[{"role": "user", "content": user}]
-    )
-    return msg.content[0].text
-
-def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
-    # Adding a small retry loop for robustness
-    import time
-    for attempt in range(3):
-        try:
-            safety_settings = [
-                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-            ]
-            
-            gen_config = {}
-            if json_mode:
-                gen_config["response_mime_type"] = "application/json"
-            
-            response = gemini_model.generate_content(
-                f"{system}\n\n{user}",
-                safety_settings=safety_settings,
-                generation_config=gen_config
-            )
-            
-            # Check if response was blocked
-            if not response.parts:
-                # If blocked, log it and retry or fail
-                print(f"Gemini BLOCKED response for prompt. Safety info: {response.candidates[0].safety_ratings if response.candidates else 'No candidates'}")
-                raise ValueError("AI_SAFETY_BLOCK")
-                
-            return response.text
-        except Exception as e:
-            err_msg = str(e).lower()
-            if "429" in err_msg or "quota" in err_msg or "rate limit" in err_msg:
-                print(f"RATE LIMIT DETECTED: {e}")
-                raise RateLimitError("AI Quota Exhausted (429)")
-            
-            if attempt == 2: 
-                print(f"Gemini call failed after 3 attempts. Raw Error: {e}")
-                raise e
-            time.sleep(1.5 ** attempt)
-
-def call_llm(system: str, user: str, json_mode: bool = False) -> str:
-    prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
-    
-    cached = mongo_brain.llm_cache.find_one({'prompt_hash': prompt_hash})
-    if cached:
-        return cached['response']
-        
-    provider = os.environ.get('LLM_PROVIDER', 'gemini').lower()
-    try:
-        if provider == 'claude' and anthropic_client:
-            response_text = call_claude(system, user)
-        else:
-            response_text = call_gemini(system, user, json_mode=json_mode)
-        
-        # Cache successful responses
-        mongo_brain.llm_cache.insert_one({
-            'prompt_hash': prompt_hash,
-            'system': system,
-            'user': user,
-            'response': response_text,
-            'created_at': datetime.utcnow()
-        })
-        return response_text
-    except Exception as e:
-        # Emergency Fallback
-        if provider == 'claude':
-            print(f"Claude failed ({str(e)}), falling back to Gemini...")
-            response_text = call_gemini(system, user, json_mode=json_mode)
-        elif provider == 'gemini' and anthropic_client:
-            print(f"Gemini failed ({str(e)}), falling back to Claude...")
-            try:
-                response_text = call_claude(system, user)
-            except:
-                raise e
-        else:
-            err_msg = str(e).lower()
-            if '429' in err_msg or 'quota' in err_msg or 'rate limit' in err_msg:
-                raise RateLimitError(f"AI Quota Exhausted: {e}")
-            raise e
-            raise e
-        
-    mongo_brain.llm_cache.insert_one({
-        'prompt_hash': prompt_hash,
-        'system': system,
-        'user': user,
-        'response': response_text,
-        'created_at': datetime.utcnow()
-    })
-    
-    return response_text
-
-def _parse_json(text: str) -> dict:
-    """Robustly parse JSON from LLM response, handling markdown blocks and conversational filler."""
-    text = text.strip()
-    
-    # Try to find the first '{' and last '}'
-    start_index = text.find('{')
-    end_index = text.rfind('}')
-    
-    if start_index != -1 and end_index != -1 and end_index > start_index:
-        json_str = text[start_index:end_index+1]
-        try:
-            return json.loads(json_str)
-        except json.JSONDecodeError:
-            # If substring fails, maybe it was a fragmented JSON or had internal backticks
-            pass
-
-    # Fallback to existing cleaning logic if indices didn't work or parse failed
-    if text.startswith('```json'):
-        text = text[7:]
-    elif text.startswith('```'):
-        text = text[3:]
-    if text.endswith('```'):
-        text = text[:-3]
-    
-    try:
-        return json.loads(text.strip())
-    except json.JSONDecodeError as e:
-        print(f"FAILED TO PARSE JSON. RAW TEXT:\n{text}\n")
-        raise e
+from .llm_service import call_llm, RateLimitError
+from .utils import log_conversation, parse_json_response as _parse_json
 
 def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
     """
@@ -225,11 +72,8 @@ def generate_roadmap(goal: str) -> dict:
         if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
             raise ValueError("AI_QUOTA_EXHAUSTED")
         
-        # If it's a parse error or safety block, purge cache and try one more time without cache
-        prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
-        mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
-        
-        print(f"Error in generate_roadmap: {e}. Purged cache. Retrying once...")
+        # If it's a parse error or safety block, try one more time
+        print(f"Error in generate_roadmap: {e}. Retrying once...")
         try:
             resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
             return _parse_json(resp)
@@ -266,10 +110,8 @@ def expand_subtopics(skill_name: str) -> dict:
         if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
             raise ValueError("AI_QUOTA_EXHAUSTED")
             
-        # Purge cache and retry once for parsing/model errors
-        prompt_hash = hashlib.md5((system + "\n" + user).encode('utf-8')).hexdigest()
-        mongo_brain.llm_cache.delete_one({'prompt_hash': prompt_hash})
-        print(f"Error in expand_subtopics: {e}. Purged cache. Retrying...")
+        # Retry once for parsing/model errors
+        print(f"Error in expand_subtopics: {e}. Retrying...")
         
         try:
             resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
@@ -291,7 +133,6 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
     Return ONLY valid JSON."""
     
     context_str = json.dumps(context) if context else "No additional context."
-    import time
     salt = time.time()
     user = f"""Topic: {skill}
     Difficulty: advanced
