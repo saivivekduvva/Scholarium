@@ -6,7 +6,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'name', 'avatar_url')
+        fields = ('id', 'username', 'email', 'name', 'avatar_url', 'is_email_verified')
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -22,4 +22,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             name=validated_data.get('name', '')
         )
+        
+        # Trigger verification email
+        from .email_utils import send_verification_email
+        send_verification_email(user)
+        
         return user

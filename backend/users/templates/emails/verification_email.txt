@@ -1,0 +1,12 @@
+Hello {{username}},
+
+Welcome to Scholarium! To start your learning journey, please verify your email address by clicking the link below:
+
+{{VERIFICATION_LINK}}
+
+This link will expire in 24 hours.
+
+If you didn't create a Scholarium account, you can safely ignore this email.
+
+Best,
+The Scholarium Team

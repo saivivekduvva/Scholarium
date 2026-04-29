@@ -45,6 +45,33 @@ class SetupAdminView(APIView):
             return Response({'status': f'{migration_status}Admin created: username=admin, password=admin123'})
         return Response({'status': f'{migration_status}Admin already exists'})
 
+class VerifyEmailView(APIView):
+    permission_classes = (AllowAny,)
+    
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        from .models import EmailVerificationToken
+        try:
+            token_obj = EmailVerificationToken.objects.get(token=token)
+            
+            if not token_obj.is_valid():
+                return Response({'error': 'Token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = token_obj.user
+            user.is_email_verified = True
+            user.save()
+            
+            # Delete token to prevent reuse
+            token_obj.delete()
+            
+            return Response({'status': 'Email verified successfully'})
+            
+        except EmailVerificationToken.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
 class DeleteAccountView(APIView):
     permission_classes = (IsAuthenticated,)
     

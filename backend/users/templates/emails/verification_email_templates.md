@@ -1,0 +1,58 @@
+# Subject Line
+Scholarium — Verify your email address
+
+# Plain Text Template
+Hello {{username}},
+
+Welcome to Scholarium! To start your learning journey, please verify your email address by clicking the link below:
+
+{{VERIFICATION_LINK}}
+
+This link will expire in 24 hours.
+
+If you didn't create a Scholarium account, you can safely ignore this email.
+
+Best,
+The Scholarium Team
+
+
+# HTML Template (Concise, minimal, mobile-friendly)
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        .header { margin-bottom: 30px; }
+        .brand { font-size: 24px; font-weight: 800; color: #4F6EF7; text-decoration: none; }
+        .content { margin-bottom: 40px; }
+        .button { display: inline-block; padding: 14px 30px; background-color: #4F6EF7; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px; }
+        .footer { font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 20px; }
+        .link-fallback { word-break: break-all; color: #4F6EF7; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="#" class="brand">scholarium</a>
+        </div>
+        <div class="content">
+            <h1 style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">Verify your email</h1>
+            <p>Welcome to Scholarium! Click the button below to verify your email address and activate your account.</p>
+            <div style="margin: 35px 0;">
+                <a href="{{VERIFICATION_LINK}}" class="button">Verify Email Address</a>
+            </div>
+            <p style="font-size: 14px; color: #666;">This link expires in 24 hours.</p>
+            <p style="font-size: 13px; color: #999; margin-top: 20px;">
+                Button not working? Copy and paste this link into your browser:<br>
+                <span class="link-fallback">{{VERIFICATION_LINK}}</span>
+            </p>
+        </div>
+        <div class="footer">
+            <p>If you didn't create a Scholarium account, you can safely ignore this email.</p>
+            <p>© 2025 Scholarium</p>
+        </div>
+    </div>
+</body>
+</html>
