@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { IoCheckmarkCircle } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoArrowBackOutline, IoArrowForwardOutline, IoPlayForwardOutline } from 'react-icons/io5';
 import api from '../services/api';
 
 const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchieved, navigateBack }) => {
@@ -8,9 +8,8 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
   const [questions, setQuestions] = useState([]);
   const [active, setActive] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState([]);
+  const [userSelections, setUserSelections] = useState([]); // Stores { selectedIndex, isCorrect, skipped }
   const [result, setResult] = useState(null);
-  const [feedback, setFeedback] = useState(null);
 
   const startAssessment = async () => {
     setLoading(true);
@@ -18,14 +17,15 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
       const res = await api.startSession({
         skill_name: skillName,
         subtopic_title: subtopicTitle,
-        difficulty: 'beginner', // Foundational difficulty for mastery
+        difficulty: 'beginner',
         goal_id: goalId
       });
       if (res.data.practice?.questions) {
-        setQuestions(res.data.practice.questions.slice(0, 5));
+        const quizQuestions = res.data.practice.questions.slice(0, 5);
+        setQuestions(quizQuestions);
         setActive(true);
         setResult(null);
-        setAnswers([]);
+        setUserSelections(new Array(quizQuestions.length).fill(null));
         setCurrentIndex(0);
       }
     } catch (err) {
@@ -36,31 +36,47 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
   };
 
   const handleAnswer = (optionIndex) => {
-    if (feedback) return;
+    if (userSelections[currentIndex]) return; // Already answered
     
     const isCorrect = optionIndex === questions[currentIndex].correct_option;
-    setFeedback({ isCorrect, selected: optionIndex });
-    
-    const newAnswers = [...answers, isCorrect];
-    setAnswers(newAnswers);
+    const newSelections = [...userSelections];
+    newSelections[currentIndex] = { selectedIndex: optionIndex, isCorrect, skipped: false };
+    setUserSelections(newSelections);
+  };
 
-    setTimeout(() => {
-      setFeedback(null);
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-      } else {
-        const correctCount = newAnswers.filter(a => a).length;
-        const passed = correctCount === questions.length; // 5/5 required for mastery
-        setResult({ passed, correctCount, total: questions.length });
-        setActive(false);
-        
-        if (passed) {
-          api.markSubtopicMastered(skillName, subtopicTitle, goalId)
-            .then(() => onMasteryAchieved())
-            .catch(err => console.error('Error marking mastery:', err));
-        }
-      }
-    }, 1200);
+  const handleSkip = () => {
+    if (userSelections[currentIndex]) return; // Already answered
+    
+    const newSelections = [...userSelections];
+    newSelections[currentIndex] = { selectedIndex: null, isCorrect: false, skipped: true };
+    setUserSelections(newSelections);
+  };
+
+  const goToNext = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      finishAssessment();
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const finishAssessment = () => {
+    const correctCount = userSelections.filter(s => s?.isCorrect).length;
+    const passed = correctCount === questions.length; // 5/5 required for mastery
+    setResult({ passed, correctCount, total: questions.length });
+    setActive(false);
+    
+    if (passed) {
+      api.markSubtopicMastered(skillName, subtopicTitle, goalId)
+        .then(() => onMasteryAchieved())
+        .catch(err => console.error('Error marking mastery:', err));
+    }
   };
 
   if (!active && !result) {
@@ -85,20 +101,26 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
 
   if (active && questions[currentIndex]) {
     const currentQuestion = questions[currentIndex];
+    const selection = userSelections[currentIndex];
+    const isAnswered = selection !== null;
+
     return (
       <div>
         <div className="d-flex justify-content-between align-items-center mb-5">
           <span className="badge bg-primary px-3 py-2">QUESTION {currentIndex + 1} OF {questions.length}</span>
           <span className="text-muted small fw-bold" style={{ color: 'var(--text-muted)' }}>SUBTOPIC MASTERY TEST</span>
         </div>
+        
         <h4 className="fw-bold mb-5" style={{ lineHeight: 1.4, color: 'var(--text-primary)' }}>{currentQuestion.prompt}</h4>
-        <div className="d-flex flex-column gap-3">
+        
+        <div className="d-flex flex-column gap-3 mb-5">
           {currentQuestion.options.map((opt, i) => {
-            const isSelected = feedback?.selected === i;
+            const isSelected = selection?.selectedIndex === i;
             const isCorrect = currentQuestion.correct_option === i;
             
             let btnStyle = { borderRadius: '16px', border: '2px solid var(--border)', background: 'var(--bg-surface)', color: 'var(--text-primary)' };
-            if (feedback) {
+            
+            if (isAnswered && !selection.skipped) {
               if (isCorrect) {
                 btnStyle = { 
                   ...btnStyle, 
@@ -121,17 +143,48 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
             return (
               <button 
                 key={i}
-                disabled={!!feedback}
+                disabled={isAnswered}
                 onClick={() => handleAnswer(i)}
-                className={`btn text-start p-4 ${!feedback ? 'hover-lift' : ''}`} 
+                className={`btn text-start p-4 ${!isAnswered ? 'hover-lift' : ''}`} 
                 style={btnStyle}
               >
                 <span className="fw-bold me-3" style={{ opacity: 0.5 }}>{String.fromCharCode(65 + i)}</span>
                 {opt}
-                {feedback && isCorrect && <IoCheckmarkCircle className="float-end mt-1" />}
+                {isAnswered && isCorrect && !selection.skipped && <IoCheckmarkCircle className="float-end mt-1" />}
               </button>
             );
           })}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+          <button 
+            onClick={goToPrevious}
+            disabled={currentIndex === 0}
+            className="btn d-flex align-items-center gap-2 px-4 py-2"
+            style={{ fontWeight: 700, borderRadius: '12px', border: '2px solid var(--border)', color: 'var(--text-primary)' }}
+          >
+            <IoArrowBackOutline /> Previous
+          </button>
+
+          {!isAnswered && (
+            <button 
+              onClick={handleSkip}
+              className="btn d-flex align-items-center gap-2 px-4 py-2"
+              style={{ fontWeight: 600, color: 'var(--text-muted)' }}
+            >
+              Skip Question <IoPlayForwardOutline />
+            </button>
+          )}
+
+          <button 
+            onClick={goToNext}
+            disabled={!isAnswered}
+            className="btn btn-primary d-flex align-items-center gap-2 px-5 py-2"
+            style={{ fontWeight: 700, borderRadius: '12px' }}
+          >
+            {currentIndex === questions.length - 1 ? 'Finish' : 'Next'} <IoArrowForwardOutline />
+          </button>
         </div>
       </div>
     );

@@ -99,7 +99,7 @@ const Footer = () => {
   if (!user) return null;
   return (
     <footer className="text-center py-4" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-      © 2025 Scholarium
+      © 2026 Scholarium
     </footer>
   );
 };
