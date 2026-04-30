@@ -71,6 +71,15 @@ const GraphView = () => {
         });
 
         setGraphData({ nodes: computedNodes, edges: rawGraph.edges });
+
+        // Check for overall goal completion
+        const allDone = computedNodes.every(n => n.data.status === 'done');
+        if (allDone && computedNodes.length > 0) {
+          // Add a slight delay for better UX before redirecting
+          setTimeout(() => {
+            window.location.href = `/goal-completed/${goalId}`;
+          }, 1500);
+        }
       })
       .catch(err => {
         console.error(err);

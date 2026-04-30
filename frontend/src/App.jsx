@@ -15,6 +15,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import GoalCompletionPage from './pages/GoalCompletionPage';
 
 // A component to render the Navbar only when authenticated
 const Navbar = () => {
@@ -122,6 +123,7 @@ function App() {
             <Route path="/subtopic/:goalId/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/goal-completed/:goalId" element={<ProtectedRoute><GoalCompletionPage /></ProtectedRoute>} />
             
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
