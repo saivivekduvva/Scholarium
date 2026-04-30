@@ -15,6 +15,13 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            logging.error(f"ERROR in RegisterView: {str(e)}", exc_info=True)
+            return Response({'error': 'Registration failed due to a server error. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class ProfileView(APIView):
     permission_classes = (IsAuthenticated,)
     
