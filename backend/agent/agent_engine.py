@@ -124,30 +124,30 @@ def expand_subtopics(skill_name: str) -> dict:
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
     system = """You are a friendly and encouraging tutor for Scholarium. 
-    Your goal is to rigorously assess the learner's deep understanding with challenging, high-quality questions.
+    Your goal is to assess the learner's basic understanding with clear, foundational questions.
     
     Rules for question generation:
-    1. HIGH DIFFICULTY: Focus on nuances, edge cases, and deep conceptual understanding. Avoid trivial questions.
-    2. BE PRECISE: Use technical terminology correctly.
-    3. NO OBVIOUS ANSWERS: Distractors should be plausible and require careful thought.
-    4. VARIETY: Ensure questions cover different aspects of the subtopic.
+    1. ACCESSIBLE DIFFICULTY: Focus on core concepts and fundamental principles. Avoid overly complex edge cases.
+    2. BE CLEAR: Use simple, easy-to-understand language.
+    3. RELEVANT DISTRACTORS: Distractors should be plausible but clearly incorrect for someone who knows the basics.
+    4. VARIETY: Ensure questions cover the essential aspects of the subtopic.
     
     Return ONLY valid JSON."""
     
     context_str = json.dumps(context) if context else "No additional context."
     salt = time.time()
     user = f"""Topic: {skill}
-    Difficulty: advanced
+    Difficulty: beginner
     Context: {context_str}
     Salt: {salt} (Generate completely unique and fresh questions)
     
-    Generate exactly 4 challenging, random, and highly-varied multiple-choice questions.
+    Generate exactly 5 clear, random, and varied multiple-choice questions.
     Return JSON format: 
     {{
         "questions": [
             {{
-                "prompt": "Rigorous, technical question...", 
-                "options": ["Nuanced A", "Nuanced B", "Nuanced C", "Nuanced D"], 
+                "prompt": "Clear, foundational question...", 
+                "options": ["Option A", "Option B", "Option C", "Option D"], 
                 "correct_option": 0
             }}
         ]

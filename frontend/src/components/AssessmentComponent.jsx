@@ -18,11 +18,11 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
       const res = await api.startSession({
         skill_name: skillName,
         subtopic_title: subtopicTitle,
-        difficulty: 'advanced', // Enforce high difficulty for mastery
+        difficulty: 'beginner', // Foundational difficulty for mastery
         goal_id: goalId
       });
       if (res.data.practice?.questions) {
-        setQuestions(res.data.practice.questions.slice(0, 4));
+        setQuestions(res.data.practice.questions.slice(0, 5));
         setActive(true);
         setResult(null);
         setAnswers([]);
@@ -50,7 +50,7 @@ const AssessmentComponent = ({ skillName, subtopicTitle, goalId, onMasteryAchiev
         setCurrentIndex(currentIndex + 1);
       } else {
         const correctCount = newAnswers.filter(a => a).length;
-        const passed = correctCount === questions.length; // 4/4 required for mastery
+        const passed = correctCount === questions.length; // 5/5 required for mastery
         setResult({ passed, correctCount, total: questions.length });
         setActive(false);
         
