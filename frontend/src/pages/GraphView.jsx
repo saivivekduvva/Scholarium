@@ -13,10 +13,60 @@ const GraphView = () => {
 
   const selectedNode = graphData?.nodes?.find(n => n.id === selectedNodeId);
 
+  const computeNodeStatuses = (rawNodes, rawEdges, checkpoints) => {
+    const cpMap = {};
+    if (checkpoints) {
+      checkpoints.forEach(cp => {
+        cpMap[cp.skill_name] = cp.proficiency;
+      });
+    }
+
+    const prereqs = {}; 
+    rawNodes.forEach(n => prereqs[String(n.id)] = []);
+    rawEdges.forEach(e => {
+      const target = String(e.target);
+      const source = String(e.source);
+      if (!prereqs[target]) prereqs[target] = [];
+      prereqs[target].push(source);
+    });
+
+    const nodesById = {};
+    rawNodes.forEach(n => nodesById[String(n.id)] = n);
+
+    // Initial pass to set basic status/progress
+    const initialComputed = rawNodes.map(node => {
+      const prof = cpMap[node.data.label] || 0;
+      return {
+        ...node,
+        data: { ...node.data, progress: prof, status: prof >= 80 ? 'done' : 'locked' }
+      };
+    });
+
+    const finalNodesById = {};
+    initialComputed.forEach(n => finalNodesById[String(n.id)] = n);
+
+    // Final pass to handle 'active' vs 'locked'
+    return initialComputed.map(node => {
+      if (node.data.status === 'done') return node;
+
+      const reqs = prereqs[String(node.id)] || [];
+      if (reqs.length === 0) {
+        return { ...node, data: { ...node.data, status: 'active' } };
+      }
+
+      const allDone = reqs.every(reqId => {
+        const reqNode = finalNodesById[reqId];
+        return reqNode?.data?.status === 'done';
+      });
+
+      return { ...node, data: { ...node.data, status: allDone ? 'active' : 'locked' } };
+    });
+  };
+
   useEffect(() => {
     Promise.all([
       api.getGraph(goalId),
-      api.getProgress(1).catch(err => {
+      api.getProfile().then(userRes => api.getProgress(userRes.data.id)).catch(err => {
         console.error("Progress fetch failed, falling back to empty:", err);
         return { data: { checkpoints: [] } };
       })
@@ -25,57 +75,12 @@ const GraphView = () => {
         const rawGraph = graphRes.data;
         const progress = progressRes.data;
         
-        const cpMap = {};
-        if (progress.checkpoints) {
-          progress.checkpoints.forEach(cp => {
-            cpMap[cp.skill_name] = cp.proficiency;
-          });
-        }
-
-        const prereqs = {}; 
-        rawGraph.nodes.forEach(n => prereqs[String(n.id)] = []);
-        rawGraph.edges.forEach(e => {
-          const target = String(e.target);
-          const source = String(e.source);
-          if (!prereqs[target]) prereqs[target] = [];
-          prereqs[target].push(source);
-        });
-
-        const nodesById = {};
-        rawGraph.nodes.forEach(n => nodesById[String(n.id)] = n);
-
-        const computedNodes = rawGraph.nodes.map(node => {
-          const prof = cpMap[node.data.label] || 0;
-          let status = 'locked';
-          
-          if (prof >= 80) {
-            status = 'done';
-          } else {
-            const reqs = prereqs[String(node.id)] || [];
-            if (reqs.length === 0) {
-              status = 'active'; 
-            } else {
-              const allDone = reqs.every(reqId => {
-                const reqNode = nodesById[reqId];
-                const reqProf = cpMap[reqNode.data.label] || 0;
-                return reqProf >= 80;
-              });
-              status = allDone ? 'active' : 'locked';
-            }
-          }
-
-          return {
-            ...node,
-            data: { ...node.data, status, progress: prof }
-          };
-        });
-
+        const computedNodes = computeNodeStatuses(rawGraph.nodes, rawGraph.edges, progress.checkpoints);
         setGraphData({ nodes: computedNodes, edges: rawGraph.edges });
 
         // Check for overall goal completion
         const allDone = computedNodes.every(n => n.data.status === 'done');
         if (allDone && computedNodes.length > 0) {
-          // Add a slight delay for better UX before redirecting
           setTimeout(() => {
             window.location.href = `/goal-completed/${goalId}`;
           }, 1500);
@@ -116,13 +121,21 @@ const GraphView = () => {
   const updateNodeProgress = (skillName, newProgress) => {
     setGraphData(prev => {
       if (!prev) return prev;
-      const newNodes = prev.nodes.map(node => {
+      
+      // Update the checkpoints locally to simulate a fresh fetch
+      const currentNodes = prev.nodes.map(node => {
         if (node.data.label === skillName) {
-          const status = newProgress >= 80 ? 'done' : node.data.status;
-          return { ...node, data: { ...node.data, progress: newProgress, status } };
+          return { ...node, data: { ...node.data, progress: newProgress } };
         }
         return node;
       });
+
+      const checkpoints = currentNodes.map(n => ({
+        skill_name: n.data.label,
+        proficiency: n.data.progress
+      }));
+
+      const newNodes = computeNodeStatuses(currentNodes, prev.edges, checkpoints);
       return { ...prev, nodes: newNodes };
     });
   };
