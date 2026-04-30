@@ -77,6 +77,33 @@ class VerifyEmailView(APIView):
         except EmailVerificationToken.DoesNotExist:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
+class ResendVerificationView(APIView):
+    permission_classes = (AllowAny,)
+    
+    def post(self, request):
+        username = request.data.get('username')
+        if not username:
+            return Response({'error': 'Username is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(username=username)
+            if user.is_email_verified:
+                return Response({'error': 'Email is already verified'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            from .email_utils import send_verification_email
+            import threading
+            thread = threading.Thread(target=send_verification_email, args=(user,))
+            thread.daemon = True
+            thread.start()
+            
+            return Response({'status': 'Verification email sent successfully'})
+            
+        except User.DoesNotExist:
+            # We return success even if user doesn't exist for security reasons (email enumeration)
+            # but in this case, since it's username based and we are friendly, maybe just return error?
+            # Actually, let's just return success to be consistent.
+            return Response({'status': 'If an account exists, a verification email has been sent.'})
+
 class DeleteAccountView(APIView):
     permission_classes = (IsAuthenticated,)
     

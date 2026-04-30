@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -100,7 +101,30 @@ const LoginPage = () => {
               boxShadow: '8px 8px 0px #1A1A1A'
             }}>
               <h4 className="fw-bold mb-4">Welcome Back</h4>
-              {error && <div className="alert alert-danger p-2 small mb-3">{error}</div>}
+              {error && (
+                <div className="alert alert-danger p-3 small mb-4 d-flex flex-column gap-2" style={{ borderRadius: '16px', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B' }}>
+                  <div className="d-flex align-items-start gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginTop: '2px' }}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span>{error}</span>
+                  </div>
+                  {error.includes('not verified') && (
+                    <button 
+                      onClick={async () => {
+                        try {
+                          await api.resendVerification({ username });
+                          alert("Verification email sent! Please check your inbox.");
+                        } catch (err) {
+                          alert("Failed to resend verification email. Please try again.");
+                        }
+                      }}
+                      className="btn btn-sm btn-danger mt-1"
+                      style={{ alignSelf: 'flex-start', borderRadius: '8px', fontWeight: 600 }}
+                    >
+                      Resend link
+                    </button>
+                  )}
+                </div>
+              )}
               
               <form onSubmit={handleSubmit}>
                 <div className="d-flex flex-column gap-3">

@@ -55,4 +55,5 @@ export default {
   markSubtopicMastered: (skill_name, subtopic_title, goal_id) => api.post('subtopic/complete/', { skill_name, subtopic_title, goal_id }),
   getProfile: () => api.get('auth/profile/'),
   verifyEmail: (data) => api.post('auth/verify-email/', data),
+  resendVerification: (data) => api.post('auth/resend-verification/', data),
 };
