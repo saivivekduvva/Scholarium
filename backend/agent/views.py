@@ -310,31 +310,40 @@ def get_progress(request, user_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_stats(request):
-    user = request.user
-    goals = Goal.objects.filter(user=user)
-    total_goals = goals.count()
-    
-    completed_goals = 0
-    for goal in goals:
-        skill_nodes = goal.skills.all()
-        if skill_nodes.exists():
-            skill_names = [sn.skill_name for sn in skill_nodes]
-            checkpoints = Checkpoint.objects.filter(user=user, skill_name__in=skill_names)
-            # A goal is completed if all its skills have a checkpoint >= 80
-            if checkpoints.count() == len(skill_names) and all(cp.proficiency >= 80 for cp in checkpoints):
-                completed_goals += 1
-    
-    total_quizzes = Session.objects.filter(user=user).count()
-    
-    from django.db.models import Sum
-    mastery_points = Checkpoint.objects.filter(user=user).aggregate(Sum('proficiency'))['proficiency__sum'] or 0
-    
-    return Response({
-        'total_goals': total_goals,
-        'completed_goals': completed_goals,
-        'total_quizzes': total_quizzes,
-        'total_mastery_points': mastery_points
-    })
+    try:
+        user = request.user
+        goals = Goal.objects.filter(user=user)
+        total_goals = goals.count()
+        
+        completed_goals = 0
+        for goal in goals:
+            skill_nodes = goal.nodes.all()
+            if skill_nodes.exists():
+                skill_names = [sn.skill_name for sn in skill_nodes]
+                checkpoints = Checkpoint.objects.filter(user=user, skill_name__in=skill_names)
+                # A goal is completed if all its skills have a checkpoint >= 80
+                if checkpoints.count() == len(skill_names) and checkpoints.count() > 0 and all(cp.proficiency >= 80 for cp in checkpoints):
+                    completed_goals += 1
+        
+        total_quizzes = Session.objects.filter(user=user).count()
+        
+        from django.db.models import Sum
+        mastery_points = Checkpoint.objects.filter(user=user).aggregate(Sum('proficiency'))['proficiency__sum'] or 0
+        
+        return Response({
+            'total_goals': total_goals,
+            'completed_goals': completed_goals,
+            'total_quizzes': total_quizzes,
+            'total_mastery_points': mastery_points
+        })
+    except Exception as e:
+        logging.error(f"ERROR in get_user_stats: {str(e)}", exc_info=True)
+        return Response({
+            'total_goals': 0,
+            'completed_goals': 0,
+            'total_quizzes': 0,
+            'total_mastery_points': 0
+        })
 
 
 @api_view(['GET'])

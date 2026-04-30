@@ -28,7 +28,7 @@ api.interceptors.response.use(
     }
     if (error.response && error.response.status === 500) {
       const url = error.config?.url || '';
-      if (!url.includes('progress') && !url.includes('profile')) {
+      if (!url.includes('progress') && !url.includes('profile') && !url.includes('user-stats')) {
         window.location.href = '/error';
       }
     }
