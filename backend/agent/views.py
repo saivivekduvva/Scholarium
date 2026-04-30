@@ -14,6 +14,42 @@ from .agent_engine import (
     get_subtopic_explanation, find_similar_goal as find_similar_goal_ai
 )
 from .mongo_client import mongo_brain
+import re
+
+def get_skill_node(skill_name, goal_id, user):
+    """Resiliently find a SkillNode by name, with relaxed fallback."""
+    skill_clean = skill_name.strip()
+    
+    # 1. Try exact (case-insensitive) match
+    if goal_id:
+        node = SkillNode.objects.filter(
+            skill_name__iexact=skill_clean, 
+            goal_id=goal_id, 
+            goal__user=user
+        ).first()
+    else:
+        node = SkillNode.objects.filter(
+            skill_name__iexact=skill_clean, 
+            goal__user=user
+        ).first()
+        
+    if node:
+        return node
+        
+    # 2. Try relaxed match (strip punctuation and spaces)
+    def clean_str(s): return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
+    target_clean = clean_str(skill_clean)
+    
+    if goal_id:
+        all_nodes = SkillNode.objects.filter(goal_id=goal_id, goal__user=user)
+    else:
+        all_nodes = SkillNode.objects.filter(goal__user=user)
+        
+    for n in all_nodes:
+        if clean_str(n.skill_name) == target_clean:
+            return n
+            
+    return None
 
 
 
@@ -111,27 +147,10 @@ def expand_skill(request, id):
         return Response({'error': 'skill_name required'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        skill_clean = skill_name.strip()
-        node = SkillNode.objects.filter(
-            skill_name__iexact=skill_clean, 
-            goal_id=id, 
-            goal__user=request.user
-        ).first()
-        
-        if not node:
-            # Fallback: Try a more relaxed match (ignoring common punctuation)
-            import re
-            def clean(s): return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
-            
-            all_nodes = SkillNode.objects.filter(goal_id=id, goal__user=request.user)
-            target_clean = clean(skill_clean)
-            for n in all_nodes:
-                if clean(n.skill_name) == target_clean:
-                    node = n
-                    break
-        
+        node = get_skill_node(skill_name, id, request.user)
         if not node:
             raise SkillNode.DoesNotExist
+            
         force_refresh = request.data.get('force_refresh', False)
         
         if force_refresh:
@@ -210,24 +229,9 @@ def get_explanation(request):
     goal_id = request.data.get('goal_id')
     
     # Get other subtopics in this skill for context
+    # Get other subtopics in this skill for context
     try:
-        skill_clean = skill_name.strip()
-        if goal_id:
-            node = SkillNode.objects.filter(skill_name__iexact=skill_clean, goal_id=goal_id, goal__user=request.user).first()
-            if not node:
-                # Fallback relaxed match
-                import re
-                def clean(s): return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
-                all_nodes = SkillNode.objects.filter(goal_id=goal_id, goal__user=request.user)
-                target_clean = clean(skill_clean)
-                for n in all_nodes:
-                    if clean(n.skill_name) == target_clean:
-                        node = n
-                        break
-        else:
-            # Fallback for legacy calls
-            node = SkillNode.objects.filter(skill_name__iexact=skill_clean, goal__user=request.user).first()
-            
+        node = get_skill_node(skill_name, goal_id, request.user)
         if not node:
             raise SkillNode.DoesNotExist
                 
@@ -274,10 +278,9 @@ def start_session(request):
     difficulty = request.data.get('difficulty', 'beginner')
     goal_id = request.data.get('goal_id')
         
-    if goal_id:
-        node = get_object_or_404(SkillNode, skill_name__iexact=skill_name.strip(), goal_id=goal_id, goal__user=request.user)
-    else:
-        node = get_object_or_404(SkillNode, skill_name__iexact=skill_name.strip(), goal__user=request.user)
+    node = get_skill_node(skill_name, goal_id, request.user)
+    if not node:
+        return Response({'error': 'Skill not found'}, status=404)
         
     session = Session.objects.create(user=request.user, skill_node=node)
     
@@ -394,19 +397,14 @@ def mark_subtopic_mastered(request):
     goal_id = request.data.get('goal_id')
     
     try:
-        if goal_id:
-            subtopic = Subtopic.objects.get(
-                title__iexact=subtopic_title.strip(), 
-                skill_node__skill_name__iexact=skill_name.strip(), 
-                skill_node__goal_id=goal_id,
-                skill_node__goal__user=request.user
-            )
-        else:
-            subtopic = Subtopic.objects.get(
-                title__iexact=subtopic_title.strip(), 
-                skill_node__skill_name__iexact=skill_name.strip(), 
-                skill_node__goal__user=request.user
-            )
+        node = get_skill_node(skill_name, goal_id, request.user)
+        if not node:
+            return Response({'error': 'Skill not found'}, status=404)
+            
+        subtopic = Subtopic.objects.get(
+            title__iexact=subtopic_title.strip(), 
+            skill_node=node
+        )
         if not subtopic.is_studied:
             subtopic.is_studied = True
             subtopic.save()
