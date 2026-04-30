@@ -1,84 +1,148 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
+import { IoBarChartOutline, IoCalendarOutline, IoCheckmarkCircleOutline, IoFlagOutline, IoSchoolOutline } from 'react-icons/io5';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
+const StatCard = ({ icon, label, value, color }) => (
+  <motion.div 
+    whileHover={{ y: -5 }}
+    style={{ 
+      background: 'white', 
+      padding: '30px', 
+      borderRadius: '24px', 
+      border: '3px solid #1A1A1A', 
+      boxShadow: '8px 8px 0px #1A1A1A',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center'
+    }}
+  >
+    <div style={{ color, marginBottom: '15px' }}>{icon}</div>
+    <div style={{ fontSize: '32px', fontWeight: 900, marginBottom: '5px' }}>{value}</div>
+    <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: '#666', letterSpacing: '1px' }}>{label}</div>
+  </motion.div>
+);
+
 const Profile = () => {
-  const [data, setData] = useState(null);
+  const [stats, setStats] = useState(null);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    if (user?.id) {
-      api.getProgress(user.id)
-        .then(res => {
-          setData(res.data);
-        })
-        .catch(err => {
-          console.error(err);
-          // Fallback for UI if DB empty or error
-          setData({
-            total_points: 0,
-            streak_days: 0,
-            checkpoints: []
-          });
-        });
-    } else {
-      setData({
-        total_points: 0,
-        streak_days: 0,
-        checkpoints: []
-      });
-    }
-  }, [user]);
+    api.getUserStats()
+      .then(res => setStats(res.data))
+      .catch(err => console.error('Failed to fetch stats:', err));
+  }, []);
 
-  if (!data) return (
-    <div className="text-center py-5">
-      <div className="spinner-border text-primary" />
+  if (!stats) return (
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+      <div className="spinner-border" style={{ color: '#4F6EF7' }} />
     </div>
   );
 
   return (
-    <motion.div 
-      className="container py-5"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      style={{ minHeight: '80vh', color: 'var(--text-primary)', transition: 'all 0.3s ease', position: 'relative' }}
-    >
-      <button 
-        onClick={() => window.history.back()}
-        className="btn btn-link text-decoration-none p-0 mb-4 d-flex align-items-center gap-2"
-        style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '15px' }}
+    <div style={{ 
+      minHeight: '100vh', 
+      width: '100%', 
+      backgroundColor: '#F5F3EF',
+      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundSize: '24px 24px',
+      color: '#1A1A1A',
+      paddingBottom: '80px'
+    }}>
+      <motion.div 
+        className="container py-5"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
-        <span>&larr;</span> Go Back
-      </button>
-      <div className="d-flex align-items-center mb-5">
-        <div 
-          style={{ 
-            width: '80px', height: '80px', borderRadius: '50%', 
-            backgroundColor: 'var(--accent-primary)', color: 'white', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            fontSize: '32px', fontWeight: 'bold', marginRight: '24px',
-            boxShadow: '0 8px 16px rgba(79, 110, 247, 0.2)'
-          }}
+        <button 
+          onClick={() => window.history.back()}
+          className="btn btn-link text-decoration-none p-0 mb-5 d-flex align-items-center gap-2"
+          style={{ color: '#1A1A1A', fontWeight: 800, fontSize: '16px' }}
         >
-          {user?.username ? user.username.charAt(0).toUpperCase() : 'S'}
-        </div>
-        <div>
-          <h2 style={{ fontFamily: 'Newsreader, serif', fontWeight: 400, margin: 0, color: 'var(--text-primary)' }}>{user?.username ? `${user.username}'s Profile` : 'My Scholarium Profile'}</h2>
-          <div className="text-muted" style={{ color: 'var(--text-muted)' }}>Intellectual Explorer</div>
-        </div>
-      </div>
+          <span>&larr;</span> Back
+        </button>
 
-      <div className="row g-4">
-        <div className="col-12">
-          <div className="card p-5 border-0 text-center" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border) !important', boxShadow: 'var(--shadow-card)', borderRadius: 'var(--radius-card)' }}>
-            <h1 className="display-4 fw-bold mb-2" style={{ color: 'var(--accent-primary)' }}>{data.total_points || 0}</h1>
-            <p className="text-muted text-uppercase letter-spacing-1 mb-0" style={{ fontSize: '12px', letterSpacing: '2px' }}>Total Mastery Points</p>
+        <div className="d-flex align-items-center mb-5 pb-4" style={{ borderBottom: '3px solid #1A1A1A' }}>
+          <div 
+            style={{ 
+              width: '100px', height: '100px', borderRadius: '30px', 
+              backgroundColor: '#4F6EF7', color: 'white', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              fontSize: '42px', fontWeight: 900, marginRight: '30px',
+              border: '4px solid #1A1A1A',
+              boxShadow: '6px 6px 0px #1A1A1A'
+            }}
+          >
+            {user?.username ? user.username.charAt(0).toUpperCase() : 'S'}
+          </div>
+          <div>
+            <h1 style={{ fontWeight: 900, fontSize: '42px', margin: 0, letterSpacing: '-1.5px' }}>
+              {user?.username ? `${user.username}` : 'Scholarium Learner'}
+            </h1>
+            <div style={{ fontWeight: 600, fontSize: '18px', color: '#666' }}>Intellectual Explorer • Member since {new Date(user?.date_joined || Date.now()).getFullYear()}</div>
           </div>
         </div>
-      </div>
-    </motion.div>
+
+        <div className="row g-4 mb-5">
+          {/* Main Hero Stat */}
+          <div className="col-12">
+            <div style={{ 
+              background: '#1A1A1A', 
+              color: 'white', 
+              padding: '60px 40px', 
+              borderRadius: '32px', 
+              boxShadow: '12px 12px 0px rgba(0,0,0,0.1)',
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+                <div style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px', opacity: 0.7 }}>Lifetime Mastery</div>
+                <h2 style={{ fontSize: '84px', fontWeight: 900, margin: 0, letterSpacing: '-4px' }}>{stats.total_mastery_points}</h2>
+                <div style={{ fontSize: '18px', fontWeight: 600 }}>Total Knowledge Points Earned</div>
+            </div>
+          </div>
+
+          {/* Secondary Stats Grid */}
+          <div className="col-md-4">
+            <StatCard 
+                icon={<IoFlagOutline size={32} />} 
+                label="Active Goals" 
+                value={stats.total_goals} 
+                color="#4F6EF7"
+            />
+          </div>
+          <div className="col-md-4">
+            <StatCard 
+                icon={<IoCheckmarkCircleOutline size={32} />} 
+                label="Goals Completed" 
+                value={stats.completed_goals} 
+                color="#06C9A0"
+            />
+          </div>
+          <div className="col-md-4">
+            <StatCard 
+                icon={<IoSchoolOutline size={32} />} 
+                label="Quizzes Taken" 
+                value={stats.total_quizzes} 
+                color="#F75C5C"
+            />
+          </div>
+        </div>
+
+        <div className="mt-5 p-5" style={{ background: 'white', borderRadius: '32px', border: '3px solid #1A1A1A', boxShadow: '8px 8px 0px #1A1A1A' }}>
+            <div className="d-flex align-items-center gap-3 mb-4">
+                <IoBarChartOutline size={28} />
+                <h3 style={{ fontWeight: 900, margin: 0 }}>Learning Activity</h3>
+            </div>
+            <p style={{ fontSize: '18px', color: '#666', lineHeight: '1.6' }}>
+                You have engaged with <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.total_goals} roadmaps</span> and successfully completed <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.completed_goals}</span> of them. Your average quiz frequency shows a dedication to mastery, with <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.total_quizzes} attempts</span> recorded across your profile. Keep pushing towards 100% mastery!
+            </p>
+        </div>
+
+      </motion.div>
+    </div>
   );
 };
 
