@@ -1,5 +1,5 @@
-from django.db import models
 import json
+import logging
 from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -15,13 +15,6 @@ from .agent_engine import (
 )
 from .mongo_client import mongo_brain
 
-def award_xp(user, amount, reason):
-    # Placeholder for XP logic. For now, just log it.
-    print(f"AWARDING {amount} XP to {user.username} for {reason}")
-    # In a real app, you'd update a Profile model or similar here.
-    pass
-
-# XP Awarding logic removed as requested.
 
 
 @api_view(['GET', 'POST'])
@@ -80,9 +73,7 @@ def create_goal(request):
     except Exception as e:
         if str(e) == "AI_QUOTA_EXHAUSTED":
             return Response({'error': 'AI Quota Exhausted. Please wait a minute and try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
-        import traceback
-        print(f"ERROR creating goal: {str(e)}")
-        print(traceback.format_exc())
+        logging.error(f"ERROR creating goal: {str(e)}", exc_info=True)
         return Response({'error': f"Failed to generate curriculum: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])
@@ -169,7 +160,8 @@ def toggle_subtopic(request, id):
         subtopic.is_studied = not subtopic.is_studied
         subtopic.save()
         if subtopic.is_studied:
-            award_xp(request.user, 10, 'subtopic_complete')
+            # XP Awarding placeholder removed
+            pass
             
         return Response({'status': 'success', 'is_studied': subtopic.is_studied, 'xp_earned': 10 if subtopic.is_studied else 0})
     except Subtopic.DoesNotExist:
@@ -299,16 +291,13 @@ def get_progress(request, user_id):
             'checkpoints': CheckpointSerializer(checkpoints, many=True).data
         })
     except Exception as e:
-        import traceback
-        print(f"ERROR in get_progress: {str(e)}")
-        print(traceback.format_exc())
+        logging.error(f"ERROR in get_progress: {str(e)}", exc_info=True)
         # Return empty data gracefully instead of 500 to prevent frontend crashes
         return Response({
             'sessions': [],
             'checkpoints': []
         })
 
-# Leaderboard removed as requested.
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -341,7 +330,7 @@ def mark_subtopic_mastered(request):
         if not subtopic.is_studied:
             subtopic.is_studied = True
             subtopic.save()
-            award_xp(request.user, 50, 'subtopic_mastery') # Premium bonus for passing quiz
+            # XP Awarding placeholder removed
             
         return Response({'status': 'success', 'xp_earned': 50})
     except Subtopic.DoesNotExist:

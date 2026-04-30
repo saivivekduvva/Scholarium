@@ -1,6 +1,7 @@
 import os
 import hashlib
 import time
+import logging
 from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -58,18 +59,18 @@ def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
             )
             
             if not response.parts:
-                print(f"Gemini BLOCKED response. Safety info: {response.candidates[0].safety_ratings if response.candidates else 'No candidates'}")
+                logging.warning(f"Gemini BLOCKED response. Safety info: {response.candidates[0].safety_ratings if response.candidates else 'No candidates'}")
                 raise ValueError("AI_SAFETY_BLOCK")
                 
             return response.text
         except Exception as e:
             err_msg = str(e).lower()
             if any(key in err_msg for key in ["429", "quota", "rate limit"]):
-                print(f"RATE LIMIT DETECTED: {e}")
+                logging.error(f"RATE LIMIT DETECTED: {e}")
                 raise RateLimitError("AI Quota Exhausted (429)")
             
             if attempt == 2: 
-                print(f"Gemini call failed after 3 attempts. Raw Error: {e}")
+                logging.error(f"Gemini call failed after 3 attempts. Raw Error: {e}")
                 raise e
             time.sleep(1.5 ** attempt)
 
@@ -96,10 +97,10 @@ def call_llm(system: str, user: str, json_mode: bool = False) -> str:
     except Exception as e:
         # Emergency Fallback
         if provider == 'claude':
-            print(f"Claude failed, falling back to Gemini: {e}")
+            logging.warning(f"Claude failed, falling back to Gemini: {e}")
             response_text = call_gemini(system, user, json_mode=json_mode)
         elif provider == 'gemini' and anthropic_client:
-            print(f"Gemini failed, falling back to Claude: {e}")
+            logging.warning(f"Gemini failed, falling back to Claude: {e}")
             try:
                 response_text = call_claude(system, user)
             except:

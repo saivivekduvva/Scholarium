@@ -53,8 +53,4 @@ class MongoBrain:
 
 mongo_brain = MongoBrain()
 
-# For backward compatibility with existing code
-conversations_col = None # These will be handled by the proxy or we update the views
-graphs_col = None
-evaluations_col = None
-llm_cache_col = None
+

@@ -1,6 +1,7 @@
 import json
 import hashlib
 import time
+import logging
 from datetime import datetime
 from .mongo_client import mongo_brain
 from .llm_service import call_llm, RateLimitError
@@ -37,7 +38,7 @@ def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
                 return g
         return None
     except Exception as e:
-        print(f"Error in find_similar_goal: {e}")
+        logging.error(f"Error in find_similar_goal: {e}")
         return None
 
 def generate_roadmap(goal: str) -> dict:
@@ -74,12 +75,12 @@ def generate_roadmap(goal: str) -> dict:
             raise ValueError("AI_QUOTA_EXHAUSTED")
         
         # If it's a parse error or safety block, try one more time
-        print(f"Error in generate_roadmap: {e}. Retrying once...")
+        logging.warning(f"Error in generate_roadmap: {e}. Retrying once...")
         try:
             resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
             return _parse_json(resp)
         except Exception as e2:
-            print(f"Final failure in generate_roadmap for goal '{goal}': {e2}")
+            logging.error(f"Final failure in generate_roadmap for goal '{goal}': {e2}")
             raise ValueError(f"AI Generation Error: {str(e2)}")
 
 def expand_subtopics(skill_name: str) -> dict:
@@ -112,13 +113,13 @@ def expand_subtopics(skill_name: str) -> dict:
             raise ValueError("AI_QUOTA_EXHAUSTED")
             
         # Retry once for parsing/model errors
-        print(f"Error in expand_subtopics: {e}. Retrying...")
+        logging.warning(f"Error in expand_subtopics: {e}. Retrying...")
         
         try:
             resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
             return _parse_json(resp)
         except Exception as e2:
-            print(f"Final failure in expand_subtopics for {skill_name}: {e2}")
+            logging.error(f"Final failure in expand_subtopics for {skill_name}: {e2}")
             raise ValueError(f"Curriculum Generation Error: {str(e2)}")
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
@@ -155,7 +156,7 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        print(f"Error parsing generate_practice: {e}")
+        logging.error(f"Error parsing generate_practice: {e}")
         raise ValueError("Failed to parse JSON")
 
 def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> dict:
@@ -193,7 +194,7 @@ def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> 
         })
         return _parse_json(resp)
     except Exception as e:
-        print(f"Error parsing evaluate_answer: {e}")
+        logging.error(f"Error parsing evaluate_answer: {e}")
         raise ValueError("Failed to parse JSON")
 
 def generate_summary(user_id: int, checkpoints: list) -> str:
@@ -202,7 +203,7 @@ def generate_summary(user_id: int, checkpoints: list) -> str:
     try:
         return call_llm(system, user)
     except Exception as e:
-        print(f"Error generating summary: {e}")
+        logging.error(f"Error generating summary: {e}")
         return "Failed to generate summary."
 
 def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subtopics: list = None) -> str:
@@ -227,5 +228,5 @@ def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subto
     try:
         return call_llm(system, user)
     except Exception as e:
-        print(f"Error generating explanation: {e}")
+        logging.error(f"Error generating explanation: {e}")
         return "Failed to generate explanation. Please try again."

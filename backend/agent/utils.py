@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 from .mongo_client import mongo_brain
 
@@ -40,5 +41,5 @@ def parse_json_response(text: str) -> dict:
     try:
         return json.loads(text.strip())
     except json.JSONDecodeError as e:
-        print(f"FAILED TO PARSE JSON. RAW TEXT:\n{text}\n")
+        logging.error(f"FAILED TO PARSE JSON. RAW TEXT:\n{text}\n")
         raise e
