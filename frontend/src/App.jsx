@@ -16,6 +16,7 @@ import RegisterPage from './pages/RegisterPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import GoalCompletionPage from './pages/GoalCompletionPage';
+import HowToUse from './pages/HowToUse';
 
 // A component to render the Navbar only when authenticated
 const Navbar = () => {
@@ -65,6 +66,9 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <Link to="/about" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>About</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/how-to-use" className="nav-link" style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 600 }} onClick={() => setIsOpen(false)}>How To Use</Link>
             </li>
           </ul>
         </div>
@@ -127,6 +131,7 @@ function App() {
             
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/how-to-use" element={<HowToUse />} />
             <Route path="/error" element={<ErrorPage />} />
           </Routes>
         </AnimatePresence>

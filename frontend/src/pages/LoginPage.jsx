@@ -38,7 +38,7 @@ const LoginPage = () => {
         <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
         <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
           <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-          <span style={{ cursor: 'pointer' }}>Resources</span>
+          <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
         </div>
         <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
       </nav>
