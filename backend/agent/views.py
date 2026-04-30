@@ -160,10 +160,19 @@ def toggle_subtopic(request, id):
         subtopic.is_studied = not subtopic.is_studied
         subtopic.save()
         if subtopic.is_studied:
-            # XP Awarding placeholder removed
-            pass
+            # Check if all subtopics for this skill node are studied
+            node = subtopic.skill_node
+            all_studied = not node.subtopics.filter(is_studied=False).exists()
+            if all_studied:
+                checkpoint, _ = Checkpoint.objects.get_or_create(
+                    user=request.user,
+                    skill_name=node.skill_name,
+                    defaults={'proficiency': 0}
+                )
+                checkpoint.proficiency = 100
+                checkpoint.save()
             
-        return Response({'status': 'success', 'is_studied': subtopic.is_studied, 'xp_earned': 10 if subtopic.is_studied else 0})
+        return Response({'status': 'success', 'is_studied': subtopic.is_studied})
     except Subtopic.DoesNotExist:
         return Response({'error': 'Subtopic not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -331,6 +340,18 @@ def mark_subtopic_mastered(request):
             subtopic.is_studied = True
             subtopic.save()
             # XP Awarding placeholder removed
+            
+        # Check if all subtopics for this skill node are studied
+        node = subtopic.skill_node
+        all_studied = not node.subtopics.filter(is_studied=False).exists()
+        if all_studied:
+            checkpoint, _ = Checkpoint.objects.get_or_create(
+                user=request.user,
+                skill_name=node.skill_name,
+                defaults={'proficiency': 0}
+            )
+            checkpoint.proficiency = 100
+            checkpoint.save()
             
         return Response({'status': 'success', 'xp_earned': 50})
     except Subtopic.DoesNotExist:
