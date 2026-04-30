@@ -52,13 +52,19 @@ def create_goal(request):
         # Only create the goal if we successfully got a roadmap
         goal = Goal.objects.create(title=title, description=description, user=request.user, status='active')
         
-        # Save SkillNodes
-        for skill in skills_list:
+        # Map skills by ID for easier lookup
+        skill_map = {str(s.get('id')): s for s in skills_list}
+        
+        # Save SkillNodes based on graph nodes for guaranteed frontend matching
+        for node_data in graph_data.get('nodes', []):
+            node_id = str(node_data.get('id'))
+            skill_info = skill_map.get(node_id, {})
+            
             SkillNode.objects.create(
                 goal=goal,
-                skill_name=skill.get('name', 'Unknown'),
-                description=skill.get('description', ''),
-                estimated_hours=skill.get('estimated_hours', 1)
+                skill_name=node_data.get('data', {}).get('label', skill_info.get('name', 'Unknown')),
+                description=node_data.get('data', {}).get('description', skill_info.get('description', '')),
+                estimated_hours=skill_info.get('estimated_hours', 1)
             )
             
         # Save to MongoDB
@@ -105,12 +111,27 @@ def expand_skill(request, id):
         return Response({'error': 'skill_name required'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        # Use goal_id to scope the search and perform case-insensitive matching
-        node = SkillNode.objects.get(
-            skill_name__iexact=skill_name.strip(), 
+        skill_clean = skill_name.strip()
+        node = SkillNode.objects.filter(
+            skill_name__iexact=skill_clean, 
             goal_id=id, 
             goal__user=request.user
-        )
+        ).first()
+        
+        if not node:
+            # Fallback: Try a more relaxed match (ignoring common punctuation)
+            import re
+            def clean(s): return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
+            
+            all_nodes = SkillNode.objects.filter(goal_id=id, goal__user=request.user)
+            target_clean = clean(skill_clean)
+            for n in all_nodes:
+                if clean(n.skill_name) == target_clean:
+                    node = n
+                    break
+        
+        if not node:
+            raise SkillNode.DoesNotExist
         force_refresh = request.data.get('force_refresh', False)
         
         if force_refresh:
@@ -190,13 +211,25 @@ def get_explanation(request):
     
     # Get other subtopics in this skill for context
     try:
+        skill_clean = skill_name.strip()
         if goal_id:
-            node = SkillNode.objects.get(skill_name__iexact=skill_name.strip(), goal_id=goal_id, goal__user=request.user)
+            node = SkillNode.objects.filter(skill_name__iexact=skill_clean, goal_id=goal_id, goal__user=request.user).first()
+            if not node:
+                # Fallback relaxed match
+                import re
+                def clean(s): return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
+                all_nodes = SkillNode.objects.filter(goal_id=goal_id, goal__user=request.user)
+                target_clean = clean(skill_clean)
+                for n in all_nodes:
+                    if clean(n.skill_name) == target_clean:
+                        node = n
+                        break
         else:
             # Fallback for legacy calls
-            node = SkillNode.objects.filter(skill_name__iexact=skill_name.strip(), goal__user=request.user).first()
-            if not node:
-                raise SkillNode.DoesNotExist
+            node = SkillNode.objects.filter(skill_name__iexact=skill_clean, goal__user=request.user).first()
+            
+        if not node:
+            raise SkillNode.DoesNotExist
                 
         subtopic = Subtopic.objects.get(title__iexact=subtopic_title.strip(), skill_node=node)
         
