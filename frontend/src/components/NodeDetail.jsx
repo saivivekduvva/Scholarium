@@ -259,7 +259,7 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
           </div>
         )}
 
-        <div className="alert alert-info mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3" style={{ borderRadius: '16px', fontSize: '13px', backgroundColor: 'var(--border)', color: 'var(--text-primary)', border: 'none' }}>
+        <div className="alert alert-info mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3" style={{ borderRadius: '16px', fontSize: '13px', backgroundColor: 'var(--border)', color: '#FFFFFF', border: 'none' }}>
           <div>
             💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
           </div>
