@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SkillGraph from '../components/SkillGraph';
 import NodeDetail from '../components/NodeDetail';
@@ -8,6 +8,7 @@ import { IoRocketOutline } from 'react-icons/io5';
 
 const GraphView = () => {
   const { goalId } = useParams();
+  const navigate = useNavigate();
   const [graphData, setGraphData] = useState(null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
 
@@ -90,10 +91,10 @@ const GraphView = () => {
     const allDone = graphData.nodes.every(n => n.data.status === 'done');
     if (allDone && graphData.nodes.length > 0) {
       setTimeout(() => {
-        window.location.href = `/goal-completed/${goalId}`;
+        navigate(`/goal-completed/${goalId}`);
       }, 1500);
     }
-  }, [graphData, goalId]);
+  }, [graphData, goalId, navigate]);
 
   const handleAutoSequence = () => {
     if (!graphData || !graphData.nodes) return;

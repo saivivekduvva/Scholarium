@@ -77,16 +77,18 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
     });
 
     // Calculate new progress using the updated state logic
-    const newSubtopics = subtopics.map(st => 
-      st.id === subtopic.id ? { ...st, is_studied: !st.is_studied } : st
-    );
-    const completedCount = newSubtopics.filter(s => s.is_studied).length;
-    const totalCount = newSubtopics.length;
-    const newProgress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-    
-    // Notify parent to update graph
-    if (onUpdate) {
-      onUpdate(skillName, newProgress);
+    if (subtopics) {
+      const newSubtopics = subtopics.map(st => 
+        st.id === subtopic.id ? { ...st, is_studied: !st.is_studied } : st
+      );
+      const completedCount = newSubtopics.filter(s => s.is_studied).length;
+      const totalCount = newSubtopics.length;
+      const newProgress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+      
+      // Notify parent to update graph
+      if (onUpdate) {
+        onUpdate(skillName, newProgress);
+      }
     }
 
     api.toggleSubtopic(subtopic.id)
@@ -189,7 +191,7 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
                 
                 return (
                   <motion.div
-                    key={st.id}
+                    key={st.id || i}
                     variants={{ 
                       initial: { opacity: 0, x: -20 }, 
                       animate: { opacity: 1, x: 0 } 
