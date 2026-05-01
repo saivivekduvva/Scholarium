@@ -5,6 +5,8 @@ urlpatterns = [
     path('goals/', views.create_goal),
     path('goals/<int:id>/', views.delete_goal),
     path('goals/<int:id>/graph/', views.get_graph),
+    path('session/start/', views.start_session),
+    path('session/evaluate/<int:id>/', views.evaluate_session_answer),
     path('progress/<int:user_id>/', views.get_progress),
     path('subtopics/explanation/', views.get_explanation),
     path('subtopic/complete/', views.mark_subtopic_mastered),

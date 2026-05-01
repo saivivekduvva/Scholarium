@@ -1,6 +1,19 @@
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from .models import Goal, User
+from .models import Goal, User, Session
+
+@receiver(pre_delete, sender=Session)
+def cleanup_session_data(sender, instance, **kwargs):
+    """
+    Ensures that MongoDB conversation logs are deleted when a Session is removed.
+    """
+    try:
+        session_id = instance.id
+        result = mongo_brain.conversations.delete_many({'session_id': session_id})
+        logging.info(f"Signal: Deleted {result.deleted_count} conversation logs for Session ID {session_id} from MongoDB.")
+    except Exception as e:
+        logging.error(f"Signal: Error cleaning up MongoDB for Session {instance.id}: {str(e)}")
+
 from .mongo_client import mongo_brain
 import logging
 

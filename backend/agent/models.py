@@ -27,6 +27,18 @@ class SkillNode(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='locked')
     estimated_hours = models.IntegerField(default=1)
 
+class Session(models.Model):
+    STATUS_CHOICES = [
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed')
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions', null=True, blank=True)
+    skill_node = models.ForeignKey(SkillNode, on_delete=models.CASCADE, related_name='sessions')
+    score = models.IntegerField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ongoing')
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
 class Checkpoint(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='checkpoints', null=True, blank=True)
     skill_name = models.CharField(max_length=255)

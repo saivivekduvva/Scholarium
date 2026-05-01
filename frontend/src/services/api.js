@@ -41,6 +41,8 @@ export default {
   expandSkill: (id, skill_name, force = false) => api.post(`skills/${id}/expand/`, { skill_name, force_refresh: force }),
   toggleSubtopic: (id) => api.post(`subtopics/${id}/toggle/`),
   getProgress: (user_id) => api.get(`progress/${user_id}/`),
+  startSession: (data) => api.post('session/start/', data),
+  evaluateAnswer: (id, data) => api.post(`session/evaluate/${id}/`, data),
   getExplanation: (skill_name, subtopic_title, goal_id) => api.post('subtopics/explanation/', { skill_name, subtopic_title, goal_id }),
   markSubtopicMastered: (skill_name, subtopic_title, goal_id) => api.post('subtopic/complete/', { skill_name, subtopic_title, goal_id }),
   getProfile: () => api.get('auth/profile/'),
