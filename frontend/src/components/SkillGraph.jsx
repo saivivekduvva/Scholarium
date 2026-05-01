@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { ReactFlow, Background, MiniMap, Controls, useNodesState, useEdgesState } from '@xyflow/react';
 import dagre from 'dagre';
 import SkillNode from './SkillNode';
-import { motion } from 'framer-motion';
 
 const nodeTypes = {
   custom: SkillNode,

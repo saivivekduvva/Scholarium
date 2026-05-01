@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
@@ -6,11 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
-from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
+from .models import Goal, SkillNode, Checkpoint, Subtopic
+from .serializers import GoalSerializer, CheckpointSerializer, SubtopicSerializer
 from .agent_engine import (
-    generate_roadmap, expand_subtopics, generate_practice, 
-    evaluate_answer, generate_summary, RateLimitError, 
+    generate_roadmap, expand_subtopics, 
+    RateLimitError, 
     get_subtopic_explanation, find_similar_goal as find_similar_goal_ai
 )
 from .mongo_client import mongo_brain
@@ -183,7 +182,7 @@ def expand_skill(request, id):
         return Response({'subtopics': SubtopicSerializer(created_subtopics, many=True).data})
     except SkillNode.DoesNotExist:
         return Response({'error': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
-    except RateLimitError as e:
+    except RateLimitError:
         return Response({'error': 'AI is rate limited'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e:
         if str(e) == "AI_QUOTA_EXHAUSTED":
@@ -260,77 +259,13 @@ def get_explanation(request):
         'pro_sources': pro_sources
     })
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def save_path(request, id):
-    goal = get_object_or_404(Goal, pk=id, user=request.user)
-    ordered_ids = request.data.get('ordered_skill_ids', [])
-    path = LearningPath.objects.create(goal=goal, ordered_skill_ids=ordered_ids)
-    return Response({'status': 'success', 'path_id': path.id})
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def start_session(request):
-    skill_name = request.data.get('skill_name')
-    subtopic_title = request.data.get('subtopic_title')
-    difficulty = request.data.get('difficulty', 'beginner')
-    goal_id = request.data.get('goal_id')
-        
-    node = get_skill_node(skill_name, goal_id, request.user)
-    if not node:
-        return Response({'error': 'Skill not found'}, status=404)
-        
-    session = Session.objects.create(user=request.user, skill_node=node)
-    
-    # Get subtopics for context
-    subtopics = list(node.subtopics.values('title', 'description'))
-    
-    try:
-        # Use subtopic_title as the primary subject if provided, else fall back to skill_name
-        subject = subtopic_title if subtopic_title else node.skill_name
-        practice = generate_practice(subject, difficulty, subtopics)
-        return Response({'session_id': session.id, 'practice': practice})
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def evaluate_session_answer(request, id):
-    session = get_object_or_404(Session, pk=id, user=request.user)
-    question = request.data.get('question')
-    answer = request.data.get('answer')
-    
-    try:
-        result = evaluate_answer(session.id, session.skill_node.skill_name, question, answer)
-        score = result.get('score', 0)
-        
-        session.score = score
-        session.status = 'completed'
-        from django.utils import timezone
-        session.completed_at = timezone.now()
-        session.save()
-        
-        checkpoint, _ = Checkpoint.objects.get_or_create(
-            user=session.user, 
-            skill_name=session.skill_node.skill_name,
-            defaults={'proficiency': 0}
-        )
-        
-        checkpoint.proficiency = max(checkpoint.proficiency, score)
-        checkpoint.save()
-        
-        return Response(result)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_progress(request, user_id):
     try:
-        sessions = Session.objects.filter(user=request.user)
         checkpoints = Checkpoint.objects.filter(user=request.user)
         return Response({
-            'sessions': SessionSerializer(sessions, many=True).data,
+            'sessions': [],
             'checkpoints': CheckpointSerializer(checkpoints, many=True).data
         })
     except Exception as e:
@@ -359,15 +294,13 @@ def get_user_stats(request):
                 if checkpoints.count() == len(skill_names) and checkpoints.count() > 0 and all(cp.proficiency >= 80 for cp in checkpoints):
                     completed_goals += 1
         
-        total_quizzes = Session.objects.filter(user=user).count()
-        
         from django.db.models import Sum
         mastery_points = Checkpoint.objects.filter(user=user).aggregate(Sum('proficiency'))['proficiency__sum'] or 0
         
         return Response({
             'total_goals': total_goals,
             'completed_goals': completed_goals,
-            'total_quizzes': total_quizzes,
+            'total_quizzes': 0,
             'total_mastery_points': mastery_points
         })
     except Exception as e:
@@ -380,12 +313,7 @@ def get_user_stats(request):
         })
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_summary(request, id): 
-    checkpoints = list(Checkpoint.objects.filter(user=request.user).values('skill_name', 'proficiency'))
-    summary = generate_summary(request.user.id, checkpoints)
-    return Response({'summary': summary})
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_subtopic_mastered(request):

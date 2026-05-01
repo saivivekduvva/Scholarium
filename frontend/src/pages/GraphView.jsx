@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SkillGraph from '../components/SkillGraph';
 import NodeDetail from '../components/NodeDetail';
 import api from '../services/api';
-import { IoRocketOutline } from 'react-icons/io5';
-
 const GraphView = () => {
   const { goalId } = useParams();
   const navigate = useNavigate();
@@ -96,13 +94,6 @@ const GraphView = () => {
     }
   }, [graphData, goalId, navigate]);
 
-  const handleAutoSequence = () => {
-    if (!graphData || !graphData.nodes) return;
-    const orderedIds = graphData.nodes.map(n => n.id);
-    api.savePath(goalId, orderedIds)
-      .then(() => alert("Path auto-sequenced and saved!"))
-      .catch(err => console.error(err));
-  };
 
   const handleNodeClick = (node) => {
     if (node.data.status === 'locked') {
@@ -122,15 +113,6 @@ const GraphView = () => {
     }
   };
 
-  const handleStartLearning = () => {
-    if (!graphData || !graphData.nodes) return;
-    const activeNode = graphData.nodes.find(n => n.data.status === 'active');
-    if (activeNode) {
-      setSelectedNodeId(activeNode.id);
-    } else {
-      alert("No active skills available. You might have completed them all!");
-    }
-  };
 
   const updateNodeProgress = (skillName, newProgress) => {
     setGraphData(prev => {

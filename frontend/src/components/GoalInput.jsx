@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import GoalAnalyzer from './GoalAnalyzer';
 
 const GoalInput = () => {
   const [goal, setGoal] = useState('');

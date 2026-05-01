@@ -26,7 +26,6 @@ const SubtopicDetail = () => {
   const [nextSubtopic, setNextSubtopic] = useState(null);
 
   const query = `${subtopicTitle} ${skillName}`;
-  const tag = subtopicTitle.toLowerCase().replace(/\s+/g, '-').split('-')[0];
 
   useEffect(() => {
     const loadContent = async () => {

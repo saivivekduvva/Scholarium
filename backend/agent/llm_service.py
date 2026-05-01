@@ -103,7 +103,7 @@ def call_llm(system: str, user: str, json_mode: bool = False) -> str:
             logging.warning(f"Gemini failed, falling back to Claude: {e}")
             try:
                 response_text = call_claude(system, user)
-            except:
+            except Exception:
                 raise e
         else:
             err_msg = str(e).lower()

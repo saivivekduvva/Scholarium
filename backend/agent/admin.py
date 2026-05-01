@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Goal, SkillNode, LearningPath, Session, Checkpoint, Subtopic
+from .models import Goal, SkillNode, Checkpoint, Subtopic
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
@@ -13,14 +13,6 @@ class SkillNodeAdmin(admin.ModelAdmin):
     list_filter = ('status', 'goal')
     search_fields = ('skill_name', 'description')
 
-@admin.register(LearningPath)
-class LearningPathAdmin(admin.ModelAdmin):
-    list_display = ('goal', 'created_at')
-
-@admin.register(Session)
-class SessionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'skill_node', 'score', 'status', 'created_at')
-    list_filter = ('status', 'user')
 
 @admin.register(Checkpoint)
 class CheckpointAdmin(admin.ModelAdmin):

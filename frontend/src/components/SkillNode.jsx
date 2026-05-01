@@ -5,7 +5,6 @@ import { IoLockClosedOutline, IoCheckmarkCircle, IoPlayCircleOutline } from 'rea
 
 const SkillNode = ({ data, selected }) => {
   const status = data.status || 'locked';
-  const progress = data.progress || 0;
   
   // Icon based on status
   const getIcon = () => {

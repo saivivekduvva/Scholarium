@@ -6,7 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Roadmaps from './pages/Roadmaps';
 import GraphView from './pages/GraphView';
-import Session from './pages/Session';
+
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import SubtopicDetail from './pages/SubtopicDetail';
@@ -22,7 +22,7 @@ import HowToUse from './pages/HowToUse';
 const Navigation = () => {
   const { user, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('scholarium-theme') || 'light');
+  const [theme] = useState(localStorage.getItem('scholarium-theme') || 'light');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -174,7 +174,7 @@ function App() {
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/roadmaps" element={<ProtectedRoute><Roadmaps /></ProtectedRoute>} />
               <Route path="/graph/:goalId" element={<ProtectedRoute><GraphView /></ProtectedRoute>} />
-              <Route path="/session/:skillId" element={<ProtectedRoute><Session /></ProtectedRoute>} />
+
               <Route path="/subtopic/:goalId/:skillName/:subtopicTitle" element={<ProtectedRoute><SubtopicDetail /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

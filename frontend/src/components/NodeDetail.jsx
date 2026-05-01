@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { IoBookOutline, IoTimeOutline, IoCheckmarkCircle, IoRefreshOutline } from 'react-icons/io5';
+import { IoTimeOutline, IoCheckmarkCircle, IoRefreshOutline } from 'react-icons/io5';
 
 const subtopicsCache = {};
 
 const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
   const [subtopics, setSubtopics] = useState(null);
-  const [xpEarned, setXpEarned] = useState(null);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
 
@@ -65,7 +65,7 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
     }
   }, [node, skillName]);
 
-  const handleToggleSubtopic = (subtopic, index) => {
+  const handleToggleSubtopic = (subtopic) => {
     if (!subtopic.id) return;
     
     setSubtopics(prev => {
@@ -92,11 +92,8 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
     }
 
     api.toggleSubtopic(subtopic.id)
-      .then(res => {
-        if (res.data.xp_earned > 0) {
-          setXpEarned(res.data.xp_earned);
-          setTimeout(() => setXpEarned(null), 2000);
-        }
+      .then(() => {
+        // Ignored xp_earned for now
       })
       .catch(err => {
         console.error("Failed to toggle subtopic", err);
@@ -215,7 +212,7 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
 
                     <motion.div
                       whileHover={{ scale: 1.01, x: 4 }}
-                      onClick={() => handleToggleSubtopic(st, i)}
+                      onClick={() => handleToggleSubtopic(st)}
                       className="p-4"
                       style={{ 
                         backgroundColor: isDone ? 'rgba(6, 201, 160, 0.05)' : 'var(--bg-surface)', 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { IoBarChartOutline, IoCalendarOutline, IoCheckmarkCircleOutline, IoFlagOutline, IoSchoolOutline } from 'react-icons/io5';
+import { IoBarChartOutline, IoCheckmarkCircleOutline, IoFlagOutline, IoSchoolOutline } from 'react-icons/io5';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
