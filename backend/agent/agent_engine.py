@@ -156,8 +156,16 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        logging.error(f"Error parsing generate_practice: {e}")
-        raise ValueError("Failed to parse JSON")
+        if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
+            raise ValueError("AI_QUOTA_EXHAUSTED")
+            
+        logging.warning(f"Error in generate_practice for {skill}: {e}. Retrying once...")
+        try:
+            resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
+            return _parse_json(resp)
+        except Exception as e2:
+            logging.error(f"Final failure in generate_practice for {skill}: {e2}")
+            raise ValueError(f"Practice Generation Error: {str(e2)}")
 
 def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> dict:
     system = """You are a supportive and helpful technical mentor. 

@@ -22,7 +22,7 @@ except (ImportError, Exception):
 
 # Configure Gemini
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY', 'dummy'))
-gemini_model = genai.GenerativeModel('gemini-3-flash-preview')
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 def call_claude(system: str, user: str) -> str:
     """Make a call to the Anthropic Claude model."""
