@@ -18,8 +18,8 @@ import ContactPage from './pages/ContactPage';
 import GoalCompletionPage from './pages/GoalCompletionPage';
 import HowToUse from './pages/HowToUse';
 
-// A component to render the Sidebar only when authenticated
-const Sidebar = () => {
+// A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
+const Navigation = () => {
   const { user, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('scholarium-theme') || 'light');
@@ -31,42 +31,40 @@ const Sidebar = () => {
 
   if (!user) return null;
 
-  const NavItem = ({ to, label, icon }) => (
-    <li className="nav-item mb-2" style={{ listStyle: 'none' }}>
-      <Link 
-        to={to} 
-        className="nav-link d-flex align-items-center gap-3 px-3 py-2" 
-        style={{ 
-          color: 'var(--text-primary)', 
-          fontSize: '16px', 
-          fontWeight: 700,
-          borderRadius: '12px',
-          transition: 'all 0.2s ease',
-          border: '2px solid transparent'
-        }} 
-        onClick={() => setIsOpen(false)}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--bg-page)';
-          e.currentTarget.style.borderColor = 'var(--border)';
-          e.currentTarget.style.transform = 'translate(-2px, -2px)';
-          e.currentTarget.style.boxShadow = '4px 4px 0px var(--border)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-          e.currentTarget.style.borderColor = 'transparent';
-          e.currentTarget.style.transform = 'none';
-          e.currentTarget.style.boxShadow = 'none';
-        }}
-      >
-        {label}
-      </Link>
-    </li>
-  );
+  const links = [
+    { to: "/", label: "Home" },
+    { to: "/roadmaps", label: "Roadmaps" },
+    { to: "/profile", label: "Profile" },
+    { to: "/settings", label: "Settings" },
+    { to: "/about", label: "About" },
+    { to: "/how-to-use", label: "How To Use" },
+  ];
 
   return (
     <>
-      {/* Mobile Toggle Header */}
-      <div className="d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'var(--bg-surface)', borderBottom: '3px solid var(--border)' }}>
+      {/* --- DESKTOP TOPBAR --- */}
+      <nav className="desktop-nav d-none d-lg-flex position-fixed top-0 start-0 end-0 px-5 py-3 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'var(--bg-glass)', backdropFilter: 'blur(10px)', borderBottom: '3px solid var(--border)' }}>
+        <Link to="/" className="scholarium-brand">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          scholarium
+        </Link>
+        
+        <ul className="d-flex align-items-center gap-4 m-0 p-0" style={{ listStyle: 'none' }}>
+          {links.map(link => (
+            <li key={link.to}>
+              <Link to={link.to} className="nav-link" style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '15px' }}>{link.label}</Link>
+            </li>
+          ))}
+        </ul>
+
+        <div className="d-flex align-items-center gap-3">
+          <Link to="/contact" className="btn btn-sm btn-outline-dark px-4 py-2 rounded-pill fw-bold" style={{ border: '2px solid var(--border)' }}>Get in touch</Link>
+          <button onClick={logout} className="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold">Logout</button>
+        </div>
+      </nav>
+
+      {/* --- MOBILE HEADER --- */}
+      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'var(--bg-surface)', borderBottom: '3px solid var(--border)' }}>
         <Link to="/" className="scholarium-brand" style={{ fontSize: '20px' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           scholarium
@@ -80,7 +78,7 @@ const Sidebar = () => {
         </button>
       </div>
 
-      {/* Backdrop for mobile drawer */}
+      {/* Mobile Sidebar Backdrop */}
       {isOpen && (
         <div 
           className="d-lg-none position-fixed top-0 start-0 end-0 bottom-0" 
@@ -89,7 +87,7 @@ const Sidebar = () => {
         />
       )}
 
-      {/* The Sidebar */}
+      {/* MOBILE SIDEBAR (Drawer) */}
       <aside 
         className={`scholarium-sidebar ${isOpen ? 'open' : ''}`}
         style={{
@@ -105,7 +103,7 @@ const Sidebar = () => {
           display: 'flex',
           flexDirection: 'column',
           transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          transform: isOpen ? 'translateX(0)' : 'translateX(0)' // Desktop default
+          transform: 'translateX(-100%)' // Default hidden for mobile
         }}
       >
         <Link to="/" className="scholarium-brand mb-5 px-3">
@@ -115,52 +113,34 @@ const Sidebar = () => {
 
         <nav className="flex-grow-1">
           <ul className="p-0 m-0">
-            <NavItem to="/" label="Home" />
-            <NavItem to="/roadmaps" label="Roadmaps" />
-            <NavItem to="/profile" label="Profile" />
-            <NavItem to="/settings" label="Settings" />
-            <NavItem to="/about" label="About" />
-            <NavItem to="/how-to-use" label="How To Use" />
+            {links.map(link => (
+              <li key={link.to} className="nav-item mb-2" style={{ listStyle: 'none' }}>
+                <Link to={link.to} className="nav-link px-3 py-2" style={{ color: 'var(--text-primary)', fontWeight: 700, borderRadius: '12px' }} onClick={() => setIsOpen(false)}>{link.label}</Link>
+              </li>
+            ))}
           </ul>
         </nav>
 
         <div className="d-flex flex-column gap-3 mt-auto">
-          <Link 
-            to="/contact" 
-            className="btn btn-outline-dark px-4 py-3" 
-            style={{ borderRadius: '16px', fontWeight: 800, border: '3px solid var(--border)', boxShadow: '4px 4px 0px var(--border)' }}
-            onClick={() => setIsOpen(false)}
-          >
-            Get in touch
-          </Link>
-          <button 
-            onClick={() => { setIsOpen(false); logout(); }} 
-            className="btn btn-dark px-4 py-3" 
-            style={{ borderRadius: '16px', fontWeight: 800, background: 'var(--accent-primary)', border: '3px solid var(--border)', boxShadow: '4px 4px 0px var(--border)' }}
-          >
-            Logout
-          </button>
+          <Link to="/contact" className="btn btn-outline-dark py-3 rounded-4 fw-bold" style={{ border: '3px solid var(--border)' }} onClick={() => setIsOpen(false)}>Get in touch</Link>
+          <button onClick={() => { setIsOpen(false); logout(); }} className="btn btn-dark py-3 rounded-4 fw-bold">Logout</button>
         </div>
       </aside>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 991px) {
-          .scholarium-sidebar {
-            transform: translateX(-100%) !important;
-          }
           .scholarium-sidebar.open {
             transform: translateX(0) !important;
           }
           .main-content-wrapper {
-            margin-left: 0 !important;
             padding-top: 80px !important;
             --header-height: 80px;
           }
         }
         @media (min-width: 992px) {
           .main-content-wrapper {
-            margin-left: 280px !important;
-            --header-height: 0px;
+            padding-top: 100px !important;
+            --header-height: 100px;
           }
         }
       `}} />
@@ -183,8 +163,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Sidebar />
-        <div className="main-content-wrapper" style={{ transition: 'margin-left 0.3s ease' }}>
+        <Navigation />
+        <div className="main-content-wrapper" style={{ transition: 'padding-top 0.3s ease' }}>
           <AnimatePresence mode="wait">
             <Routes>
               {/* Public Routes */}
