@@ -53,9 +53,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (username, email, password, name) => {
     try {
-      await api.register({ username, email, password });
+      await api.register({ username, email, password, name });
       // After register, auto login
       return await login(username, password);
     } catch (error) {
@@ -63,8 +63,11 @@ export const AuthProvider = ({ children }) => {
       const errorData = error.response?.data;
       let errorMsg = 'Registration failed';
       if (errorData) {
-        if (errorData.username) errorMsg = `Username: ${errorData.username[0]}`;
+        if (errorData.error) errorMsg = errorData.error;
+        else if (errorData.username) errorMsg = `Username: ${errorData.username[0]}`;
         else if (errorData.email) errorMsg = `Email: ${errorData.email[0]}`;
+        else if (errorData.password) errorMsg = `Password: ${errorData.password[0]}`;
+        else if (typeof errorData === 'string') errorMsg = errorData;
       }
       return { success: false, error: errorMsg };
     }

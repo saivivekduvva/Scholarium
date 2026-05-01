@@ -10,6 +10,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from rest_framework.exceptions import ValidationError
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
@@ -18,6 +20,8 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
+        except ValidationError:
+            raise
         except Exception as e:
             logging.error(f"ERROR in RegisterView: {str(e)}", exc_info=True)
             return Response({'error': 'Registration failed due to a server error. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

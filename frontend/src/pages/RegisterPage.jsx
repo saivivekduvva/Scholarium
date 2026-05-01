@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 
 const RegisterPage = () => {
   const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,7 +16,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const result = await register(username, email, password);
+    const result = await register(username, email, password, name);
     if (!result.success) {
       setError(result.error);
     }
@@ -85,6 +86,14 @@ const RegisterPage = () => {
                     className="form-control"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    style={{ borderRadius: '100px', padding: '16px 24px', border: '2px solid #EEE' }}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Full Name" 
+                    className="form-control"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     style={{ borderRadius: '100px', padding: '16px 24px', border: '2px solid #EEE' }}
                   />
                   <input 
