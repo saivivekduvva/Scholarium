@@ -68,6 +68,8 @@ const Roadmaps = () => {
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -8, x: -4, boxShadow: '12px 12px 0px var(--border)' }}
+                  whileTap={{ scale: 0.98 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => navigate(`/graph/${goal.id}`)}
                   style={{
@@ -79,7 +81,6 @@ const Roadmaps = () => {
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    transition: 'all 0.2s ease',
                     boxShadow: '4px 4px 0px var(--border)'
                   }}
                   className="roadmap-card"
@@ -94,12 +95,14 @@ const Roadmaps = () => {
                     }}>
                       <IoBookOutline size={24} />
                     </div>
-                    <button 
+                    <motion.button 
+                      whileHover={{ scale: 1.2, color: 'var(--accent-danger)' }}
+                      whileTap={{ scale: 0.8 }}
                       className="btn btn-sm p-0"
                       onClick={(e) => handleDeleteGoal(e, goal.id)}
                     >
                       <IoTrashOutline size={20} />
-                    </button>
+                    </motion.button>
                   </div>
                   <h4 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>{goal.title}</h4>
                   <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: 1.6, flex: 1 }}>
@@ -124,12 +127,6 @@ const Roadmaps = () => {
         )}
       </div>
       
-      <style dangerouslySetInnerHTML={{ __html: `
-        .roadmap-card:hover {
-          transform: translate(-4px, -4px);
-          box-shadow: 8px 8px 0px var(--border) !important;
-        }
-      `}} />
     </div>
   );
 };

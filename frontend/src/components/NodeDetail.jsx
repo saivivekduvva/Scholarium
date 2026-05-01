@@ -148,14 +148,16 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
             <p className="text-muted small mb-0" style={{ color: 'var(--text-muted)' }}>Master each module to reach full proficiency</p>
           </div>
           <div className="d-flex flex-wrap align-items-center gap-2">
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={`btn btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill ${isRefreshing ? 'disabled' : ''}`}
               style={{ fontSize: '11px', fontWeight: 700, backgroundColor: 'var(--bg-page)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
               onClick={refreshSubtopics}
             >
               <IoRefreshOutline className={isRefreshing ? 'spin' : ''} size={14} />
               {isRefreshing ? 'Refining...' : 'Refresh'}
-            </button>
+            </motion.button>
             <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold" style={{ fontSize: '12px', background: 'var(--border)', color: 'var(--accent-primary)' }}>
               {subtopics?.length || 0} Modules
             </span>
@@ -234,7 +236,9 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
                           </p>
                         </div>
                         <div className="col-md-4 text-md-end mt-3 mt-md-0">
-                          <button 
+                          <motion.button 
+                            whileHover={{ scale: 1.05, x: 5 }}
+                            whileTap={{ scale: 0.95 }}
                             className={`btn btn-sm px-4 py-2 rounded-pill fw-bold ${isDone ? 'btn-light' : 'btn-dark shadow-sm'}`} 
                             style={{ 
                               fontSize: '12px', 
@@ -248,7 +252,7 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
                             }}
                           >
                             {isDone ? 'Review Module' : 'Launch Learning'} &rarr;
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                     </motion.div>
@@ -264,13 +268,15 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
             💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
           </div>
           {currentProgress === 100 && onNext && (
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onNext}
               className="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm"
               style={{ backgroundColor: 'var(--accent-secondary)', border: 'none', color: 'white', whiteSpace: 'nowrap' }}
             >
               Next Skill &rarr;
-            </button>
+            </motion.button>
           )}
         </div>
 

@@ -157,13 +157,15 @@ const LoginPage = () => {
                       )}
                     </button>
                   </div>
-                  <button 
+                  <motion.button
+                    whileHover={{ scale: 1.02, backgroundColor: '#333' }}
+                    whileTap={{ scale: 0.98 }}
                     type="submit" 
                     className="btn btn-dark w-100 py-3 mt-2" 
                     style={{ borderRadius: '100px', fontWeight: 700, fontSize: '18px' }}
                   >
                     Sign In &rarr;
-                  </button>
+                  </motion.button>
                 </div>
               </form>
               <div className="mt-4 small">

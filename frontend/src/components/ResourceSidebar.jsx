@@ -15,7 +15,9 @@ const ResourceSidebar = ({ proSources, query, books }) => {
             <p className="small text-muted mb-3" style={{ color: 'var(--text-muted)' }}>Verified external articles for deeper study.</p>
             <div className="d-flex flex-column gap-2">
               {proSources.map((src, i) => (
-                <a 
+                <motion.a 
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  whileTap={{ scale: 0.98 }}
                   key={i} 
                   href={src.url} 
                   target="_blank" 
@@ -24,7 +26,7 @@ const ResourceSidebar = ({ proSources, query, books }) => {
                 >
                   <span>Study on {src.name}</span>
                   <IoExtensionPuzzleOutline size={14} />
-                </a>
+                </motion.a>
               ))}
             </div>
           </div>
@@ -38,14 +40,16 @@ const ResourceSidebar = ({ proSources, query, books }) => {
             <IoVideocamOutline className="text-danger" size={20} /> Video Tutorials
           </h6>
           <p className="small text-muted mb-4" style={{ color: 'var(--text-muted)' }}>Curated video content to visualize concepts.</p>
-          <a 
+          <motion.a 
+            whileHover={{ scale: 1.02, backgroundColor: '#c42b2b' }}
+            whileTap={{ scale: 0.98 }}
             href={`https://www.youtube.com/results?search_query=${query}+tutorial`} 
             target="_blank" 
             rel="noreferrer" 
             className="btn btn-danger w-100 rounded-3 py-2 fw-bold"
           >
             Watch on YouTube
-          </a>
+          </motion.a>
         </div>
       </div>
 

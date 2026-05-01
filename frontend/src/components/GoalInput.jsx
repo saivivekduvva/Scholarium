@@ -44,7 +44,8 @@ const GoalInput = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-100">
-      <textarea
+      <motion.textarea
+        whileFocus={{ scale: 1.01, borderColor: 'var(--accent-primary)' }}
         className="form-control"
         style={{ 
           minHeight: '100px', 
@@ -52,7 +53,8 @@ const GoalInput = () => {
           padding: '20px', 
           fontSize: '18px',
           boxShadow: 'var(--shadow-card)',
-          border: '1px solid var(--border)'
+          border: '1px solid var(--border)',
+          transition: 'border-color 0.2s ease'
         }}
         placeholder="e.g. Become a backend engineer"
         value={goal}

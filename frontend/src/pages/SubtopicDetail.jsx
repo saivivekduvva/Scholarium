@@ -88,12 +88,14 @@ const SubtopicDetail = () => {
       className="container py-5"
       style={{ maxWidth: '1100px', backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)' }}
     >
-      <button 
+      <motion.button 
+        whileHover={{ x: -5, color: 'var(--accent-primary)' }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => navigate(-1)} 
         className="btn btn-link text-decoration-none text-muted mb-4 p-0 d-flex align-items-center gap-2"
       >
         <IoArrowBack /> Back to Roadmap
-      </button>
+      </motion.button>
 
       <div className="row g-5">
         {/* Main Content */}
@@ -125,7 +127,9 @@ const SubtopicDetail = () => {
                 <p className="text-muted small mb-1">Up Next</p>
                 <h5 className="mb-0 fw-bold">{nextSubtopic}</h5>
               </div>
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   window.scrollTo(0, 0);
                   navigate(`/subtopic/${goalId}/${encodeURIComponent(skillName)}/${encodeURIComponent(nextSubtopic)}`);
@@ -134,8 +138,8 @@ const SubtopicDetail = () => {
                 style={{ borderRadius: '12px', fontWeight: 600 }}
               >
                 Go to Next &rarr;
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
 
           {/* Mastery Assessment Section */}

@@ -195,7 +195,9 @@ const GraphView = () => {
         )}
       </AnimatePresence>
       
-      <button 
+      <motion.button 
+        whileHover={{ scale: 1.05, x: -5 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => window.history.back()}
         className="btn btn-sm"
         style={{
@@ -203,11 +205,11 @@ const GraphView = () => {
           background: 'var(--bg-surface)', color: 'var(--text-primary)',
           border: '3px solid var(--border)', borderRadius: '12px',
           padding: '10px 20px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
-          boxShadow: '4px 4px 0px var(--border)'
+          boxShadow: '4px 4px 0px var(--border)', cursor: 'pointer'
         }}
       >
         <span>&larr;</span> Back to Dashboard
-      </button>
+      </motion.button>
 
     </motion.div>
   );
