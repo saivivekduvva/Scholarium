@@ -39,7 +39,7 @@ const GraphView = () => {
       const prof = cpMap[node.data.label] || 0;
       return {
         ...node,
-        data: { ...node.data, progress: prof, status: prof >= 80 ? 'done' : 'locked' }
+        data: { ...node.data, progress: prof, status: prof >= 100 ? 'done' : 'locked' }
       };
     });
 
