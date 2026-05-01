@@ -42,28 +42,14 @@ def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
         return None
 
 def generate_roadmap(goal: str) -> dict:
-    system = """You are a curriculum and graph layout expert for Scholarium. 
-    Break down the goal into a logical sequence of skills (DAG).
-    Return a JSON object containing both the list of skills and the visual graph layout (React Flow format).
-    
-    Nodes must have: id, type: 'skillNode', data: { label: 'name', description: 'desc' }, position {x, y}.
-    Edges must have: id, source, target.
-    
-    Arrange the nodes logically from left to right (foundational to advanced).
-    
-    CRITICAL: The 'name' in the skills list MUST EXACTLY MATCH the 'label' in the graph nodes for each corresponding ID.
-    CRITICAL: RETURN ONLY VALID JSON. NO CONVERSATIONAL TEXT."""
+    system = "Expert curriculum architect. Create a DAG roadmap. Return ONLY JSON."
     
     user = f"""Goal: {goal}
-    Return JSON format: 
+    JSON format: 
     {{
-        "skills": [
-            {{ "id": "s1", "name": "Skill Name", "description": "Short description", "estimated_hours": 5 }}
-        ],
+        "skills": [{{ "id": "s1", "name": "Name", "description": "Desc", "estimated_hours": 2 }}],
         "graph": {{
-            "nodes": [
-                {{ "id": "s1", "type": "skillNode", "data": {{ "label": "Skill Name", "description": "Short description" }}, "position": {{ "x": 0, "y": 0 }} }}
-            ],
+            "nodes": [{{ "id": "s1", "type": "skillNode", "data": {{ "label": "Name", "description": "Desc" }}, "position": {{ "x": 0, "y": 0 }} }}],
             "edges": []
         }}
     }}"""
@@ -84,20 +70,9 @@ def generate_roadmap(goal: str) -> dict:
             raise ValueError(f"AI Generation Error: {str(e2)}")
 
 def expand_subtopics(skill_name: str) -> dict:
-    system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 5-7 logically sequenced, UNIQUE subtopics.
+    system = "Curriculum Architect. Break skill into 5-7 UNIQUE, sequenced subtopics. Return ONLY JSON."
     
-    RULES:
-    1. NO DUPLICATES: Every subtopic must have a unique title.
-    2. LOGICAL FLOW: Order from foundational to advanced.
-    3. DESCRIPTION: Provide a brief summary (20-30 words) for each subtopic.
-    4. LIMIT: Generate exactly 5-7 subtopics per skill.
-    
-    Return ONLY valid JSON."""
-    
-    user = f"""Skill: {skill_name}
-    Return JSON format: 
-    {{
-        "subtopics": [
+    user = f"Skill: {skill_name}. Format: {{'subtopics': [{{'title': '...', 'description': '...'}}]}}"
             {{ 
                 "title": "Subtopic Name", 
                 "description": "Short summary of focus...", 
@@ -123,35 +98,10 @@ def expand_subtopics(skill_name: str) -> dict:
             raise ValueError(f"Curriculum Generation Error: {str(e2)}")
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
-    system = """You are a friendly and encouraging tutor for Scholarium. 
-    Your goal is to assess the learner's basic understanding with clear, foundational questions.
+    system = "Scholarium Tutor. Generate a clear foundational quiz. Return ONLY JSON."
     
-    Rules for question generation:
-    1. ACCESSIBLE DIFFICULTY: Focus on core concepts and fundamental principles. Avoid overly complex edge cases.
-    2. BE CLEAR: Use simple, easy-to-understand language.
-    3. RELEVANT DISTRACTORS: Distractors should be plausible but clearly incorrect for someone who knows the basics.
-    4. VARIETY: Ensure questions cover the essential aspects of the subtopic.
-    
-    Return ONLY valid JSON."""
-    
-    context_str = json.dumps(context) if context else "No additional context."
-    salt = time.time()
-    user = f"""Topic: {skill}
-    Difficulty: beginner
-    Context: {context_str}
-    Salt: {salt} (Generate completely unique and fresh questions)
-    
-    Generate exactly 5 clear, random, and varied multiple-choice questions.
-    Return JSON format: 
-    {{
-        "questions": [
-            {{
-                "prompt": "Clear, foundational question...", 
-                "options": ["Option A", "Option B", "Option C", "Option D"], 
-                "correct_option": 0
-            }}
-        ]
-    }}"""
+    user = f"""Topic: {skill}. Generate 3 fresh MCQs.
+    Format: {{ "questions": [ {{ "prompt": "...", "options": ["...", "...", "...", "..."], "correct_option": 0 }} ] }}"""
     try:
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
