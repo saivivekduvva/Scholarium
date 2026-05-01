@@ -419,6 +419,15 @@ def mark_subtopic_mastered(request):
             )
             checkpoint.proficiency = 100
             checkpoint.save()
+
+            # Check if all other skills in the goal are completed
+            all_goal_skills = node.goal.nodes.all()
+            skill_names = [sn.skill_name for sn in all_goal_skills]
+            goal_checkpoints = Checkpoint.objects.filter(user=request.user, skill_name__in=skill_names, proficiency=100)
+            
+            if goal_checkpoints.count() == len(skill_names):
+                node.goal.status = 'completed'
+                node.goal.save()
             
         return Response({'status': 'success', 'xp_earned': 50})
     except Subtopic.DoesNotExist:

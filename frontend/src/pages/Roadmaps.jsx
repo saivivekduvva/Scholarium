@@ -63,58 +63,74 @@ const Roadmaps = () => {
           </div>
         ) : (
           <div className="row g-4">
-            {goals.length > 0 ? goals.map((goal, index) => (
-              <div className="col-md-6 col-lg-4" key={goal.id}>
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -8, x: -4, boxShadow: '12px 12px 0px var(--border)' }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => navigate(`/graph/${goal.id}`)}
-                  style={{
-                    background: 'var(--bg-surface)',
-                    border: '3px solid var(--border)',
-                    borderRadius: '24px',
-                    padding: '32px',
-                    cursor: 'pointer',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    boxShadow: '4px 4px 0px var(--border)'
-                  }}
-                  className="roadmap-card"
-                >
-                  <div className="d-flex justify-content-between align-items-start mb-4">
-                    <div style={{ 
-                      width: '48px', height: '48px', 
-                      borderRadius: '12px', 
-                      background: 'var(--accent-highlight)',
-                      border: '2px solid var(--border)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      <IoBookOutline size={24} />
-                    </div>
-                    <motion.button 
-                      whileHover={{ scale: 1.2, color: 'var(--accent-danger)' }}
-                      whileTap={{ scale: 0.8 }}
-                      className="btn btn-sm p-0"
-                      onClick={(e) => handleDeleteGoal(e, goal.id)}
+            {goals.length > 0 ? (
+              goals.map((goal, index) => {
+                const isCompleted = goal.status === 'completed';
+                return (
+                  <div className="col-md-6 col-lg-4" key={goal.id}>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ 
+                        y: -8, x: -4, 
+                        boxShadow: isCompleted ? '12px 12px 0px #06C9A0' : '12px 12px 0px var(--border)' 
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => navigate(`/graph/${goal.id}`)}
+                      style={{
+                        background: 'var(--bg-surface)',
+                        border: `3px solid ${isCompleted ? '#06C9A0' : 'var(--border)'}`,
+                        borderRadius: '24px',
+                        padding: '32px',
+                        cursor: 'pointer',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: `4px 4px 0px ${isCompleted ? '#06C9A0' : 'var(--border)'}`
+                      }}
+                      className="roadmap-card"
                     >
-                      <IoTrashOutline size={20} />
-                    </motion.button>
+                      <div className="d-flex justify-content-between align-items-start mb-4">
+                        <div style={{ 
+                          width: '48px', height: '48px', 
+                          borderRadius: '12px', 
+                          background: isCompleted ? 'rgba(6, 201, 160, 0.1)' : 'var(--accent-highlight)',
+                          border: `2px solid ${isCompleted ? '#06C9A0' : 'var(--border)'}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: isCompleted ? '#06C9A0' : 'inherit'
+                        }}>
+                          <IoBookOutline size={24} />
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                          {isCompleted && (
+                            <span className="badge" style={{ backgroundColor: '#06C9A0', color: 'white', fontSize: '10px', fontWeight: 800 }}>MASTERED</span>
+                          )}
+                          <motion.button 
+                            whileHover={{ scale: 1.2, color: 'var(--accent-danger)' }}
+                            whileTap={{ scale: 0.8 }}
+                            className="btn btn-sm p-0"
+                            onClick={(e) => handleDeleteGoal(e, goal.id)}
+                          >
+                            <IoTrashOutline size={20} />
+                          </motion.button>
+                        </div>
+                      </div>
+                      <h4 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>{goal.title}</h4>
+                      <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: 1.6, flex: 1 }}>
+                        {isCompleted ? "Goal Mastered! You've successfully completed this learning roadmap." : (goal.description || 'Continue your journey to master this skill.')}
+                      </p>
+                      <div className="mt-4 pt-3 d-flex align-items-center justify-content-between border-top" style={{ borderColor: isCompleted ? '#06C9A0' : 'var(--border)', borderTopWidth: '2px !important' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: isCompleted ? '#06C9A0' : 'inherit' }}>
+                          {isCompleted ? 'Review Mastery' : 'Open Roadmap'}
+                        </span>
+                        <IoArrowForward size={18} color={isCompleted ? '#06C9A0' : 'inherit'} />
+                      </div>
+                    </motion.div>
                   </div>
-                  <h4 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>{goal.title}</h4>
-                  <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: 1.6, flex: 1 }}>
-                    {goal.description || 'Continue your journey to master this skill.'}
-                  </p>
-                  <div className="mt-4 pt-3 d-flex align-items-center justify-content-between border-top" style={{ borderColor: 'var(--border)', borderTopWidth: '2px !important' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Open Roadmap</span>
-                    <IoArrowForward size={18} />
-                  </div>
-                </motion.div>
-              </div>
-            )) : (
+                );
+              })
+            ) : (
               <div className="col-12 text-center py-5">
                 <div style={{ padding: '60px', border: '3px dashed var(--border)', borderRadius: '32px' }}>
                   <h3 style={{ fontWeight: 800 }}>No active roadmaps yet.</h3>
