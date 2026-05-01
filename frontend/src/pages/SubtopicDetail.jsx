@@ -122,7 +122,11 @@ const SubtopicDetail = () => {
           </div>
 
           {nextSubtopic && (
-            <div className="mb-5 p-4 rounded-4 border d-flex justify-content-between align-items-center" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
+            <motion.div 
+              whileHover={{ scale: 1.01 }}
+              className="mb-5 p-4 rounded-4 border d-flex justify-content-between align-items-center" 
+              style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+            >
               <div>
                 <p className="text-muted small mb-1">Up Next</p>
                 <h5 className="mb-0 fw-bold">{nextSubtopic}</h5>
