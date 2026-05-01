@@ -77,20 +77,23 @@ const GraphView = () => {
         
         const computedNodes = computeNodeStatuses(rawGraph.nodes, rawGraph.edges, progress.checkpoints);
         setGraphData({ nodes: computedNodes, edges: rawGraph.edges });
-
-        // Check for overall goal completion
-        const allDone = computedNodes.every(n => n.data.status === 'done');
-        if (allDone && computedNodes.length > 0) {
-          setTimeout(() => {
-            window.location.href = `/goal-completed/${goalId}`;
-          }, 1500);
-        }
       })
       .catch(err => {
         console.error(err);
         setGraphData({ error: true });
       });
   }, [goalId]);
+
+  useEffect(() => {
+    if (!graphData || !graphData.nodes || graphData.error) return;
+
+    const allDone = graphData.nodes.every(n => n.data.status === 'done');
+    if (allDone && graphData.nodes.length > 0) {
+      setTimeout(() => {
+        window.location.href = `/goal-completed/${goalId}`;
+      }, 1500);
+    }
+  }, [graphData, goalId]);
 
   const handleAutoSequence = () => {
     if (!graphData || !graphData.nodes) return;
