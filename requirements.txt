@@ -1,7 +1,9 @@
 django==4.2.*
 djangorestframework
 django-cors-headers
-mysqlclient
+psycopg2-binary
+dj-database-url
+whitenoise
 pymongo
 python-dotenv
 anthropic
