@@ -33,7 +33,7 @@ const HowToUse = () => {
     },
     {
       title: "5. Mastery Quiz",
-      description: "Answer all 4 MCQs. You must score 100% to unlock the next skill. If you don't pass, click Retry — the AI generates fresh questions every time.",
+      description: "Answer all MCQs. You must score 100% to unlock the next skill. If you don't pass, click Retry — the AI generates fresh questions every time.",
       icon: <IoRibbonOutline size={40} />,
       color: "#F75C5C"
     },

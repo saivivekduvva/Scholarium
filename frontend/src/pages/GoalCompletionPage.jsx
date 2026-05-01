@@ -94,7 +94,10 @@ const GoalCompletionPage = () => {
             </Link>
             
             <button 
-              onClick={() => alert("Sharing feature coming soon!")}
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Achievement link copied to clipboard!");
+              }}
               className="btn btn-outline-dark px-5 py-3 d-flex align-items-center justify-content-center gap-2" 
               style={{ borderRadius: '100px', fontWeight: 700, fontSize: '18px', border: '3px solid #1A1A1A' }}
             >

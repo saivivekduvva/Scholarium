@@ -14,8 +14,7 @@ const GoalInput = () => {
     
     setLoading(true);
     try {
-      // Mock user_id = 1 for MVP
-      const response = await api.createGoal({ title: goal, description: '', user_id: 1 });
+      const response = await api.createGoal({ title: goal, description: '' });
       const goalId = response.data.goal.id;
       const isDuplicate = response.data.is_duplicate;
       
