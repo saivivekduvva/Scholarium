@@ -44,9 +44,8 @@ const Navigation = () => {
     <>
       {/* --- DESKTOP TOPBAR --- */}
       <nav className="desktop-nav d-none d-lg-flex position-absolute top-0 start-0 end-0 px-5 py-4 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
-        <Link to="/" className="scholarium-brand">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          scholarium
+        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>
+          Scholarium
         </Link>
         
         <ul className="d-flex align-items-center gap-4 m-0 p-0" style={{ listStyle: 'none' }}>
@@ -65,9 +64,8 @@ const Navigation = () => {
 
       {/* --- MOBILE HEADER --- */}
       <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'transparent' }}>
-        <Link to="/" className="scholarium-brand" style={{ fontSize: '20px' }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          scholarium
+        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '20px', letterSpacing: '-1px' }}>
+          Scholarium
         </Link>
         <button 
           className="btn p-2" 
@@ -106,9 +104,8 @@ const Navigation = () => {
           transform: 'translateX(-100%)' // Default hidden for mobile
         }}
       >
-        <Link to="/" className="scholarium-brand mb-5 px-3">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          scholarium
+        <Link to="/" className="scholarium-brand mb-5 px-3" style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>
+          Scholarium
         </Link>
 
         <nav className="flex-grow-1">
