@@ -68,12 +68,18 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
   const handleToggleSubtopic = (subtopic, index) => {
     if (!subtopic.id) return;
     
-    const newSubtopics = [...subtopics];
-    newSubtopics[index].is_studied = !newSubtopics[index].is_studied;
-    setSubtopics(newSubtopics);
-    subtopicsCache[skillName] = newSubtopics;
+    setSubtopics(prev => {
+      const updated = prev.map(st => 
+        st.id === subtopic.id ? { ...st, is_studied: !st.is_studied } : st
+      );
+      subtopicsCache[skillName] = updated;
+      return updated;
+    });
 
-    // Calculate new progress
+    // Calculate new progress using the updated state logic
+    const newSubtopics = subtopics.map(st => 
+      st.id === subtopic.id ? { ...st, is_studied: !st.is_studied } : st
+    );
     const completedCount = newSubtopics.filter(s => s.is_studied).length;
     const totalCount = newSubtopics.length;
     const newProgress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -92,12 +98,16 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
       })
       .catch(err => {
         console.error("Failed to toggle subtopic", err);
-        const reverted = [...subtopics];
-        reverted[index].is_studied = !reverted[index].is_studied;
-        setSubtopics(reverted);
-        subtopicsCache[skillName] = reverted;
+        setSubtopics(prev => {
+          const reverted = prev.map(st => 
+            st.id === subtopic.id ? { ...st, is_studied: !st.is_studied } : st
+          );
+          subtopicsCache[skillName] = reverted;
+          return reverted;
+        });
         
-        const revertedProgress = totalCount > 0 ? Math.round((reverted.filter(s => s.is_studied).length / totalCount) * 100) : 0;
+        const totalCount = subtopics.length;
+        const revertedProgress = totalCount > 0 ? Math.round((subtopics.filter(s => s.is_studied).length / totalCount) * 100) : 0;
         if (onUpdate) onUpdate(skillName, revertedProgress);
       });
   };
@@ -179,7 +189,7 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
                 
                 return (
                   <motion.div
-                    key={st.id || i}
+                    key={st.id}
                     variants={{ 
                       initial: { opacity: 0, x: -20 }, 
                       animate: { opacity: 1, x: 0 } 
@@ -223,8 +233,13 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
                         </div>
                         <div className="col-md-4 text-md-end mt-3 mt-md-0">
                           <button 
-                            className={`btn btn-sm px-4 py-2 rounded-pill fw-bold ${isDone ? 'btn-light text-muted' : 'btn-primary shadow-sm'}`} 
-                            style={{ fontSize: '12px', ...(isDone ? { backgroundColor: 'var(--border)', color: 'var(--text-muted)', border: 'none' } : {}) }}
+                            className={`btn btn-sm px-4 py-2 rounded-pill fw-bold ${isDone ? 'btn-light' : 'btn-dark shadow-sm'}`} 
+                            style={{ 
+                              fontSize: '12px', 
+                              backgroundColor: isDone ? 'var(--bg-page)' : 'var(--accent-primary)',
+                              color: isDone ? 'var(--text-muted)' : '#FFFFFF',
+                              border: isDone ? '1px solid var(--border)' : 'none'
+                            }}
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/subtopic/${goalId}/${encodeURIComponent(skillName)}/${encodeURIComponent(st.title)}`);
