@@ -43,7 +43,7 @@ const Navigation = () => {
   return (
     <>
       {/* --- DESKTOP TOPBAR --- */}
-      <nav className="desktop-nav d-none d-lg-flex position-fixed top-0 start-0 end-0 px-5 py-3 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'var(--bg-glass)', backdropFilter: 'blur(10px)', borderBottom: '3px solid var(--border)' }}>
+      <nav className="desktop-nav d-none d-lg-flex position-absolute top-0 start-0 end-0 px-5 py-4 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'transparent' }}>
         <Link to="/" className="scholarium-brand">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           scholarium
@@ -64,7 +64,7 @@ const Navigation = () => {
       </nav>
 
       {/* --- MOBILE HEADER --- */}
-      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'var(--bg-surface)', borderBottom: '3px solid var(--border)' }}>
+      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'transparent' }}>
         <Link to="/" className="scholarium-brand" style={{ fontSize: '20px' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           scholarium
