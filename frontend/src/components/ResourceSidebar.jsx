@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { IoBookOutline, IoVideocamOutline, IoNewspaperOutline, IoExtensionPuzzleOutline } from 'react-icons/io5';
 
 const ResourceSidebar = ({ proSources, query, books }) => {
