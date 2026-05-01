@@ -110,6 +110,16 @@ const GraphView = () => {
     }
     setSelectedNodeId(node.id);
   };
+ 
+  const handleNextSkill = () => {
+    if (!graphData || !graphData.nodes) return;
+    const nextNode = graphData.nodes.find(n => n.data.status === 'active' && n.id !== selectedNodeId);
+    if (nextNode) {
+      setSelectedNodeId(nextNode.id);
+    } else {
+      setSelectedNodeId(null);
+    }
+  };
 
   const handleStartLearning = () => {
     if (!graphData || !graphData.nodes) return;
@@ -179,6 +189,7 @@ const GraphView = () => {
             goalId={goalId}
             onClose={() => setSelectedNodeId(null)} 
             onUpdate={updateNodeProgress}
+            onNext={handleNextSkill}
           />
         )}
       </AnimatePresence>

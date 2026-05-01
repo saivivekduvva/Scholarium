@@ -6,7 +6,7 @@ import { IoBookOutline, IoTimeOutline, IoCheckmarkCircle, IoRefreshOutline } fro
 
 const subtopicsCache = {};
 
-const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
+const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
   const [subtopics, setSubtopics] = useState(null);
   const [xpEarned, setXpEarned] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -257,8 +257,19 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate }) => {
           </div>
         )}
 
-        <div className="alert alert-info mt-4" style={{ borderRadius: '16px', fontSize: '13px', backgroundColor: 'var(--border)', color: 'var(--text-primary)', border: 'none' }}>
-          💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
+        <div className="alert alert-info mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3" style={{ borderRadius: '16px', fontSize: '13px', backgroundColor: 'var(--border)', color: 'var(--text-primary)', border: 'none' }}>
+          <div>
+            💡 <strong>Pro Tip:</strong> Click on a subtopic to study it. You'll need to pass a quick assessment at the bottom of the page to mark it as mastered!
+          </div>
+          {currentProgress === 100 && onNext && (
+            <button 
+              onClick={onNext}
+              className="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm"
+              style={{ backgroundColor: 'var(--accent-secondary)', border: 'none', color: 'white', whiteSpace: 'nowrap' }}
+            >
+              Next Skill &rarr;
+            </button>
+          )}
         </div>
 
       </motion.div>
