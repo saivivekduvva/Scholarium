@@ -32,17 +32,20 @@ const RegisterPage = () => {
       color: '#1A1A1A',
       fontFamily: 'Inter, sans-serif',
       position: 'relative',
-      overflowX: 'hidden'
+      overflowX: 'hidden',
+      paddingTop: user ? '80px' : '0'
     }}>
       
-      <nav className="d-flex justify-content-between align-items-center px-5 py-4">
-        <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
-        <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
-          <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-          <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
-        </div>
-        <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
-      </nav>
+      {!user && (
+        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
+          <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
+          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
+            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
+            <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
+          </div>
+          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
+        </nav>
+      )}
 
       <div className="container" style={{ paddingTop: '5vh' }}>
         <div className="text-center">

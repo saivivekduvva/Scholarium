@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import { IoRocketOutline, IoMapOutline, IoLibraryOutline, IoRibbonOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 
 const HowToUse = () => {
+  const { user } = useContext(AuthContext);
   const steps = [
     {
       title: "Define Your Goal",
@@ -40,9 +42,22 @@ const HowToUse = () => {
       backgroundSize: '24px 24px',
       color: '#1A1A1A',
       fontFamily: 'Inter, sans-serif',
-      paddingBottom: '100px'
+      paddingBottom: '100px',
+      paddingTop: user ? '80px' : '0'
     }}>
-      <div className="container" style={{ maxWidth: '1000px', paddingTop: '80px' }}>
+      {!user && (
+        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
+          <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
+          </Link>
+          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
+            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
+            <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
+          </div>
+          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
+        </nav>
+      )}
+      <div className="container" style={{ maxWidth: '1000px', paddingTop: '5vh' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
