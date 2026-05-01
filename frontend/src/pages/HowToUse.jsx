@@ -8,28 +8,40 @@ const HowToUse = () => {
   const { user } = useContext(AuthContext);
   const steps = [
     {
-      title: "Define Your Goal",
-      description: "Start by entering any learning objective, from 'Advanced Quantum Mechanics' to 'Baking Sourdough'. Scholarium's AI analyzes the topic and builds a foundational structure.",
+      title: "1. Sign In",
+      description: "Go to the Scholarium homepage. New user? Click Join now to register. Returning user? Enter your username and password, then click Sign In.",
       icon: <IoRocketOutline size={40} />,
       color: "#4F6EF7"
     },
     {
-      title: "Master the Roadmap",
-      description: "View your personalized Skill Graph (DAG). Skills are logically sequenced; foundational concepts unlock advanced ones as you progress. No more guessing what to learn next.",
+      title: "2. Generate a Roadmap",
+      description: "Click Roadmaps in the top navigation bar. Type your learning goal (e.g. 'Become a Backend Engineer'). The AI will build a visual skill roadmap for you in seconds.",
       icon: <IoMapOutline size={40} />,
       color: "#F7C35C"
     },
     {
-      title: "Learn with Precision",
-      description: "Dive into specific subtopics. Scholarium prioritizes high-quality academic sources and provides AI-powered explanations and video tutorials for every module.",
-      icon: <IoLibraryOutline size={40} />,
+      title: "3. Navigate the Roadmap",
+      description: "Your current skill is shown at the top — click it to start. Locked nodes have a padlock icon. Complete the current skill to unlock them. Use zoom and minimap to explore.",
+      icon: <IoCheckmarkCircleOutline size={40} />,
       color: "#06C9A0"
     },
     {
-      title: "Verify Your Knowledge",
-      description: "Complete adaptive assessments for every subtopic. To master a skill node, you must achieve 100% accuracy, ensuring you truly understand the material.",
+      title: "4. Learn a Skill",
+      description: "Click an unlocked node to open subtopics. Read content sourced from high-quality platforms like Wikipedia and GeeksforGeeks. Use resource links for deeper reading.",
+      icon: <IoLibraryOutline size={40} />,
+      color: "#9D7BFF"
+    },
+    {
+      title: "5. Mastery Quiz",
+      description: "Answer all 4 MCQs. You must score 100% to unlock the next skill. If you don't pass, click Retry — the AI generates fresh questions every time.",
       icon: <IoRibbonOutline size={40} />,
       color: "#F75C5C"
+    },
+    {
+      title: "6. Contact & Help",
+      description: "Click About in the navigation bar to find us. Phone: +91 80197 92969 | Email: saivivekduvva@gmail.com. We're here to help you master your goals!",
+      icon: <IoRibbonOutline size={40} />,
+      color: "#1A1A1A"
     }
   ];
 
