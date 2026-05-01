@@ -43,28 +43,30 @@ const Navigation = () => {
   return (
     <>
       {/* --- DESKTOP TOPBAR --- */}
-      <nav className="desktop-nav d-none d-lg-flex position-absolute top-0 start-0 end-0 px-5 py-4 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
-        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>
-          Scholarium
-        </Link>
-        
-        <ul className="d-flex align-items-center gap-4 m-0 p-0" style={{ listStyle: 'none' }}>
-          {links.map(link => (
-            <li key={link.to}>
-              <Link to={link.to} className="nav-link" style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '15px' }}>{link.label}</Link>
-            </li>
-          ))}
-        </ul>
+      <nav className="desktop-nav d-none d-lg-flex position-fixed top-0 start-0 end-0 py-3 justify-content-center" style={{ zIndex: 1000, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+        <div className="container-fluid px-5 d-flex justify-content-between align-items-center">
+          <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '26px', letterSpacing: '-1.5px', color: '#1A1A1A', textDecoration: 'none' }}>
+            Scholarium
+          </Link>
+          
+          <ul className="d-flex align-items-center gap-4 m-0 p-0" style={{ listStyle: 'none' }}>
+            {links.map(link => (
+              <li key={link.to}>
+                <Link to={link.to} className="nav-link" style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '15px', transition: 'opacity 0.2s' }}>{link.label}</Link>
+              </li>
+            ))}
+          </ul>
 
-        <div className="d-flex align-items-center gap-3">
-          <Link to="/contact" className="btn btn-sm btn-outline-dark px-4 py-2 rounded-pill fw-bold" style={{ border: '2px solid var(--border)' }}>Get in touch</Link>
-          <button onClick={logout} className="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold">Logout</button>
+          <div className="d-flex align-items-center gap-3">
+            <Link to="/contact" className="btn btn-sm px-4 py-2" style={{ border: '2px solid var(--border)', borderRadius: '100px', fontWeight: 700, fontSize: '13px' }}>Get in touch</Link>
+            <button onClick={logout} className="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold" style={{ fontSize: '13px' }}>Logout</button>
+          </div>
         </div>
       </nav>
 
       {/* --- MOBILE HEADER --- */}
-      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'transparent' }}>
-        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '20px', letterSpacing: '-1px' }}>
+      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--border)' }}>
+        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '22px', letterSpacing: '-1px', color: '#1A1A1A', textDecoration: 'none' }}>
           Scholarium
         </Link>
         <button 
