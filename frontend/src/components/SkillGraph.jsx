@@ -84,7 +84,7 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
   }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   return (
-    <div style={{ height: 'calc(100vh - 64px)', width: '100%', position: 'relative' }}>
+    <div style={{ height: 'calc(100vh - var(--header-height, 0px))', width: '100%', position: 'relative' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

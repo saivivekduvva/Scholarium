@@ -164,7 +164,7 @@ const GraphView = () => {
     >
       {graphData ? (
         graphData.error ? (
-          <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: 'calc(100vh - 64px)' }}>
+          <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: 'calc(100vh - var(--header-height, 0px))' }}>
             <h3 style={{ color: 'var(--accent-danger)', fontFamily: 'Outfit' }}>Failed to generate graph</h3>
             <p className="text-muted text-center" style={{ maxWidth: '400px' }}>
               The AI may have been rate-limited or encountered an error while mapping your skills. Please try deleting this goal and creating it again later.
@@ -178,7 +178,7 @@ const GraphView = () => {
           />
         )
       ) : (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: 'calc(100vh - 64px)' }}>
+        <div className="d-flex justify-content-center align-items-center" style={{ height: 'calc(100vh - var(--header-height, 0px))' }}>
           <div className="spinner-border" style={{ color: 'var(--accent-primary)' }} />
         </div>
       )}
