@@ -26,12 +26,6 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    if (error.response && error.response.status === 500) {
-      const url = error.config?.url || '';
-      if (!url.includes('progress') && !url.includes('profile') && !url.includes('user-stats') && !url.includes('register')) {
-        window.location.href = '/error';
-      }
-    }
     return Promise.reject(error);
   }
 );

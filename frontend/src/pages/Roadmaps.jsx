@@ -8,6 +8,7 @@ const Roadmaps = () => {
   const navigate = useNavigate();
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     api.getGoals()
@@ -17,6 +18,7 @@ const Roadmaps = () => {
       })
       .catch(err => {
         console.error('Failed to fetch goals:', err);
+        setError("Failed to load your roadmaps. Please check your connection.");
         setLoading(false);
       });
   }, []);
@@ -29,6 +31,7 @@ const Roadmaps = () => {
       setGoals(goals.filter(g => g.id !== id));
     } catch (err) {
       console.error("Failed to delete goal:", err);
+      alert("Failed to delete roadmap. Please try again.");
     }
   };
 
@@ -52,6 +55,11 @@ const Roadmaps = () => {
             <div className="spinner-border" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <p className="text-danger">{error}</p>
+            <button className="btn btn-outline-dark" onClick={() => window.location.reload()}>Retry</button>
           </div>
         ) : (
           <div className="row g-4">
