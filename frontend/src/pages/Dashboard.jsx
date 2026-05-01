@@ -56,7 +56,9 @@ const Dashboard = () => {
           style={{ maxWidth: '640px', marginTop: '6vh' }}
         >
           <div style={{
-            background: 'var(--bg-surface)',
+            background: 'var(--glass-surface)',
+            backdropFilter: 'var(--glass-blur)',
+            WebkitBackdropFilter: 'var(--glass-blur)',
             border: '3px solid var(--border)',
             borderRadius: '32px',
             padding: '12px',

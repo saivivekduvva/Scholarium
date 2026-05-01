@@ -19,6 +19,11 @@
   --glass-bg: #FFFFFF;
   --glass-border: #1A1A1A;
   --gradient-bg: radial-gradient(#00000010 1px, transparent 0);
+  
+  /* Glassmorphism Tokens */
+  --glass-surface: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(16px) saturate(180%);
 }
 
 [data-theme='dark'] {
@@ -149,11 +154,26 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.4;
 }
 
-/* Floating Toolbar */
+/* Floating Toolbar & Glass UI */
 .floating-toolbar {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  background: var(--glass-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card {
+  background: var(--glass-surface) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 3px solid var(--border) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.glass-modal {
+  background: var(--glass-surface) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
 }

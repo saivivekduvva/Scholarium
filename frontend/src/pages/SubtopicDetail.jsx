@@ -117,7 +117,7 @@ const SubtopicDetail = () => {
             )}
           </div>
 
-          <div className="prose p-5 rounded-4 shadow-sm border mb-5" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)', minHeight: '600px' }}>
+          <div className="prose p-5 rounded-4 border mb-5" style={{ background: 'var(--glass-surface)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)', borderColor: 'var(--border)', minHeight: '600px', boxShadow: '8px 8px 0px var(--border)' }}>
             <ReactMarkdown>{explanation}</ReactMarkdown>
           </div>
 

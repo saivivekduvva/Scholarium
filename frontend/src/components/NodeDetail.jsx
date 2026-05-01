@@ -131,9 +131,10 @@ const NodeDetail = ({ node, goalId, onClose, onUpdate, onNext }) => {
         style={{
           position: 'fixed', left: 0, right: 0, margin: '0 auto', top: '5vh', bottom: '5vh',
           width: '92%', maxWidth: '800px',
-          backgroundColor: 'var(--bg-surface)', boxShadow: '0 32px 80px rgba(0,0,0,0.2)',
-          zIndex: 1001, padding: 'clamp(20px, 5vw, 40px)', overflowY: 'auto', borderRadius: '24px',
-          border: '1px solid var(--border)', transition: 'background-color 0.3s ease, color 0.3s ease'
+          background: 'var(--glass-surface)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.15)',
+          zIndex: 1001, padding: 'clamp(20px, 5vw, 40px)', overflowY: 'auto', borderRadius: '32px',
+          border: '1px solid var(--glass-border)', transition: 'background-color 0.3s ease'
         }}
       >
         <button onClick={onClose} className="btn-close float-end" style={{ filter: 'var(--theme-invert)' }}></button>

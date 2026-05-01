@@ -79,7 +79,9 @@ const Roadmaps = () => {
                       transition={{ delay: index * 0.05 }}
                       onClick={() => navigate(`/graph/${goal.id}`)}
                       style={{
-                        background: 'var(--bg-surface)',
+                        background: 'var(--glass-surface)',
+                        backdropFilter: 'var(--glass-blur)',
+                        WebkitBackdropFilter: 'var(--glass-blur)',
                         border: `3px solid ${isCompleted ? '#06C9A0' : 'var(--border)'}`,
                         borderRadius: '24px',
                         padding: '32px',

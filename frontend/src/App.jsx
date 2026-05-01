@@ -43,7 +43,7 @@ const Navigation = () => {
   return (
     <>
       {/* --- DESKTOP TOPBAR --- */}
-      <nav className="desktop-nav d-none d-lg-flex position-absolute top-0 start-0 end-0 px-5 py-4 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'transparent' }}>
+      <nav className="desktop-nav d-none d-lg-flex position-absolute top-0 start-0 end-0 px-5 py-4 justify-content-between align-items-center" style={{ zIndex: 1000, background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
         <Link to="/" className="scholarium-brand">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           scholarium
