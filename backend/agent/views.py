@@ -123,8 +123,6 @@ def create_goal(request):
 def delete_goal(request, id):
     goal = get_object_or_404(Goal, pk=id, user=request.user)
     goal.delete()
-    # Note: Cascading deletes will handle SkillNodes, but we should ideally clean up Mongo too
-    mongo_brain.graphs.delete_many({'goal_id': id})
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
