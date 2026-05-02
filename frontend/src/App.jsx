@@ -164,8 +164,8 @@ const Footer = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
           <Navigation />
           <div className="main-content-wrapper" style={{ transition: 'padding-top 0.3s ease' }}>
           <AnimatePresence mode="wait">
@@ -194,8 +194,8 @@ function App() {
           </AnimatePresence>
           <Footer />
         </div>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </ThemeProvider>
   );
 }
