@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SkillGraph from '../components/SkillGraph';
 import NodeDetail from '../components/NodeDetail';
 import api from '../services/api';
+import { IoArrowBack } from 'react-icons/io5';
 const GraphView = () => {
   const { goalId } = useParams();
   const navigate = useNavigate();
@@ -146,7 +147,7 @@ const GraphView = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.28, ease: 'easeOut' }}
-      style={{ position: 'relative' }}
+      style={{ position: 'relative', height: 'calc(100vh - var(--header-height, 0px))', overflow: 'hidden' }}
     >
       {graphData ? (
         graphData.error ? (

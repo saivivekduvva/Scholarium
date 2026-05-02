@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const Settings = () => {
   const { user, logout } = useContext(AuthContext);
+  const { theme, setTheme } = useContext(ThemeContext);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
@@ -44,15 +46,48 @@ const Settings = () => {
         </button>
         <h1 className="mb-4" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>Account Settings</h1>
         
-        <div className="p-4 mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="h5 mb-3" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Profile Information</h2>
-          <div className="mb-3">
-            <label className="form-label" style={{ color: 'var(--text-muted)' }}>Username</label>
-            <p className="fw-bold" style={{ color: 'var(--text-primary)' }}>{user?.username}</p>
+        <div className="p-4 mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: `2px solid var(--border)`, borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}>
+          <h2 className="h4 mb-4 fw-black" style={{ fontFamily: 'Outfit' }}>Personalization</h2>
+          <div className="mb-4">
+            <label className="form-label text-muted small fw-bold text-uppercase mb-3">Choose Your Interface Theme</label>
+            <div className="d-flex flex-wrap gap-3">
+              {[
+                { id: 'light', name: 'Akademia', color: '#F5F3EF' },
+                { id: 'midnight', name: 'Midnight', color: '#0F172A' },
+                { id: 'forest', name: 'Forest', color: '#064E3B' },
+                { id: 'ocean', name: 'Ocean', color: '#0C4A6E' }
+              ].map(t => (
+                <motion.button
+                  key={t.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setTheme(t.id)}
+                  className="btn d-flex align-items-center gap-3 p-3 text-start"
+                  style={{ 
+                    flex: '1 1 150px',
+                    backgroundColor: 'white',
+                    border: `2px solid var(--border)`,
+                    borderRadius: '16px',
+                    boxShadow: theme === t.id ? '4px 4px 0px var(--border)' : 'none'
+                  }}
+                >
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: t.color, border: '1px solid rgba(0,0,0,0.1)' }} />
+                  <span className="fw-bold small">{t.name}</span>
+                </motion.button>
+              ))}
+            </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label" style={{ color: 'var(--text-muted)' }}>Email</label>
-            <p className="fw-bold" style={{ color: 'var(--text-primary)' }}>{user?.email || 'Not provided'}</p>
+        </div>
+
+        <div className="p-4 mb-4" style={{ backgroundColor: 'var(--bg-surface)', border: `2px solid var(--border)`, borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}>
+          <h2 className="h4 mb-4 fw-black" style={{ fontFamily: 'Outfit' }}>Profile Information</h2>
+          <div className="mb-4">
+            <label className="form-label text-muted small fw-bold text-uppercase">Username</label>
+            <p className="fw-black h5" style={{ color: 'var(--text-primary)' }}>{user?.username}</p>
+          </div>
+          <div className="mb-0">
+            <label className="form-label text-muted small fw-bold text-uppercase">Email</label>
+            <p className="fw-black h5" style={{ color: 'var(--text-primary)' }}>{user?.email || 'Not provided'}</p>
           </div>
         </div>
 

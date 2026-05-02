@@ -19,6 +19,7 @@ import GoalCompletionPage from './pages/GoalCompletionPage';
 import HowToUse from './pages/HowToUse';
 import RoadmapQuiz from './pages/RoadmapQuiz';
 import QuizAnalytics from './pages/QuizAnalytics';
+import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 
 // A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
 const Navigation = () => {
@@ -162,8 +163,8 @@ const Footer = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <ThemeProvider>
+      <BrowserRouter>
         <Navigation />
         <div className="main-content-wrapper" style={{ transition: 'padding-top 0.3s ease' }}>
           <AnimatePresence mode="wait">
@@ -192,8 +193,8 @@ function App() {
           </AnimatePresence>
           <Footer />
         </div>
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
