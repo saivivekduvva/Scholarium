@@ -10,8 +10,9 @@
   --accent-danger: #F75C5C;
   --text-primary: #1A1A1A;
   --text-secondary: #4A4A4A;
-  --text-muted: #7A7A7A;
+  --text-muted: #8A8A8A;
   --border: #1A1A1A;
+  --border-muted: #E5E7EB;
   --shadow-sm: 2px 2px 0px #1A1A1A;
   --shadow-md: 4px 4px 0px #1A1A1A;
   --shadow-lg: 8px 8px 0px #1A1A1A;
@@ -20,9 +21,9 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
-  --glass-surface: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-blur: blur(12px) saturate(180%);
+  --glass-surface: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(16px) saturate(180%);
   --gradient-bg: radial-gradient(#00000010 1px, transparent 0);
 }
 
@@ -32,8 +33,12 @@
   --accent-primary: #F8FAFC;
   --accent-secondary: #818CF8;
   --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
   --border: #334155;
+  --border-muted: #1E293B;
+  --glass-surface: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --shadow-lg: 8px 8px 0px #000000;
   --gradient-bg: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0);
 }
@@ -44,7 +49,12 @@
   --accent-primary: #064E3B;
   --accent-secondary: #10B981;
   --text-primary: #064E3B;
+  --text-secondary: #065F46;
+  --text-muted: #34D39980;
   --border: #064E3B;
+  --border-muted: #D1FAE5;
+  --glass-surface: rgba(240, 244, 240, 0.7);
+  --glass-border: rgba(6, 78, 59, 0.1);
   --shadow-lg: 8px 8px 0px #064E3B;
 }
 
@@ -54,7 +64,12 @@
   --accent-primary: #0C4A6E;
   --accent-secondary: #0EA5E9;
   --text-primary: #0C4A6E;
+  --text-secondary: #0369A1;
+  --text-muted: #7DD3FC;
   --border: #0C4A6E;
+  --border-muted: #E0F2FE;
+  --glass-surface: rgba(240, 249, 255, 0.7);
+  --glass-border: rgba(12, 74, 110, 0.1);
   --shadow-lg: 8px 8px 0px #0C4A6E;
 }
 
@@ -101,8 +116,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Premium Graph Background */
 .react-flow__background {
-  background-color: #f1f5f9;
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-color: var(--bg-page);
+  background-image: var(--gradient-bg);
   background-size: 24px 24px;
 }
 
@@ -195,16 +210,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .node-locked {
-  opacity: 0.6;
+  opacity: 0.5;
   filter: grayscale(1);
-  border: 2px dashed #94a3b8 !important;
+  border: 3px dashed var(--text-muted) !important;
   box-shadow: none !important;
-  background: rgba(241, 245, 249, 0.5) !important;
+  background: var(--bg-page) !important;
   pointer-events: none;
 }
 
 .node-locked .node-title, .node-locked .node-desc {
-  color: #94a3b8 !important;
+  color: var(--text-muted) !important;
 }
 
 /* Glass UI Components */

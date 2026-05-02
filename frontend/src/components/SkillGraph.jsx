@@ -69,7 +69,7 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
         className: isActive ? 'edge-active' : 'edge-locked',
         animated: isActive,
         style: { 
-          stroke: isActive ? 'var(--accent-primary)' : '#cbd5e1', 
+          stroke: isActive ? 'var(--accent-primary)' : 'var(--text-muted)', 
           strokeWidth: isActive ? 3 : 2,
           transition: 'all 0.5s ease'
         }
@@ -96,15 +96,15 @@ const SkillGraph = ({ initialNodes, initialEdges, onNodeClick }) => {
         maxZoom={1.5}
         style={{ background: 'var(--bg-page)' }}
       >
-        <Background variant="dots" gap={30} size={1} color="rgba(0,0,0,0.1)" />
+        <Background variant="dots" gap={30} size={1} color="var(--border)" />
         <MiniMap 
           nodeColor={(node) => {
             if (node.data.status === 'done') return '#06C9A0';
             if (node.data.status === 'active') return '#4F6EF7';
-            return 'rgba(0,0,0,0.05)';
+            return 'var(--text-muted)';
           }}
-          maskColor="rgba(245, 243, 239, 0.8)"
-          style={{ borderRadius: '16px', border: '3px solid var(--border)', background: 'white' }}
+          maskColor="var(--bg-page)"
+          style={{ borderRadius: '16px', border: '2px solid var(--border)', background: 'var(--bg-surface)' }}
         />
         <Controls 
           style={{ 

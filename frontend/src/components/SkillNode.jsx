@@ -10,7 +10,7 @@ const SkillNode = ({ data, selected }) => {
   const getIcon = () => {
     if (status === 'done') return <IoCheckmarkCircle className="text-success" size={20} />;
     if (status === 'active') return <IoPlayCircleOutline className="text-primary" size={20} />;
-    return <IoLockClosedOutline size={20} style={{ color: '#94a3b8' }} />;
+    return <IoLockClosedOutline size={20} style={{ color: 'var(--text-muted)' }} />;
   };
 
   return (
@@ -23,7 +23,7 @@ const SkillNode = ({ data, selected }) => {
       
       <div className="d-flex align-items-center gap-2 mb-2">
         {getIcon()}
-        <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: status === 'active' ? 'var(--accent-primary)' : '#64748B' }}>
+        <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: status === 'active' ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
           {status === 'active' ? 'Current Skill' : status}
         </span>
       </div>
