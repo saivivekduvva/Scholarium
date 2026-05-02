@@ -51,6 +51,10 @@ class MongoBrain:
     def llm_cache(self):
         return self.get_db()['llm_cache']
 
+    @property
+    def telemetry(self):
+        return self.get_db()['llm_telemetry']
+
 mongo_brain = MongoBrain()
 
 

@@ -35,6 +35,19 @@ def call_claude(system: str, user: str) -> str:
         system=system,
         messages=[{"role": "user", "content": user}]
     )
+    
+    # Log Telemetry
+    try:
+        mongo_brain.telemetry.insert_one({
+            'provider': 'anthropic',
+            'model': 'claude-3-sonnet',
+            'input_tokens': msg.usage.input_tokens,
+            'output_tokens': msg.usage.output_tokens,
+            'total_tokens': msg.usage.input_tokens + msg.usage.output_tokens,
+            'timestamp': datetime.utcnow()
+        })
+    except Exception: pass
+
     return msg.content[0].text
 
 def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
@@ -62,6 +75,19 @@ def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
             if not response.parts:
                 logging.warning(f"Gemini BLOCKED response. Safety info: {response.candidates[0].safety_ratings if response.candidates else 'No candidates'}")
                 raise ValueError("AI_SAFETY_BLOCK")
+            
+            # Log Telemetry
+            try:
+                usage = response.usage_metadata
+                mongo_brain.telemetry.insert_one({
+                    'provider': 'google',
+                    'model': 'gemini-1.5-flash',
+                    'input_tokens': usage.prompt_token_count,
+                    'output_tokens': usage.candidates_token_count,
+                    'total_tokens': usage.total_token_count,
+                    'timestamp': datetime.utcnow()
+                })
+            except Exception: pass
                 
             return response.text
         except Exception as e:
