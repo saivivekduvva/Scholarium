@@ -56,7 +56,8 @@ const RoadmapQuiz = () => {
       setResult(res.data);
     } catch (err) {
       console.error("Failed to submit quiz:", err);
-      alert("Error submitting quiz results.");
+      const errorMsg = err.response?.data?.error || "Error submitting quiz results.";
+      alert(errorMsg);
     } finally {
       setSubmitting(false);
     }

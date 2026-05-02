@@ -551,7 +551,8 @@ def submit_roadmap_quiz(request, id):
             'analytics': QuizAnalyticsSerializer(analytics).data
         })
     except Exception as e:
-        return Response({'error': str(e)}, status=500)
+        logging.error(f"Quiz Submission Error for session {id}: {str(e)}", exc_info=True)
+        return Response({'error': f"Submission failed: {str(e)}"}, status=500)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
