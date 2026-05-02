@@ -9,6 +9,7 @@ const GraphView = () => {
   const navigate = useNavigate();
   const [graphData, setGraphData] = useState(null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [quizStatus, setQuizStatus] = useState({ can_take_quiz: false, completed_subtopics_count: 0 });
 
   const selectedNode = graphData?.nodes?.find(n => n.id === selectedNodeId);
 
@@ -76,6 +77,9 @@ const GraphView = () => {
         
         const computedNodes = computeNodeStatuses(rawGraph.nodes, rawGraph.edges, progress.checkpoints);
         setGraphData({ nodes: computedNodes, edges: rawGraph.edges });
+        
+        // Fetch quiz status
+        api.getQuizStatus(goalId).then(res => setQuizStatus(res.data)).catch(err => console.error(err));
       })
       .catch(err => {
         console.error(err);
@@ -184,14 +188,50 @@ const GraphView = () => {
         className="btn btn-sm"
         style={{
           position: 'absolute', top: '24px', left: '24px', zIndex: 100,
-          background: 'var(--bg-surface)', color: 'var(--text-primary)',
+          background: 'var(--glass-surface)', color: 'var(--text-primary)',
           border: '3px solid var(--border)', borderRadius: '12px',
           padding: '10px 20px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
-          boxShadow: '4px 4px 0px var(--border)', cursor: 'pointer'
+          boxShadow: '4px 4px 0px var(--border)', cursor: 'pointer',
+          backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)'
         }}
       >
-        <span>&larr;</span> Back to Dashboard
+        <span>&larr;</span> Back
       </motion.button>
+
+      <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 100, display: 'flex', gap: '12px' }}>
+        {quizStatus.can_take_quiz && (
+          <motion.button 
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate(`/quiz/${goalId}`)}
+            className="btn"
+            style={{
+              background: '#06C9A0', color: 'white',
+              border: '3px solid #04a886', borderRadius: '12px',
+              padding: '10px 24px', fontWeight: 800,
+              boxShadow: '4px 4px 0px #04a886', cursor: 'pointer'
+            }}
+          >
+            Take Quiz ({quizStatus.completed_subtopics_count})
+          </motion.button>
+        )}
+        
+        <motion.button 
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate(`/analytics/${goalId}`)}
+          className="btn"
+          style={{
+            background: 'var(--glass-surface)', color: 'var(--text-primary)',
+            border: '3px solid var(--border)', borderRadius: '12px',
+            padding: '10px 24px', fontWeight: 800,
+            boxShadow: '4px 4px 0px var(--border)', cursor: 'pointer',
+            backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)'
+          }}
+        >
+          Analytics
+        </motion.button>
+      </div>
 
     </motion.div>
   );

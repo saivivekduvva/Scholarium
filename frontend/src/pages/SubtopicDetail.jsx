@@ -9,7 +9,6 @@ import api from '../services/api';
 import resourceService from '../services/resourceService';
 
 // Components
-import AssessmentComponent from '../components/AssessmentComponent';
 import ResourceSidebar from '../components/ResourceSidebar';
 
 const SubtopicDetail = () => {
@@ -145,16 +144,39 @@ const SubtopicDetail = () => {
             </motion.div>
           )}
 
-          {/* Mastery Assessment Section */}
-          <section id="assessment" className="mt-5 pt-5 border-top" style={{ borderColor: 'var(--border)' }}>
-            <div className="card border-0 shadow-lg p-5" style={{ borderRadius: '32px', background: 'var(--bg-surface)' }}>
-              <AssessmentComponent 
-                skillName={skillName} 
-                subtopicTitle={subtopicTitle} 
-                goalId={goalId}
-                onMasteryAchieved={() => setIsStudied(true)}
-                navigateBack={() => navigate(-1)}
-              />
+          {/* Mastery Section */}
+          <section id="mastery" className="mt-5 pt-5 border-top" style={{ borderColor: 'var(--border)' }}>
+            <div className="card border-0 shadow-lg p-5 text-center" style={{ borderRadius: '32px', background: 'var(--bg-surface)' }}>
+              {!isStudied ? (
+                <>
+                  <div className="display-6 mb-3">📖</div>
+                  <h3 className="fw-bold mb-3">Finished studying this?</h3>
+                  <p className="text-muted mb-5 mx-auto" style={{ maxWidth: '450px' }}>
+                    Mark this subtopic as mastered to progress in your roadmap. You can always review it later.
+                  </p>
+                  <button 
+                    onClick={async () => {
+                      try {
+                        await api.markSubtopicMastered(skillName, subtopicTitle, goalId);
+                        setIsStudied(true);
+                      } catch (err) {
+                        alert("Failed to mark as mastered. Please try again.");
+                      }
+                    }}
+                    className="btn btn-primary btn-lg px-5 py-3 shadow-sm" 
+                    style={{ borderRadius: '20px', fontWeight: 700 }}
+                  >
+                    Mark as Mastered
+                  </button>
+                </>
+              ) : (
+                <div className="text-center">
+                  <div className="display-4 text-success mb-3">🏆</div>
+                  <h3 className="fw-bold mb-2">Mastery Achieved!</h3>
+                  <p className="text-muted mb-4">You've successfully mastered this subtopic. Great work!</p>
+                  <button onClick={() => navigate(-1)} className="btn btn-outline-primary px-5 py-2 rounded-pill fw-bold">Back to Roadmap</button>
+                </div>
+              )}
             </div>
           </section>
         </div>

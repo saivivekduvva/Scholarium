@@ -47,4 +47,10 @@ export default {
   markSubtopicMastered: (skill_name, subtopic_title, goal_id) => api.post('subtopic/complete/', { skill_name, subtopic_title, goal_id }),
   getProfile: () => api.get('auth/profile/'),
   getUserStats: () => api.get('user-stats/'),
+  
+  // Roadmap Quiz
+  getQuizStatus: (goal_id) => api.get(`quiz/status/?goal_id=${goal_id}`),
+  startRoadmapQuiz: (goal_id) => api.post('quiz/start/', { goal_id }),
+  submitRoadmapQuiz: (session_id, answers) => api.post(`quiz/submit/${session_id}/`, { answers }),
+  getQuizAnalytics: (goal_id) => api.get(`quiz/analytics/?goal_id=${goal_id}`),
 };

@@ -6,13 +6,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Goal, SkillNode, Session, Checkpoint, Subtopic
-from .serializers import GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer
 from .agent_engine import (
     generate_roadmap, expand_subtopics, generate_practice, 
     evaluate_answer, 
     RateLimitError, 
-    get_subtopic_explanation, find_similar_goal as find_similar_goal_ai
+    get_subtopic_explanation, find_similar_goal as find_similar_goal_ai,
+    generate_roadmap_quiz, evaluate_roadmap_quiz
+)
+from .models import Goal, SkillNode, Session, Checkpoint, Subtopic, QuizSession, QuizAnalytics
+from .serializers import (
+    GoalSerializer, SessionSerializer, CheckpointSerializer, SubtopicSerializer,
+    QuizSessionSerializer, QuizAnalyticsSerializer
 )
 from .mongo_client import mongo_brain
 import re
@@ -422,3 +426,137 @@ def mark_subtopic_mastered(request):
         return Response({'error': 'Subtopic not found'}, status=404)
     except Exception as e:
         return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_quiz_status(request):
+    goal_id = request.query_params.get('goal_id')
+    if not goal_id:
+        return Response({'error': 'goal_id required'}, status=400)
+    
+    goal = get_object_or_404(Goal, pk=goal_id, user=request.user)
+    completed_count = Subtopic.objects.filter(skill_node__goal=goal, is_studied=True).count()
+    
+    return Response({
+        'can_take_quiz': completed_count > 0,
+        'completed_subtopics_count': completed_count
+    })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_roadmap_quiz(request):
+    goal_id = request.data.get('goal_id')
+    if not goal_id:
+        return Response({'error': 'goal_id required'}, status=400)
+    
+    goal = get_object_or_404(Goal, pk=goal_id, user=request.user)
+    completed_subtopics = list(Subtopic.objects.filter(skill_node__goal=goal, is_studied=True).values_list('title', flat=True))
+    
+    if not completed_subtopics:
+        return Response({'error': 'No completed subtopics to base quiz on'}, status=400)
+    
+    try:
+        quiz_data = generate_roadmap_quiz(goal.title, completed_subtopics)
+        
+        session = QuizSession.objects.create(
+            user=request.user,
+            goal=goal,
+            completed_subtopics_snapshot=completed_subtopics,
+            questions_json=quiz_data.get('questions', [])
+        )
+        
+        return Response({
+            'session_id': session.id,
+            'questions': session.questions_json
+        })
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_roadmap_quiz(request, id):
+    session = get_object_or_404(QuizSession, pk=id, user=request.user)
+    user_answers = request.data.get('answers') # List of indices
+    
+    if user_answers is None or len(user_answers) != len(session.questions_json):
+        return Response({'error': 'Invalid answers format or count'}, status=400)
+    
+    try:
+        evaluation = evaluate_roadmap_quiz(session.id, session.questions_json, user_answers)
+        
+        # Update session
+        session.correct_count = evaluation.get('correct_count', 0)
+        session.wrong_count = evaluation.get('wrong_count', 0)
+        session.accuracy = evaluation.get('accuracy_percentage', 0.0)
+        session.user_answers = user_answers
+        
+        gap_analysis = evaluation.get('gap_analysis', {})
+        session.weak_concepts = gap_analysis.get('weak_concepts', [])
+        session.revision_priority = gap_analysis.get('revision_priority', [])
+        session.gap_summary = gap_analysis.get('summary', '')
+        session.save()
+        
+        # Update Analytics
+        analytics, _ = QuizAnalytics.objects.get_or_create(user=request.user, goal=session.goal)
+        
+        # Keep last 5 quizzes
+        last_quizzes = list(analytics.last_quizzes)
+        last_quizzes.append({
+            'session_id': session.id,
+            'accuracy': session.accuracy,
+            'date': datetime.now().isoformat()
+        })
+        analytics.last_quizzes = last_quizzes[-5:]
+        
+        # Accuracy over time
+        accuracy_history = list(analytics.accuracy_over_time)
+        accuracy_history.append({
+            'date': datetime.now().date().isoformat(),
+            'accuracy': session.accuracy
+        })
+        analytics.accuracy_over_time = accuracy_history
+        
+        # Concept coverage
+        coverage = dict(analytics.subtopic_coverage)
+        for i, q in enumerate(session.questions_json):
+            concept = q.get('related_concept', 'General')
+            is_correct = user_answers[i] == q.get('correct_option')
+            
+            if concept not in coverage:
+                coverage[concept] = {'correct': 0, 'wrong': 0}
+            
+            if is_correct:
+                coverage[concept]['correct'] += 1
+            else:
+                coverage[concept]['wrong'] += 1
+        analytics.subtopic_coverage = coverage
+        
+        # Simple recommendation insight
+        if session.weak_concepts:
+            analytics.recommendation_insight = f"You are doing well but need more practice in: {', '.join(session.weak_concepts[:2])}."
+        else:
+            analytics.recommendation_insight = "Great job! You have a solid grasp of the completed topics."
+            
+        analytics.save()
+        
+        return Response({
+            'result': evaluation,
+            'analytics': QuizAnalyticsSerializer(analytics).data
+        })
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_quiz_analytics(request):
+    goal_id = request.query_params.get('goal_id')
+    if not goal_id:
+        return Response({'error': 'goal_id required'}, status=400)
+    
+    goal = get_object_or_404(Goal, pk=goal_id, user=request.user)
+    analytics = QuizAnalytics.objects.filter(user=request.user, goal=goal).first()
+    
+    if not analytics:
+        return Response({'message': 'No quiz data yet'}, status=200)
+        
+    return Response(QuizAnalyticsSerializer(analytics).data)

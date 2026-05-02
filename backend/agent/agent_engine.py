@@ -168,6 +168,102 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
             logging.error(f"Final failure in generate_practice for {skill}: {e2}")
             raise ValueError(f"Practice Generation Error: {str(e2)}")
 
+def generate_roadmap_quiz(goal_title: str, completed_subtopics: list) -> dict:
+    system = """You are a master educator for Scholarium. 
+    Your task is to create a comprehensive roadmap-wide quiz.
+    
+    RULES:
+    1. DIFFICULTY: Questions must be in the EASY to MEDIUM range. Focus on clarity and core concepts.
+    2. RELEVANCE: Questions MUST ONLY be based on the provided list of completed subtopics.
+    3. VARIETY: Ensure the 7 questions cover a range of the completed subtopics.
+    4. FORMAT: Return exactly 7 Multiple Choice Questions.
+    5. JSON: Return ONLY valid JSON.
+    
+    Each question should have:
+    - prompt: The question text.
+    - options: A list of 4 options.
+    - correct_option: Index (0-3) of the correct answer.
+    - related_concept: The specific subtopic title this question belongs to.
+    """
+    
+    subtopics_str = ", ".join(completed_subtopics)
+    user = f"""Goal: {goal_title}
+    Completed Subtopics: {subtopics_str}
+    
+    Generate 7 multiple-choice questions based on these subtopics.
+    Return JSON format:
+    {{
+        "questions": [
+            {{
+                "prompt": "...",
+                "options": ["...", "...", "...", "..."],
+                "correct_option": 0,
+                "related_concept": "Subtopic Name"
+            }}
+        ]
+    }}"""
+    
+    try:
+        resp = call_llm(system, user, json_mode=True)
+        return _parse_json(resp)
+    except Exception as e:
+        logging.error(f"Error in generate_roadmap_quiz: {e}")
+        raise ValueError(f"Quiz Generation Error: {str(e)}")
+
+def evaluate_roadmap_quiz(quiz_session_id: int, questions: list, user_answers: list) -> dict:
+    system = """You are an expert technical mentor. Your goal is to evaluate a learner's quiz performance and provide actionable gap analysis.
+    
+    RULES:
+    1. SCORING: For each question, determine if it is Correct or Wrong.
+    2. CONCEPT MAPPING: For each wrong answer, identify why they missed it.
+    3. GAP ANALYSIS: Summarize the weak concepts and provide revision priorities.
+    4. TONE: Be direct, clear, and actionable.
+    
+    Return ONLY valid JSON."""
+    
+    evaluation_data = []
+    for q, a in zip(questions, user_answers):
+        evaluation_data.append({
+            "question": q['prompt'],
+            "correct_option": q['correct_option'],
+            "user_option": a,
+            "concept": q['related_concept']
+        })
+        
+    user = f"""Evaluation Data: {json.dumps(evaluation_data)}
+    
+    Analyze the results and return JSON format:
+    {{
+        "correct_count": 0,
+        "wrong_count": 0,
+        "accuracy_percentage": 0.0,
+        "results": [
+            {{ "is_correct": true/false, "feedback": "Brief feedback" }}
+        ],
+        "gap_analysis": {{
+            "weak_concepts": ["Concept A", "Concept B"],
+            "revision_priority": ["Concept A is priority because..."],
+            "summary": "Overall summary of what to learn next."
+        }}
+    }}"""
+    
+    try:
+        resp = call_llm(system, user, json_mode=True)
+        data = _parse_json(resp)
+        
+        # Store evaluation in Mongo for history
+        mongo_brain.evaluations.insert_one({
+            'quiz_session_id': quiz_session_id,
+            'type': 'roadmap_quiz',
+            'data': data,
+            'timestamp': datetime.utcnow()
+        })
+        
+        return data
+    except Exception as e:
+        logging.error(f"Error in evaluate_roadmap_quiz: {e}")
+        raise ValueError(f"Quiz Evaluation Error: {str(e)}")
+
 def evaluate_answer(session_id: int, skill: str, question: str, answer: str) -> dict:
     system = """You are a supportive and helpful technical mentor. 
     Your goal is to provide encouraging feedback that helps the learner grow.

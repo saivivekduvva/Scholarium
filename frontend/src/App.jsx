@@ -17,6 +17,8 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import GoalCompletionPage from './pages/GoalCompletionPage';
 import HowToUse from './pages/HowToUse';
+import RoadmapQuiz from './pages/RoadmapQuiz';
+import QuizAnalytics from './pages/QuizAnalytics';
 
 // A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
 const Navigation = () => {
@@ -179,6 +181,8 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/goal-completed/:goalId" element={<ProtectedRoute><GoalCompletionPage /></ProtectedRoute>} />
+              <Route path="/quiz/:goalId" element={<ProtectedRoute><RoadmapQuiz /></ProtectedRoute>} />
+              <Route path="/analytics/:goalId" element={<ProtectedRoute><QuizAnalytics /></ProtectedRoute>} />
               
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />

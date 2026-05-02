@@ -13,4 +13,10 @@ urlpatterns = [
     path('skills/<int:id>/expand/', views.expand_skill),
     path('subtopics/<int:id>/toggle/', views.toggle_subtopic),
     path('user-stats/', views.get_user_stats),
+    
+    # Roadmap Quiz Endpoints
+    path('quiz/status/', views.get_quiz_status),
+    path('quiz/start/', views.start_roadmap_quiz),
+    path('quiz/submit/<int:id>/', views.submit_roadmap_quiz),
+    path('quiz/analytics/', views.get_quiz_analytics),
 ]

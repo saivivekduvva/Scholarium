@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Goal, SkillNode, Session, Checkpoint, Subtopic
+from .models import Goal, SkillNode, Session, Checkpoint, Subtopic, QuizSession, QuizAnalytics
 
 class GoalSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,3 +27,13 @@ class SubtopicSerializer(serializers.ModelSerializer):
         model = Subtopic
         fields = '__all__'
 
+
+class QuizSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizSession
+        fields = '__all__'
+
+class QuizAnalyticsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAnalytics
+        fields = '__all__'
