@@ -28,7 +28,7 @@ class RegisterView(generics.CreateAPIView):
             # For database integrity errors (like duplicate usernames)
             from django.db import IntegrityError
             if isinstance(e, IntegrityError):
-                return Response({'error': 'Username or email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': f'Database conflict: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ProfileView(APIView):
