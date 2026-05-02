@@ -164,9 +164,10 @@ const Footer = () => {
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Navigation />
-        <div className="main-content-wrapper" style={{ transition: 'padding-top 0.3s ease' }}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Navigation />
+          <div className="main-content-wrapper" style={{ transition: 'padding-top 0.3s ease' }}>
           <AnimatePresence mode="wait">
             <Routes>
               {/* Public Routes */}
@@ -194,7 +195,8 @@ function App() {
           <Footer />
         </div>
       </BrowserRouter>
-    </ThemeProvider>
+    </AuthProvider>
+  </ThemeProvider>
   );
 }
 
