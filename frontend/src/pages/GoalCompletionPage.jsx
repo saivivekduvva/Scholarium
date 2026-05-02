@@ -27,10 +27,10 @@ const GoalCompletionPage = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: '#F5F3EF',
-      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundColor: 'var(--bg-page)',
+      backgroundImage: 'var(--gradient-bg)',
       backgroundSize: '24px 24px',
-      color: '#1A1A1A',
+      color: 'var(--text-primary)',
       fontFamily: 'Outfit, sans-serif',
       padding: '80px 20px'
     }}>
@@ -48,17 +48,17 @@ const GoalCompletionPage = () => {
             Mission Accomplished!
           </h1>
           
-          <p style={{ fontSize: '20px', fontWeight: 600, color: '#4F6EF7', marginBottom: '40px' }}>
+          <p style={{ fontSize: '20px', fontWeight: 600, color: 'var(--accent-secondary)', marginBottom: '40px' }}>
             You've successfully mastered the roadmap for:
           </p>
 
           {/* Goal Certificate Card */}
           <div style={{ 
-            background: 'white', 
+            background: 'var(--bg-surface)', 
             padding: '40px', 
             borderRadius: '32px', 
-            border: '4px solid #1A1A1A', 
-            boxShadow: '12px 12px 0px #1A1A1A',
+            border: '4px solid var(--border)', 
+            boxShadow: '12px 12px 0px var(--border)',
             marginBottom: '60px',
             position: 'relative',
             overflow: 'hidden'
@@ -71,10 +71,10 @@ const GoalCompletionPage = () => {
             </div>
 
             <h2 style={{ fontWeight: 900, fontSize: '32px', marginBottom: '20px' }}>{goal?.title || 'Untitled Goal'}</h2>
-            <div style={{ width: '60px', height: '4px', background: '#1A1A1A', margin: '0 auto 30px' }} />
+            <div style={{ width: '60px', height: '4px', background: 'var(--border)', margin: '0 auto 30px' }} />
             
-            <div style={{ fontSize: '18px', color: '#666', lineHeight: '1.6', marginBottom: '30px' }}>
-                This is to certify that <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{user?.username}</span> has demonstrated 100% mastery across all required skills within the {goal?.title} learning path.
+            <div style={{ fontSize: '18px', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '30px' }}>
+                This is to certify that <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{user?.username}</span> has demonstrated 100% mastery across all required skills within the {goal?.title} learning path.
             </div>
 
             <div className="d-flex justify-content-center gap-2 align-items-center" style={{ opacity: 0.7 }}>
@@ -99,7 +99,7 @@ const GoalCompletionPage = () => {
                 alert("Achievement link copied to clipboard!");
               }}
               className="btn btn-outline-dark px-5 py-3 d-flex align-items-center justify-content-center gap-2" 
-              style={{ borderRadius: '100px', fontWeight: 700, fontSize: '18px', border: '3px solid #1A1A1A' }}
+              style={{ borderRadius: '100px', fontWeight: 700, fontSize: '18px', border: '3px solid var(--border)' }}
             >
               <IoShareSocialOutline size={20} /> Share Achievement
             </button>

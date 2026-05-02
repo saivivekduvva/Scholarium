@@ -8,11 +8,11 @@ const StatCard = ({ icon, label, value, color }) => (
   <motion.div 
     whileHover={{ y: -5 }}
     style={{ 
-      background: 'white', 
+      background: 'var(--bg-surface)', 
       padding: '30px', 
       borderRadius: '24px', 
-      border: '3px solid #1A1A1A', 
-      boxShadow: '8px 8px 0px #1A1A1A',
+      border: '3px solid var(--border)', 
+      boxShadow: '8px 8px 0px var(--border)',
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -21,7 +21,7 @@ const StatCard = ({ icon, label, value, color }) => (
   >
     <div style={{ color, marginBottom: '15px' }}>{icon}</div>
     <div style={{ fontSize: '32px', fontWeight: 900, marginBottom: '5px' }}>{value}</div>
-    <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: '#666', letterSpacing: '1px' }}>{label}</div>
+    <div style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '1px' }}>{label}</div>
   </motion.div>
 );
 
@@ -45,10 +45,10 @@ const Profile = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: '#F5F3EF',
-      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundColor: 'var(--bg-page)',
+      backgroundImage: 'var(--gradient-bg)',
       backgroundSize: '24px 24px',
-      color: '#1A1A1A',
+      color: 'var(--text-primary)',
       paddingBottom: '80px'
     }}>
       <motion.div 
@@ -59,7 +59,7 @@ const Profile = () => {
         <button 
           onClick={() => window.history.back()}
           className="btn btn-link text-decoration-none p-0 mb-5 d-flex align-items-center gap-2"
-          style={{ color: '#1A1A1A', fontWeight: 800, fontSize: '16px' }}
+          style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: '16px' }}
         >
           <span>&larr;</span> Back
         </button>
@@ -71,8 +71,8 @@ const Profile = () => {
               backgroundColor: '#4F6EF7', color: 'white', 
               display: 'flex', alignItems: 'center', justifyContent: 'center', 
               fontSize: '42px', fontWeight: 900, marginRight: '30px',
-              border: '4px solid #1A1A1A',
-              boxShadow: '6px 6px 0px #1A1A1A'
+              border: '4px solid var(--border)',
+              boxShadow: '6px 6px 0px var(--border)'
             }}
           >
             {user?.username ? user.username.charAt(0).toUpperCase() : 'S'}
@@ -131,14 +131,14 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="mt-5 p-5" style={{ background: 'white', borderRadius: '32px', border: '3px solid #1A1A1A', boxShadow: '8px 8px 0px #1A1A1A' }}>
+        <div className="mt-5 p-5" style={{ background: 'var(--bg-surface)', borderRadius: '32px', border: '3px solid var(--border)', boxShadow: '8px 8px 0px var(--border)' }}>
             <div className="d-flex align-items-center gap-3 mb-4">
                 <IoBarChartOutline size={28} />
                 <h3 style={{ fontWeight: 900, margin: 0 }}>Learning Activity</h3>
             </div>
-            <p style={{ fontSize: '18px', color: '#666', lineHeight: '1.6' }}>
-                You have engaged with <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.total_goals} roadmaps</span> and successfully completed <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.completed_goals}</span> of them. 
-                Your profile records <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.roadmap_quizzes || 0} Roadmap Assessments</span> and <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.practice_sessions || 0} Practice Sessions</span>. 
+            <p style={{ fontSize: '18px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                You have engaged with <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{stats.total_goals} roadmaps</span> and successfully completed <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{stats.completed_goals}</span> of them. 
+                Your profile records <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{stats.roadmap_quizzes || 0} Roadmap Assessments</span> and <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{stats.practice_sessions || 0} Practice Sessions</span>. 
                 Keep pushing towards 100% mastery!
             </p>
         </div>

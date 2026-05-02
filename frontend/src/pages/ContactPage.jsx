@@ -10,26 +10,14 @@ const ContactPage = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: '#F5F3EF',
-      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundColor: 'var(--bg-page)',
+      backgroundImage: 'var(--gradient-bg)',
       backgroundSize: '24px 24px',
-      color: '#1A1A1A',
+      color: 'var(--text-primary)',
       fontFamily: 'Inter, sans-serif',
       position: 'relative',
-      paddingTop: user ? '80px' : '0' // Add padding if global navbar is present
+      paddingTop: '0' // Handled by main-content-wrapper in App.jsx
     }}>
-      {!user && (
-        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
-          <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
-          </Link>
-          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-            <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
-          </div>
-          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600 }}>Get in touch</Link>
-        </nav>
-      )}
 
       <div className="container py-5">
         <div className="text-center mb-5">
@@ -43,11 +31,11 @@ const ContactPage = () => {
               <div style={{ 
                 width: '220px', height: '280px', 
                 borderRadius: '24px', 
-                border: '4px solid #1A1A1A',
+                border: '4px solid var(--border)',
                 overflow: 'hidden',
                 margin: '0 auto 20px',
-                boxShadow: '10px 10px 0px #4F6EF7',
-                backgroundColor: 'white'
+                boxShadow: '10px 10px 0px var(--accent-secondary)',
+                backgroundColor: 'var(--bg-surface)'
               }}>
                 <img src="/saivivek.jpeg" alt="Duvva Sai Vivek" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
@@ -63,8 +51,8 @@ const ContactPage = () => {
                 border: '4px solid #1A1A1A',
                 overflow: 'hidden',
                 margin: '0 auto 20px',
-                boxShadow: '10px 10px 0px #F4E87C',
-                backgroundColor: 'white'
+                boxShadow: '10px 10px 0px var(--accent-warn)',
+                backgroundColor: 'var(--bg-surface)'
               }}>
                 <img src="/mokshagna.jpeg" alt="Mokshagna BC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>

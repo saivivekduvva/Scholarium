@@ -49,26 +49,14 @@ const HowToUse = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: '#F5F3EF',
-      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundColor: 'var(--bg-page)',
+      backgroundImage: 'var(--gradient-bg)',
       backgroundSize: '24px 24px',
-      color: '#1A1A1A',
+      color: 'var(--text-primary)',
       fontFamily: 'Inter, sans-serif',
       paddingBottom: '100px',
-      paddingTop: user ? '80px' : '0'
+      paddingTop: '0'
     }}>
-      {!user && (
-        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
-          <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
-          </Link>
-          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-            <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
-          </div>
-          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
-        </nav>
-      )}
       <div className="container" style={{ maxWidth: '1000px', paddingTop: '5vh' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -78,7 +66,7 @@ const HowToUse = () => {
           <h1 style={{ fontWeight: 900, fontSize: 'clamp(40px, 8vw, 72px)', letterSpacing: '-3px', marginBottom: '20px' }}>
             Master Any Skill.
           </h1>
-          <p style={{ fontSize: '24px', fontWeight: 600, color: '#4F6EF7', maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ fontSize: '24px', fontWeight: 600, color: 'var(--accent-secondary)', maxWidth: '700px', margin: '0 auto' }}>
             A step-by-step guide to achieving mastery with Scholarium's AI-driven platform.
           </p>
         </motion.div>
@@ -91,11 +79,11 @@ const HowToUse = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
                 style={{ 
-                  background: 'white', 
+                  background: 'var(--bg-surface)', 
                   padding: '40px', 
                   borderRadius: '32px', 
-                  border: '3px solid #1A1A1A', 
-                  boxShadow: '10px 10px 0px #1A1A1A',
+                  border: '3px solid var(--border)', 
+                  boxShadow: '10px 10px 0px var(--border)',
                   height: '100%',
                   position: 'relative',
                   overflow: 'hidden'
@@ -119,7 +107,7 @@ const HowToUse = () => {
                     {step.icon}
                   </div>
                   <h3 style={{ fontWeight: 800, fontSize: '28px', marginBottom: '16px' }}>{step.title}</h3>
-                  <p style={{ fontSize: '18px', lineHeight: '1.6', color: '#444', marginBottom: 0 }}>
+                  <p style={{ fontSize: '18px', lineHeight: '1.6', color: 'var(--text-secondary)', marginBottom: 0 }}>
                     {step.description}
                   </p>
                 </div>

@@ -97,7 +97,7 @@ const Roadmaps = () => {
                         <div style={{ 
                           width: '48px', height: '48px', 
                           borderRadius: '12px', 
-                          background: isCompleted ? 'rgba(6, 201, 160, 0.1)' : 'var(--accent-highlight)',
+                          background: isCompleted ? 'rgba(6, 201, 160, 0.1)' : 'var(--accent-warn)',
                           border: `2px solid ${isCompleted ? '#06C9A0' : 'var(--border)'}`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           color: isCompleted ? '#06C9A0' : 'inherit'

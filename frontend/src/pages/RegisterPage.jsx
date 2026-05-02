@@ -26,26 +26,16 @@ const RegisterPage = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: '#F5F3EF',
-      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundColor: 'var(--bg-page)',
+      backgroundImage: 'var(--gradient-bg)',
       backgroundSize: '24px 24px',
-      color: '#1A1A1A',
+      color: 'var(--text-primary)',
       fontFamily: 'Inter, sans-serif',
       position: 'relative',
       overflowX: 'hidden',
-      paddingTop: user ? '80px' : '0'
+      paddingTop: '0'
     }}>
       
-      {!user && (
-        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
-          <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
-          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-            <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
-          </div>
-          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
-        </nav>
-      )}
 
       <div className="container" style={{ paddingTop: '5vh' }}>
         <div className="text-center">
@@ -58,7 +48,7 @@ const RegisterPage = () => {
             <div style={{ 
               width: '140px', height: '70px', 
               backgroundImage: 'url(/pill-2.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-              borderRadius: '100px', border: '3px solid #1A1A1A'
+              borderRadius: '100px', border: '3px solid var(--border)'
             }} />
             <h1 style={{ fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 800, letterSpacing: '-2px' }}>intellectual</h1>
             <h1 style={{ fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 800, letterSpacing: '-2px' }}>journey</h1>
@@ -72,11 +62,11 @@ const RegisterPage = () => {
             style={{ maxWidth: '480px' }}
           >
             <div style={{ 
-              backgroundColor: 'white', 
-              border: '2px solid #1A1A1A', 
+              backgroundColor: 'var(--bg-surface)', 
+              border: '2px solid var(--border)', 
               borderRadius: '32px',
               padding: '32px',
-              boxShadow: '8px 8px 0px #1A1A1A'
+              boxShadow: '8px 8px 0px var(--border)'
             }}>
               <h4 className="fw-bold mb-4">Create Account</h4>
               {error && <div className="alert alert-danger p-2 small mb-3">{error}</div>}
@@ -149,7 +139,7 @@ const RegisterPage = () => {
                 </div>
               </form>
               <div className="mt-4 small">
-                Already have an account? <Link to="/login" style={{ color: '#4F6EF7', fontWeight: 700 }}>Sign in</Link>
+                Already have an account? <Link to="/login" style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>Sign in</Link>
               </div>
             </div>
           </motion.div>

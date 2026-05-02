@@ -24,27 +24,16 @@ const LoginPage = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: '#F5F3EF', // Paper-like off-white
-      backgroundImage: 'radial-gradient(#00000010 1px, transparent 0)',
+      backgroundColor: 'var(--bg-page)', // Paper-like off-white
+      backgroundImage: 'var(--gradient-bg)',
       backgroundSize: '24px 24px',
-      color: '#1A1A1A',
+      color: 'var(--text-primary)',
       fontFamily: 'Inter, sans-serif',
       position: 'relative',
       overflowX: 'hidden',
-      paddingTop: user ? '80px' : '0'
+      paddingTop: '0'
     }}>
       
-      {/* Top Navigation Bar */}
-      {!user && (
-        <nav className="d-flex justify-content-between align-items-center px-5 py-4">
-          <div style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>Scholarium</div>
-          <div className="d-none d-md-flex gap-5" style={{ fontSize: '15px', fontWeight: 500 }}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>About</Link>
-            <Link to="/how-to-use" style={{ textDecoration: 'none', color: 'inherit' }}>How To Use</Link>
-          </div>
-          <Link to="/contact" className="btn btn-outline-dark px-4 py-2" style={{ borderRadius: '100px', fontWeight: 600, textDecoration: 'none' }}>Get in touch</Link>
-        </nav>
-      )}
 
       <div className="container" style={{ paddingTop: '10vh' }}>
         <div className="text-center">
@@ -57,7 +46,7 @@ const LoginPage = () => {
             <div style={{ 
               width: '180px', height: '90px', 
               backgroundImage: 'url(/pill-1.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-              borderRadius: '100px', border: '3px solid #1A1A1A'
+              borderRadius: '100px', border: '3px solid var(--border)'
             }} />
             <h1 style={{ fontSize: 'clamp(40px, 8vw, 90px)', fontWeight: 800, letterSpacing: '-2px' }}>wisdom</h1>
           </motion.div>
@@ -70,8 +59,8 @@ const LoginPage = () => {
           >
             <h1 style={{ fontSize: 'clamp(40px, 8vw, 90px)', fontWeight: 800, letterSpacing: '-2px' }}>curriculums</h1>
             <div style={{ display: 'flex', gap: '-10px' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#F4E87C', border: '3px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '24px', zIndex: 2 }}>&</div>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#4F6EF7', border: '3px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginLeft: '-15px', zIndex: 1 }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--accent-warn)', border: '3px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '24px', zIndex: 2 }}>&</div>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--accent-secondary)', border: '3px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginLeft: '-15px', zIndex: 1 }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
               </div>
             </div>
@@ -79,7 +68,7 @@ const LoginPage = () => {
             <div style={{ 
               width: '100px', height: '100px', 
               backgroundImage: 'url(/pill-2.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-              borderRadius: '50%', border: '3px solid #1A1A1A'
+              borderRadius: '50%', border: '3px solid var(--border)'
             }} />
           </motion.div>
 
@@ -96,11 +85,11 @@ const LoginPage = () => {
             style={{ maxWidth: '480px' }}
           >
             <div style={{ 
-              backgroundColor: 'white', 
-              border: '2px solid #1A1A1A', 
+              backgroundColor: 'var(--bg-surface)', 
+              border: '2px solid var(--border)', 
               borderRadius: '32px',
               padding: '32px',
-              boxShadow: '8px 8px 0px #1A1A1A'
+              boxShadow: '8px 8px 0px var(--border)'
             }}>
               <h4 className="fw-bold mb-4">Welcome Back</h4>
               {error && <div className="alert alert-danger p-2 small mb-3">{error}</div>}
@@ -169,7 +158,7 @@ const LoginPage = () => {
                 </div>
               </form>
               <div className="mt-4 small">
-                Don't have an account? <Link to="/register" style={{ color: '#4F6EF7', fontWeight: 700 }}>Join now</Link>
+                Don't have an account? <Link to="/register" style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>Join now</Link>
               </div>
             </div>
           </motion.div>

@@ -27,21 +27,6 @@
   --gradient-bg: radial-gradient(#00000010 1px, transparent 0);
 }
 
-[data-theme='midnight'] {
-  --bg-page: #0F172A;
-  --bg-surface: #1E293B;
-  --accent-primary: #F8FAFC;
-  --accent-secondary: #818CF8;
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --border: #334155;
-  --border-muted: #1E293B;
-  --glass-surface: rgba(15, 23, 42, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --shadow-lg: 8px 8px 0px #000000;
-  --gradient-bg: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0);
-}
 
 [data-theme='forest'] {
   --bg-page: #F0F4F0;

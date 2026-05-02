@@ -28,7 +28,7 @@ const Dashboard = () => {
           <div className="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-4">
             <h1 style={{ fontSize: 'clamp(40px, 8vw, 82px)', fontWeight: 800, letterSpacing: '-2px', color: 'var(--text-primary)' }}>with</h1>
             <div style={{ display: 'flex', gap: '-15px' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--accent-highlight)', border: '3px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '24px', zIndex: 2 }}>&</div>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--accent-warn)', border: '3px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '24px', zIndex: 2 }}>&</div>
               <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--accent-secondary)', border: '3px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginLeft: '-15px', zIndex: 1 }}>
                 <IoBookOutline size={24} />
               </div>

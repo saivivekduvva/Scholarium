@@ -22,33 +22,33 @@ import QuizAnalytics from './pages/QuizAnalytics';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 
 // A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
+// A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
 const Navigation = () => {
   const { user, logout } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [theme] = useState(localStorage.getItem('scholarium-theme') || 'light');
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('scholarium-theme', theme);
-  }, [theme]);
-
-  if (!user) return null;
-
-  const links = [
+  const authLinks = [
     { to: "/", label: "Home" },
     { to: "/roadmaps", label: "Roadmaps" },
     { to: "/profile", label: "Profile" },
     { to: "/settings", label: "Settings" },
+  ];
+
+  const publicLinks = [
     { to: "/about", label: "About" },
     { to: "/how-to-use", label: "How To Use" },
   ];
 
+  const links = user ? [...authLinks, ...publicLinks] : publicLinks;
+
   return (
     <>
       {/* --- DESKTOP TOPBAR --- */}
-      <nav className="desktop-nav d-none d-lg-flex position-fixed top-0 start-0 end-0 py-3 justify-content-center" style={{ zIndex: 1000, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+      <nav className="desktop-nav d-none d-lg-flex position-fixed top-0 start-0 end-0 py-3 justify-content-center" 
+           style={{ zIndex: 1000, background: 'var(--glass-surface)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)', borderBottom: '1px solid var(--glass-border)' }}>
         <div className="container-fluid px-5 d-flex justify-content-between align-items-center">
-          <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '26px', letterSpacing: '-1.5px', color: '#1A1A1A', textDecoration: 'none' }}>
+          <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '26px', letterSpacing: '-1.5px', color: 'var(--text-primary)', textDecoration: 'none' }}>
             Scholarium
           </Link>
           
@@ -61,21 +61,26 @@ const Navigation = () => {
           </ul>
 
           <div className="d-flex align-items-center gap-3">
-            <Link to="/contact" className="btn btn-sm px-4 py-2" style={{ border: '2px solid var(--border)', borderRadius: '100px', fontWeight: 700, fontSize: '13px' }}>Get in touch</Link>
-            <button onClick={logout} className="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold" style={{ fontSize: '13px' }}>Logout</button>
+            <Link to="/contact" className="btn btn-sm px-4 py-2" style={{ border: '2px solid var(--border)', borderRadius: '100px', fontWeight: 700, fontSize: '13px', color: 'var(--text-primary)' }}>Get in touch</Link>
+            {user ? (
+              <button onClick={logout} className="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold" style={{ fontSize: '13px' }}>Logout</button>
+            ) : (
+              <Link to="/login" className="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold" style={{ fontSize: '13px', textDecoration: 'none' }}>Sign In</Link>
+            )}
           </div>
         </div>
       </nav>
 
       {/* --- MOBILE HEADER --- */}
-      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" style={{ zIndex: 1001, background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--border)' }}>
-        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '22px', letterSpacing: '-1px', color: '#1A1A1A', textDecoration: 'none' }}>
+      <div className="mobile-header d-lg-none position-fixed top-0 start-0 end-0 px-4 py-3 d-flex justify-content-between align-items-center" 
+           style={{ zIndex: 1001, background: 'var(--glass-surface)', backdropFilter: 'var(--glass-blur)', borderBottom: '1px solid var(--border)' }}>
+        <Link to="/" className="scholarium-brand" style={{ fontWeight: 900, fontSize: '22px', letterSpacing: '-1px', color: 'var(--text-primary)', textDecoration: 'none' }}>
           Scholarium
         </Link>
         <button 
           className="btn p-2" 
           onClick={() => setIsOpen(!isOpen)}
-          style={{ border: '2px solid var(--border)', borderRadius: '8px' }}
+          style={{ border: '2px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)' }}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         </button>
@@ -109,7 +114,7 @@ const Navigation = () => {
           transform: 'translateX(-100%)' // Default hidden for mobile
         }}
       >
-        <Link to="/" className="scholarium-brand mb-5 px-3" style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px' }}>
+        <Link to="/" className="scholarium-brand mb-5 px-3" style={{ fontWeight: 900, fontSize: '24px', letterSpacing: '-1px', color: 'var(--text-primary)', textDecoration: 'none' }}>
           Scholarium
         </Link>
 
@@ -117,15 +122,19 @@ const Navigation = () => {
           <ul className="p-0 m-0">
             {links.map(link => (
               <li key={link.to} className="nav-item mb-2" style={{ listStyle: 'none' }}>
-                <Link to={link.to} className="nav-link px-3 py-2" style={{ color: 'var(--text-primary)', fontWeight: 700, borderRadius: '12px' }} onClick={() => setIsOpen(false)}>{link.label}</Link>
+                <Link to={link.to} className="nav-link px-3 py-2" style={{ color: 'var(--text-primary)', fontWeight: 700, borderRadius: '12px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>{link.label}</Link>
               </li>
             ))}
           </ul>
         </nav>
 
         <div className="d-flex flex-column gap-3 mt-auto">
-          <Link to="/contact" className="btn btn-outline-dark py-3 rounded-4 fw-bold" style={{ border: '3px solid var(--border)' }} onClick={() => setIsOpen(false)}>Get in touch</Link>
-          <button onClick={() => { setIsOpen(false); logout(); }} className="btn btn-dark py-3 rounded-4 fw-bold">Logout</button>
+          <Link to="/contact" className="btn btn-outline-dark py-3 rounded-4 fw-bold" style={{ border: '3px solid var(--border)', color: 'var(--text-primary)' }} onClick={() => setIsOpen(false)}>Get in touch</Link>
+          {user ? (
+            <button onClick={() => { setIsOpen(false); logout(); }} className="btn btn-dark py-3 rounded-4 fw-bold">Logout</button>
+          ) : (
+            <Link to="/login" className="btn btn-dark py-3 rounded-4 fw-bold" style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Sign In</Link>
+          )}
         </div>
       </aside>
 
@@ -144,6 +153,9 @@ const Navigation = () => {
             padding-top: 100px !important;
             --header-height: 100px;
           }
+        }
+        .nav-link:hover {
+          opacity: 0.7;
         }
       `}} />
     </>

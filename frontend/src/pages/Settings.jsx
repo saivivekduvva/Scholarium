@@ -53,7 +53,6 @@ const Settings = () => {
             <div className="d-flex flex-wrap gap-3">
               {[
                 { id: 'light', name: 'Akademia', color: '#F5F3EF' },
-                { id: 'midnight', name: 'Midnight', color: '#0F172A' },
                 { id: 'forest', name: 'Forest', color: '#064E3B' },
                 { id: 'ocean', name: 'Ocean', color: '#0C4A6E' }
               ].map(t => (
