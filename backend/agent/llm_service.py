@@ -39,7 +39,8 @@ def call_claude(system: str, user: str) -> str:
 
 def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
     """Make a call to the Google Gemini model with retries."""
-    for attempt in range(3):
+    # Increase retries to 5 for free-tier resilience
+    for attempt in range(5):
         try:
             safety_settings = [
                 {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -67,16 +68,16 @@ def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
             err_msg = str(e).lower()
             is_rate_limit = any(key in err_msg for key in ["429", "quota", "rate limit"])
             
-            if attempt == 2: # Final attempt
+            if attempt == 4: # Final attempt (increased from 2)
                 if is_rate_limit:
-                    logging.error(f"RATE LIMIT PERSISTS after retries: {e}")
-                    raise RateLimitError("AI Quota Exhausted (429). Please wait a moment.")
-                logging.error(f"Gemini call failed after 3 attempts. Raw Error: {e}")
+                    logging.error(f"RATE LIMIT PERSISTS after 5 retries: {e}")
+                    raise RateLimitError("AI Quota Exhausted (429). The AI is currently very busy, please wait 30 seconds.")
+                logging.error(f"Gemini call failed after 5 attempts. Raw Error: {e}")
                 raise e
             
-            # For rate limits, wait a bit longer than usual
-            wait_time = (2 ** attempt) + 1 if is_rate_limit else (1.5 ** attempt)
-            logging.warning(f"Gemini error (Attempt {attempt+1}/3): {err_msg}. Retrying in {wait_time}s...")
+            # For rate limits, wait significantly longer (3s, 6s, 12s, 24s)
+            wait_time = (3 * (2 ** attempt)) if is_rate_limit else (2 ** attempt)
+            logging.warning(f"Gemini error (Attempt {attempt+1}/5): {err_msg}. Retrying in {wait_time}s...")
             time.sleep(wait_time)
 
 def call_llm(system: str, user: str, json_mode: bool = False) -> str:
