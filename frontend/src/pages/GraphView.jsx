@@ -199,7 +199,7 @@ const GraphView = () => {
       </motion.button>
 
       <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 100, display: 'flex', gap: '12px' }}>
-        {quizStatus.can_take_quiz && (
+        {quizStatus?.can_take_quiz && (
           <motion.button 
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
@@ -212,7 +212,7 @@ const GraphView = () => {
               boxShadow: '4px 4px 0px #04a886', cursor: 'pointer'
             }}
           >
-            Take Quiz ({quizStatus.completed_subtopics_count})
+            Take Quiz ({quizStatus?.completed_subtopics_count || 0})
           </motion.button>
         )}
         

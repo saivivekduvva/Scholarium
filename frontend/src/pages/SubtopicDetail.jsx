@@ -49,7 +49,14 @@ const SubtopicDetail = () => {
           const subsRes = await api.expandSkill(goalId, skillName, false);
           if (subsRes.data?.subtopics) {
             const subs = subsRes.data.subtopics;
-            const currentIndex = subs.findIndex(s => s.title === subtopicTitle);
+            
+            // Sync isStudied status
+            const currentSub = subs.find(s => s.title.toLowerCase() === subtopicTitle.toLowerCase());
+            if (currentSub) {
+              setIsStudied(currentSub.is_studied);
+            }
+
+            const currentIndex = subs.findIndex(s => s.title.toLowerCase() === subtopicTitle.toLowerCase());
             if (currentIndex !== -1 && currentIndex < subs.length - 1) {
               setNextSubtopic(subs[currentIndex + 1].title);
             }

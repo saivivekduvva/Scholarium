@@ -85,14 +85,14 @@ const QuizAnalytics = () => {
                   <IoTrendingUp /> AVG ACCURACY
                 </div>
                 <span className="fw-black h4 mb-0">
-                  {Math.round(data.last_quizzes.reduce((acc, q) => acc + q.accuracy, 0) / (data.last_quizzes.length || 1))}%
+                  {Math.round((data.last_quizzes || []).reduce((acc, q) => acc + (q.accuracy || 0), 0) / (data.last_quizzes?.length || 1))}%
                 </span>
               </div>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center gap-2 text-muted fw-bold small">
                   <IoTimeOutline /> TOTAL ATTEMPTS
                 </div>
-                <span className="fw-black h4 mb-0">{data.accuracy_over_time.length}</span>
+                <span className="fw-black h4 mb-0">{data.accuracy_over_time?.length || 0}</span>
               </div>
             </div>
           </div>
@@ -107,9 +107,9 @@ const QuizAnalytics = () => {
               <IoPieChartOutline /> Performance by Topic
             </h4>
             <div className="d-flex flex-column gap-4">
-              {Object.entries(data.subtopic_coverage).map(([topic, stats], i) => {
-                const total = stats.correct + stats.wrong;
-                const percentage = Math.round((stats.correct / (total || 1)) * 100);
+              {Object.entries(data.subtopic_coverage || {}).map(([topic, stats], i) => {
+                const total = (stats.correct || 0) + (stats.wrong || 0);
+                const percentage = Math.round(((stats.correct || 0) / (total || 1)) * 100);
                 return (
                   <div key={i}>
                     <div className="d-flex justify-content-between mb-2">
@@ -134,14 +134,14 @@ const QuizAnalytics = () => {
           <div className="card border-0 shadow-sm p-5 h-100" style={{ borderRadius: '32px', background: 'var(--bg-surface)' }}>
             <h4 className="fw-bold mb-5">Attempt History</h4>
             <div className="d-flex flex-column gap-3">
-              {data.last_quizzes.reverse().map((quiz, i) => (
+              {(data.last_quizzes || []).slice().reverse().map((quiz, i) => (
                 <div key={i} className="p-3 rounded-4 border d-flex justify-content-between align-items-center" style={{ borderColor: 'var(--border)' }}>
                   <div>
-                    <p className="fw-bold mb-0">Quiz Attempt #{data.accuracy_over_time.length - i}</p>
-                    <p className="text-muted small mb-0">{new Date(quiz.date).toLocaleDateString()}</p>
+                    <p className="fw-bold mb-0">Quiz Attempt #{ (data.accuracy_over_time?.length || 0) - i}</p>
+                    <p className="text-muted small mb-0">{quiz.date ? new Date(quiz.date).toLocaleDateString() : 'N/A'}</p>
                   </div>
-                  <div className={`fw-black h5 mb-0 ${quiz.accuracy >= 80 ? 'text-success' : 'text-primary'}`}>
-                    {quiz.accuracy}%
+                  <div className={`fw-black h5 mb-0 ${ (quiz.accuracy || 0) >= 80 ? 'text-success' : 'text-primary'}`}>
+                    {quiz.accuracy || 0}%
                   </div>
                 </div>
               ))}

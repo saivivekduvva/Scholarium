@@ -72,7 +72,9 @@ const RoadmapQuiz = () => {
   }
 
   if (result) {
-    const { result: evalResult, analytics } = result;
+    const evalResult = result?.result || {};
+    const gapAnalysis = evalResult?.gap_analysis || {};
+    const analyticsData = result?.analytics || {};
     return (
       <div className="container py-5">
         <motion.div 
@@ -102,9 +104,7 @@ const RoadmapQuiz = () => {
                 <p className="text-muted small mb-0">WRONG</p>
               </div>
             </div>
-            <div className="col-4">
-              <div className="p-4 rounded-4 border" style={{ borderColor: 'var(--border)' }}>
-                <h2 className="fw-bold text-primary mb-1">{evalResult.accuracy_percentage}%</h2>
+                <h2 className="fw-bold text-primary mb-1">{evalResult?.accuracy_percentage || 0}%</h2>
                 <p className="text-muted small mb-0">ACCURACY</p>
               </div>
             </div>
@@ -118,8 +118,8 @@ const RoadmapQuiz = () => {
               <div className="mb-4">
                 <p className="fw-bold text-muted small mb-2 text-uppercase">Weak Concepts</p>
                 <div className="d-flex flex-wrap gap-2">
-                  {evalResult.gap_analysis.weak_concepts.length > 0 ? (
-                    evalResult.gap_analysis.weak_concepts.map((c, i) => (
+                  {gapAnalysis.weak_concepts?.length > 0 ? (
+                    gapAnalysis.weak_concepts.map((c, i) => (
                       <span key={i} className="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">{c}</span>
                     ))
                   ) : (
@@ -129,7 +129,7 @@ const RoadmapQuiz = () => {
               </div>
               <div>
                 <p className="fw-bold text-muted small mb-2 text-uppercase">What To Learn Next</p>
-                <p className="mb-0" style={{ lineHeight: 1.6 }}>{evalResult.gap_analysis.summary}</p>
+                <p className="mb-0" style={{ lineHeight: 1.6 }}>{gapAnalysis.summary || 'Continue exploring your roadmap!'}</p>
               </div>
             </div>
           </div>

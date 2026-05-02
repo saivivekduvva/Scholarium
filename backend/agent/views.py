@@ -434,7 +434,10 @@ def get_quiz_status(request):
     if not goal_id:
         return Response({'error': 'goal_id required'}, status=400)
     
-    goal = get_object_or_404(Goal, pk=goal_id, user=request.user)
+    goal = Goal.objects.filter(pk=goal_id, user=request.user).first()
+    if not goal:
+        return Response({'can_take_quiz': False, 'completed_subtopics_count': 0, 'message': 'Goal not found'})
+        
     completed_count = Subtopic.objects.filter(skill_node__goal=goal, is_studied=True).count()
     
     return Response({
