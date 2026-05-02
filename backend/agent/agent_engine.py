@@ -21,13 +21,7 @@ def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
         if g.strip().lower() == new_goal_title.strip().lower():
             return g
         
-    system = "You are a semantic matching expert. Compare the NEW goal with the list of EXISTING goals."
-    user = f"""NEW Goal: {new_goal_title}
-    EXISTING Goals: {json.dumps(existing_goals)}
-    
-    If the NEW goal is semantically the same as one of the EXISTING goals (e.g. 'Learn Python' and 'Study Python Programming'), return ONLY the exact title from the EXISTING list.
-    If there is no close match, return ONLY the word 'NONE'.
-    Do not provide any explanation."""
+    system = "Semantic matcher. Compare NEW goal with EXISTING list. Return exact title match or 'NONE'. No text."
     
     try:
         resp = call_llm(system, user).strip()
@@ -43,31 +37,9 @@ def find_similar_goal(new_goal_title: str, existing_goals: list) -> str:
         return None
 
 def generate_roadmap(goal: str) -> dict:
-    system = """You are a curriculum and graph layout expert for Scholarium. 
-    Break down the goal into a logical sequence of skills (DAG).
-    Return a JSON object containing both the list of skills and the visual graph layout (React Flow format).
+    system = "Curriculum & Graph Expert. Return JSON: {skills: [{id, name, desc, subtopics: [string]}], graph: {nodes, edges}}. Nodes: type 'skillNode'. Left-to-right layout. JSON ONLY."
     
-    Nodes must have: id, type: 'skillNode', data: { label: 'name', description: 'desc' }, position {x, y}.
-    Edges must have: id, source, target.
-    
-    Arrange the nodes logically from left to right (foundational to advanced).
-    
-    CRITICAL: The 'name' in the skills list MUST EXACTLY MATCH the 'label' in the graph nodes for each corresponding ID.
-    CRITICAL: RETURN ONLY VALID JSON. NO CONVERSATIONAL TEXT."""
-    
-    user = f"""Goal: {goal}
-    Return JSON format: 
-    {{
-        "skills": [
-            {{ "id": "s1", "name": "Skill Name", "description": "Short description", "estimated_hours": 5 }}
-        ],
-        "graph": {{
-            "nodes": [
-                {{ "id": "s1", "type": "skillNode", "data": {{ "label": "Skill Name", "description": "Short description" }}, "position": {{ "x": 0, "y": 0 }} }}
-            ],
-            "edges": []
-        }}
-    }}"""
+    user = f"Goal: {goal}. Return JSON with skills (including 4 subtopic titles each) and ReactFlow graph nodes/edges."
     try:
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
@@ -105,35 +77,8 @@ def expand_subtopics(skill_name: str) -> dict:
         raise e
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
-    system = """You are a friendly and encouraging tutor for Scholarium. 
-    Your goal is to assess the learner's basic understanding with clear, foundational questions.
-    
-    Rules for question generation:
-    1. ACCESSIBLE DIFFICULTY: Focus on core concepts and fundamental principles. Avoid overly complex edge cases.
-    2. BE CLEAR: Use simple, easy-to-understand language.
-    3. RELEVANT DISTRACTORS: Distractors should be plausible but clearly incorrect for someone who knows the basics.
-    4. VARIETY: Ensure questions cover the essential aspects of the subtopic.
-    
-    Return ONLY valid JSON."""
-    
-    context_str = json.dumps(context) if context else "No additional context."
-    salt = time.time()
-    user = f"""Topic: {skill}
-    Difficulty: beginner
-    Context: {context_str}
-    Salt: {salt} (Generate completely unique and fresh questions)
-    
-    Generate exactly 5 clear, random, and varied multiple-choice questions.
-    Return JSON format: 
-    {{
-        "questions": [
-            {{
-                "prompt": "Clear, foundational question...", 
-                "options": ["Option A", "Option B", "Option C", "Option D"], 
-                "correct_option": 0
-            }}
-        ]
-    }}"""
+    system = "Foundational Tutor. Return 5 MCQs (prompt, options, correct_option). JSON ONLY."
+    user = f"Topic: {skill}. Difficulty: beginner. Context: {json.dumps(context)}. Salt: {time.time()}. Return 5 MCQs."
     try:
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
@@ -272,22 +217,8 @@ def generate_summary(user_id: int, checkpoints: list) -> str:
 
 def get_subtopic_explanation(skill_name: str, subtopic_title: str, context_subtopics: list = None) -> str:
     # LLM Only Strategy (Wikipedia Scrape Removed as per user request)
-    system = """You are a technical educator for Scholarium.
-    
-    STRICT RULES:
-    1. RELEVANCE: Only talk about the specific subtopic.
-    2. CONCISE: Keep the explanation clear-cut and strictly UNDER 350 WORDS.
-    3. NO HALLUCINATIONS: Stay strictly within the technical bounds.
-    4. FORMATTING: Use clean Markdown, bold headers, and short code examples if needed.
-    5. REFERENCES: At the end of the explanation, provide 2-3 reference links (e.g., official docs, MDN, Wikipedia) for further reading."""
-    
-    context_str = ", ".join(context_subtopics) if context_subtopics else "No other topics provided."
-    user = f"""Skill: {skill_name}
-    Specific Subtopic to explain: {subtopic_title}
-    
-    Context (Other subtopics in this skill - DO NOT EXPLAIN THESE): {context_str}
-    
-    Write a clear-cut explanation for '{subtopic_title}' only (under 350 words). Include 2-3 reference links."""
+    system = "Scholarium Tutor. Explain '{subtopic_title}' (under 300 words). Use Markdown, bold headers, code snippets. JSON: {explanation, references: [string]}."
+    user = f"Skill: {skill_name}. Topic: {subtopic_title}. Context: {', '.join(context_subtopics or [])}."
     
     try:
         return call_llm(system, user)
