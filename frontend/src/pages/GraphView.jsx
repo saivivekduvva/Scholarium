@@ -123,7 +123,6 @@ const GraphView = () => {
     setGraphData(prev => {
       if (!prev) return prev;
       
-      // Update the checkpoints locally to simulate a fresh fetch
       const currentNodes = prev.nodes.map(node => {
         if (node.data.label === skillName) {
           return { ...node, data: { ...node.data, progress: newProgress } };
@@ -139,6 +138,11 @@ const GraphView = () => {
       const newNodes = computeNodeStatuses(currentNodes, prev.edges, checkpoints);
       return { ...prev, nodes: newNodes };
     });
+
+    // Refresh quiz status immediately to reflect newly completed subtopics
+    api.getQuizStatus(goalId)
+      .then(res => setQuizStatus(res.data))
+      .catch(err => console.error("Failed to refresh quiz status:", err));
   };
 
   return (
