@@ -142,39 +142,13 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
         raise e
 
 def generate_roadmap_quiz(goal_title: str, completed_subtopics: list) -> dict:
-    system = """You are a master educator for Scholarium. 
-    Your task is to create a comprehensive roadmap-wide quiz.
-    
-    RULES:
-    1. DIFFICULTY: Questions must be in the EASY to MEDIUM range. Focus on clarity and core concepts.
-    2. RELEVANCE: Questions MUST ONLY be based on the provided list of completed subtopics.
-    3. VARIETY: Ensure the 7 questions cover a range of the completed subtopics.
-    4. FORMAT: Return exactly 7 Multiple Choice Questions.
-    5. JSON: Return ONLY valid JSON.
-    
-    Each question should have:
-    - prompt: The question text.
-    - options: A list of 4 options.
-    - correct_option: Index (0-3) of the correct answer.
-    - related_concept: The specific subtopic title this question belongs to.
-    """
+    system = """Generate 5 Multiple Choice Questions for Scholarium based on provided subtopics.
+    - Difficulty: Easy-Medium.
+    - Format: Return exactly 5 questions.
+    - JSON ONLY: prompt, options (list of 4), correct_option (0-3), related_concept (subtopic title)."""
     
     subtopics_str = ", ".join(completed_subtopics)
-    user = f"""Goal: {goal_title}
-    Completed Subtopics: {subtopics_str}
-    
-    Generate 7 multiple-choice questions based on these subtopics.
-    Return JSON format:
-    {{
-        "questions": [
-            {{
-                "prompt": "...",
-                "options": ["...", "...", "...", "..."],
-                "correct_option": 0,
-                "related_concept": "Subtopic Name"
-            }}
-        ]
-    }}"""
+    user = f"Goal: {goal_title}\nCompleted Subtopics: {subtopics_str}\n\nReturn JSON format: {{\"questions\": [...]}}"
     
     try:
         resp = call_llm(system, user, json_mode=True)
@@ -184,45 +158,57 @@ def generate_roadmap_quiz(goal_title: str, completed_subtopics: list) -> dict:
         raise ValueError(f"Quiz Generation Error: {str(e)}")
 
 def evaluate_roadmap_quiz(quiz_session_id: int, questions: list, user_answers: list) -> dict:
-    system = """You are an expert technical mentor. Your goal is to evaluate a learner's quiz performance and provide actionable gap analysis.
+    # 1. Local Grading (Saves ~2000 tokens)
+    correct_count = 0
+    wrong_count = 0
+    results = []
+    weak_concepts = set()
     
-    RULES:
-    1. SCORING: For each question, determine if it is Correct or Wrong.
-    2. CONCEPT MAPPING: For each wrong answer, identify why they missed it.
-    3. GAP ANALYSIS: Summarize the weak concepts and provide revision priorities.
-    4. TONE: Be direct, clear, and actionable.
-    
-    Return ONLY valid JSON."""
-    
-    evaluation_data = []
     for q, a in zip(questions, user_answers):
-        evaluation_data.append({
-            "question": q['prompt'],
-            "correct_option": q['correct_option'],
-            "user_option": a,
-            "concept": q['related_concept']
-        })
+        is_correct = int(q['correct_option']) == int(a)
+        if is_correct:
+            correct_count += 1
+        else:
+            wrong_count += 1
+            weak_concepts.add(q['related_concept'])
         
-    user = f"""Evaluation Data: {json.dumps(evaluation_data)}
-    
-    Analyze the results and return JSON format:
-    {{
-        "correct_count": 0,
-        "wrong_count": 0,
-        "accuracy_percentage": 0.0,
-        "results": [
-            {{ "is_correct": true/false, "feedback": "Brief feedback" }}
-        ],
-        "gap_analysis": {{
-            "weak_concepts": ["Concept A", "Concept B"],
-            "revision_priority": ["Concept A is priority because..."],
-            "summary": "Overall summary of what to learn next."
-        }}
-    }}"""
+        results.append({
+            "is_correct": is_correct,
+            "feedback": f"Correct answer was: {q['options'][q['correct_option']]}" if not is_correct else "Correct!"
+        })
+
+    # 2. AI only for Gap Analysis (Brief)
+    system = "You are a concise technical mentor. Analyze the weak concepts and provide a 2-sentence summary/recommendation."
+    user = f"Learner struggled with: {', '.join(weak_concepts)}. Provide a gap analysis summary and 2-3 revision priorities."
     
     try:
-        resp = call_llm(system, user, json_mode=True)
-        data = _parse_json(resp)
+        # If perfect score, skip AI and return success
+        if wrong_count == 0:
+            data = {
+                "correct_count": correct_count,
+                "wrong_count": wrong_count,
+                "accuracy_percentage": 100.0,
+                "results": results,
+                "gap_analysis": {
+                    "weak_concepts": [],
+                    "revision_priority": [],
+                    "summary": "Perfect score! You have demonstrated complete mastery of these topics."
+                }
+            }
+        else:
+            resp = call_llm(system, user, json_mode=True)
+            ai_data = _parse_json(resp)
+            data = {
+                "correct_count": correct_count,
+                "wrong_count": wrong_count,
+                "accuracy_percentage": (correct_count / len(questions)) * 100,
+                "results": results,
+                "gap_analysis": {
+                    "weak_concepts": list(weak_concepts),
+                    "revision_priority": ai_data.get('revision_priority', []),
+                    "summary": ai_data.get('summary', 'Focus on the highlighted concepts to improve.')
+                }
+            }
         
         # Store evaluation in Mongo for history
         mongo_brain.evaluations.insert_one({

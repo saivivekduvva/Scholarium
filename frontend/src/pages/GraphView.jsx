@@ -92,8 +92,11 @@ const GraphView = () => {
     if (!graphData || !graphData.nodes || graphData.error) return;
 
     const allDone = graphData.nodes.every(n => n.data.status === 'done');
-    if (allDone && graphData.nodes.length > 0) {
+    const alreadyVisited = sessionStorage.getItem(`mastery_visited_${goalId}`);
+
+    if (allDone && graphData.nodes.length > 0 && !alreadyVisited) {
       setTimeout(() => {
+        sessionStorage.setItem(`mastery_visited_${goalId}`, 'true');
         navigate(`/goal-completed/${goalId}`);
       }, 1500);
     }
