@@ -20,11 +20,16 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
-        except ValidationError:
-            raise
         except Exception as e:
             logging.error(f"ERROR in RegisterView: {str(e)}", exc_info=True)
-            return Response({'error': 'Registration failed due to a server error. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # If it's a validation error that wasn't caught by DRF, return it
+            if hasattr(e, 'detail'):
+                return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+            # For database integrity errors (like duplicate usernames)
+            from django.db import IntegrityError
+            if isinstance(e, IntegrityError):
+                return Response({'error': 'Username or email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ProfileView(APIView):
     permission_classes = (IsAuthenticated,)
