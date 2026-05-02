@@ -137,7 +137,9 @@ const Profile = () => {
                 <h3 style={{ fontWeight: 900, margin: 0 }}>Learning Activity</h3>
             </div>
             <p style={{ fontSize: '18px', color: '#666', lineHeight: '1.6' }}>
-                You have engaged with <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.total_goals} roadmaps</span> and successfully completed <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.completed_goals}</span> of them. Your average quiz frequency shows a dedication to mastery, with <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.total_quizzes} attempts</span> recorded across your profile. Keep pushing towards 100% mastery!
+                You have engaged with <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.total_goals} roadmaps</span> and successfully completed <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.completed_goals}</span> of them. 
+                Your profile records <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.roadmap_quizzes || 0} Roadmap Assessments</span> and <span style={{ fontWeight: 800, color: '#1A1A1A' }}>{stats.practice_sessions || 0} Practice Sessions</span>. 
+                Keep pushing towards 100% mastery!
             </p>
         </div>
 

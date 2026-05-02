@@ -356,8 +356,9 @@ def get_user_stats(request):
                 if checkpoints.count() == len(skill_names) and checkpoints.count() > 0 and all(cp.proficiency >= 80 for cp in checkpoints):
                     completed_goals += 1
         
-        # Sum both per-skill practice sessions and roadmap-wide quizzes
-        total_quizzes = Session.objects.filter(user=user).count() + QuizSession.objects.filter(user=user).count()
+        practice_count = Session.objects.filter(user=user).count()
+        roadmap_quiz_count = QuizSession.objects.filter(user=user).count()
+        total_quizzes = practice_count + roadmap_quiz_count
         
         from django.db.models import Sum
         mastery_points = Checkpoint.objects.filter(user=user).aggregate(Sum('proficiency'))['proficiency__sum'] or 0
@@ -366,6 +367,8 @@ def get_user_stats(request):
             'total_goals': total_goals,
             'completed_goals': completed_goals,
             'total_quizzes': total_quizzes,
+            'practice_sessions': practice_count,
+            'roadmap_quizzes': roadmap_quiz_count,
             'total_mastery_points': mastery_points
         })
     except Exception as e:
