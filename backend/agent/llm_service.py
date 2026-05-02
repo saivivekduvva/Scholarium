@@ -65,14 +65,19 @@ def call_gemini(system: str, user: str, json_mode: bool = False) -> str:
             return response.text
         except Exception as e:
             err_msg = str(e).lower()
-            if any(key in err_msg for key in ["429", "quota", "rate limit"]):
-                logging.error(f"RATE LIMIT DETECTED: {e}")
-                raise RateLimitError("AI Quota Exhausted (429)")
+            is_rate_limit = any(key in err_msg for key in ["429", "quota", "rate limit"])
             
-            if attempt == 2: 
+            if attempt == 2: # Final attempt
+                if is_rate_limit:
+                    logging.error(f"RATE LIMIT PERSISTS after retries: {e}")
+                    raise RateLimitError("AI Quota Exhausted (429). Please wait a moment.")
                 logging.error(f"Gemini call failed after 3 attempts. Raw Error: {e}")
                 raise e
-            time.sleep(1.5 ** attempt)
+            
+            # For rate limits, wait a bit longer than usual
+            wait_time = (2 ** attempt) + 1 if is_rate_limit else (1.5 ** attempt)
+            logging.warning(f"Gemini error (Attempt {attempt+1}/3): {err_msg}. Retrying in {wait_time}s...")
+            time.sleep(wait_time)
 
 def call_llm(system: str, user: str, json_mode: bool = False) -> str:
     """
