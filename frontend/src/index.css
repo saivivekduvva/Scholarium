@@ -185,13 +185,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .node-active {
-  border: 2px solid var(--accent-secondary);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+  border-color: var(--accent-secondary) !important;
+  box-shadow: 8px 8px 0px var(--accent-secondary) !important;
 }
 
 .node-done {
-  border-color: var(--accent-success);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+  border-color: var(--accent-success) !important;
+  box-shadow: 8px 8px 0px var(--accent-success) !important;
+}
+
+.node-locked {
+  opacity: 0.6;
+  filter: grayscale(1);
+  border: 2px dashed #94a3b8 !important;
+  box-shadow: none !important;
+  background: rgba(241, 245, 249, 0.5) !important;
+  pointer-events: none;
+}
+
+.node-locked .node-title, .node-locked .node-desc {
+  color: #94a3b8 !important;
 }
 
 /* Glass UI Components */
