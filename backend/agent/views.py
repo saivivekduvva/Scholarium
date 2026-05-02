@@ -461,6 +461,9 @@ def start_roadmap_quiz(request):
     try:
         quiz_data = generate_roadmap_quiz(goal.title, completed_subtopics)
         
+        if not quiz_data or not quiz_data.get('questions'):
+            return Response({'error': 'AI failed to generate quiz questions. Please try again.'}, status=500)
+
         session = QuizSession.objects.create(
             user=request.user,
             goal=goal,
@@ -473,7 +476,8 @@ def start_roadmap_quiz(request):
             'questions': session.questions_json
         })
     except Exception as e:
-        return Response({'error': str(e)}, status=500)
+        logging.error(f"Quiz Generation Error for goal {goal_id}: {str(e)}", exc_info=True)
+        return Response({'error': f'AI Generation Error: {str(e)}'}, status=500)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

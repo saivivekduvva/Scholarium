@@ -26,7 +26,8 @@ const RoadmapQuiz = () => {
         setLoading(false);
       } catch (err) {
         console.error("Failed to start quiz:", err);
-        alert("Failed to start quiz. Make sure you have completed subtopics.");
+        const errorMsg = err.response?.data?.error || "Failed to start quiz. Make sure you have completed subtopics.";
+        alert(errorMsg);
         navigate(-1);
       }
     };
