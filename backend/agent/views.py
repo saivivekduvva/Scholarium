@@ -191,8 +191,7 @@ def expand_skill(request, id):
     except RateLimitError:
         return Response({'error': 'AI is rate limited'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e:
-        if str(e) == "AI_QUOTA_EXHAUSTED":
-            return Response({'error': 'AI Quota Exhausted. Please wait a minute and try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        logging.error(f"Goal Creation Error: {e}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
@@ -238,7 +237,9 @@ def get_explanation(request):
         if not node:
             raise SkillNode.DoesNotExist
                 
-        subtopic = Subtopic.objects.get(title__iexact=subtopic_title.strip(), skill_node=node)
+        subtopic = Subtopic.objects.filter(title__iexact=subtopic_title.strip(), skill_node=node).first()
+        if not subtopic:
+            return Response({'error': 'Subtopic not found'}, status=status.HTTP_404_NOT_FOUND)
         
         if subtopic.explanation:
             explanation = subtopic.explanation
@@ -247,7 +248,9 @@ def get_explanation(request):
             explanation = get_subtopic_explanation(skill_name, subtopic_title, all_subtopics)
             subtopic.explanation = explanation
             subtopic.save()
-    except SkillNode.DoesNotExist:
+    except Exception as e:
+        logging.error(f"Explanation Error: {e}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({'error': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
     except Subtopic.DoesNotExist:
         # Fallback if subtopic doesn't exist in DB yet
@@ -555,8 +558,8 @@ def submit_roadmap_quiz(request, id):
             'analytics': QuizAnalyticsSerializer(analytics).data
         })
     except Exception as e:
-        logging.error(f"Quiz Submission Error for session {id}: {str(e)}", exc_info=True)
-        return Response({'error': f"Submission failed: {str(e)}"}, status=500)
+        logging.error(f"Quiz Submission Error: {e}", exc_info=True)
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

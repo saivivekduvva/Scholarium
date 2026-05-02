@@ -72,17 +72,8 @@ def generate_roadmap(goal: str) -> dict:
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
-            raise ValueError("AI_QUOTA_EXHAUSTED")
-        
-        # If it's a parse error or safety block, try one more time
-        logging.warning(f"Error in generate_roadmap: {e}. Retrying once...")
-        try:
-            resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
-            return _parse_json(resp)
-        except Exception as e2:
-            logging.error(f"Final failure in generate_roadmap for goal '{goal}': {e2}")
-            raise ValueError(f"AI Generation Error: {str(e2)}")
+        logging.error(f"Error in generate_roadmap for goal '{goal}': {e}")
+        raise e
 
 def expand_subtopics(skill_name: str) -> dict:
     system = """You are an expert Curriculum Architect. Your goal is to break down a complex skill into exactly 4-5 logically sequenced, UNIQUE subtopics.
@@ -110,18 +101,8 @@ def expand_subtopics(skill_name: str) -> dict:
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
-            raise ValueError("AI_QUOTA_EXHAUSTED")
-            
-        # Retry once for parsing/model errors
-        logging.warning(f"Error in expand_subtopics: {e}. Retrying...")
-        
-        try:
-            resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
-            return _parse_json(resp)
-        except Exception as e2:
-            logging.error(f"Final failure in expand_subtopics for {skill_name}: {e2}")
-            raise ValueError(f"Curriculum Generation Error: {str(e2)}")
+        logging.error(f"Error in expand_subtopics for {skill_name}: {e}")
+        raise e
 
 def generate_practice(skill: str, difficulty: str, context: list = None) -> dict:
     system = """You are a friendly and encouraging tutor for Scholarium. 
@@ -157,16 +138,8 @@ def generate_practice(skill: str, difficulty: str, context: list = None) -> dict
         resp = call_llm(system, user, json_mode=True)
         return _parse_json(resp)
     except Exception as e:
-        if "quota" in str(e).lower() or "429" in str(e) or "RateLimitError" in str(type(e)):
-            raise ValueError("AI_QUOTA_EXHAUSTED")
-            
-        logging.warning(f"Error in generate_practice for {skill}: {e}. Retrying once...")
-        try:
-            resp = call_llm(system + " (CRITICAL: ONLY JSON, NO TEXT)", user, json_mode=True)
-            return _parse_json(resp)
-        except Exception as e2:
-            logging.error(f"Final failure in generate_practice for {skill}: {e2}")
-            raise ValueError(f"Practice Generation Error: {str(e2)}")
+        logging.error(f"Error in generate_practice for {skill}: {e}")
+        raise e
 
 def generate_roadmap_quiz(goal_title: str, completed_subtopics: list) -> dict:
     system = """You are a master educator for Scholarium. 
