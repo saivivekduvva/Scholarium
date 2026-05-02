@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IoArrowBack, IoCheckmarkCircle, IoCloseCircle, IoAlertCircleOutline, IoStatsChart } from 'react-icons/io5';
+import { IoArrowBack, IoCheckmarkCircle, IoCloseCircle, IoAlertCircleOutline, IoStatsChart, IoBulbOutline } from 'react-icons/io5';
 import api from '../services/api';
 
 const RoadmapQuiz = () => {
