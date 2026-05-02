@@ -101,22 +101,12 @@ def create_goal(request):
             node_id = str(node_data.get('id'))
             skill_info = skill_map.get(node_id, {})
             
-            node = SkillNode.objects.create(
+            SkillNode.objects.create(
                 goal=goal,
                 skill_name=node_data.get('data', {}).get('label', skill_info.get('name', 'Unknown')),
                 description=node_data.get('data', {}).get('description', skill_info.get('description', '')),
                 estimated_hours=skill_info.get('estimated_hours', 1)
             )
-
-            # Auto-populate subtopics (Merged Call Optimization)
-            subtopic_titles = skill_info.get('subtopics', [])
-            for st_title in subtopic_titles:
-                Subtopic.objects.create(
-                    skill_node=node,
-                    title=st_title,
-                    description=f"Core concepts of {st_title}.",
-                    duration_mins=30
-                )
             
         # Save to MongoDB
         mongo_brain.graphs.insert_one({
@@ -166,22 +156,33 @@ def expand_skill(request, id):
             
         force_refresh = request.data.get('force_refresh', False)
         
-        # If subtopics don't exist (legacy goals), we can expand them, but for new goals they are pre-populated
-        if node.subtopics.exists():
+        if force_refresh:
+            node.subtopics.all().delete()
+        elif node.subtopics.exists():
             return Response({'subtopics': SubtopicSerializer(node.subtopics.all(), many=True).data})
-
-        # Fallback for legacy goals without subtopics
+            
         subtopics_data = expand_subtopics(skill_name)
         subtopics_list = subtopics_data.get('subtopics', [])
         
         created_subtopics = []
+        seen_titles = set()
         for st in subtopics_list:
             title = st.get('title', 'Unknown Topic').strip()
+            if title.lower() in seen_titles:
+                continue
+            seen_titles.add(title.lower())
+            
+            explanation = st.get('full_explanation', '')
+            refs = st.get('references', [])
+            if refs:
+                explanation += "\n\n### References\n" + "\n".join([f"- {r}" for r in refs])
+
             created_subtopics.append(Subtopic.objects.create(
                 skill_node=node,
                 title=title,
-                description=st.get('description', f"Concepts of {title}"),
-                duration_mins=st.get('duration_mins', 30)
+                description=st.get('description', ''),
+                duration_mins=st.get('duration_mins', 30),
+                explanation=explanation
             ))
             
         return Response({'subtopics': SubtopicSerializer(created_subtopics, many=True).data})
