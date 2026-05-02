@@ -76,68 +76,70 @@ const RoadmapQuiz = () => {
     const gapAnalysis = evalResult?.gap_analysis || {};
     const analyticsData = result?.analytics || {};
     return (
-      <div className="container py-5">
+      <div className="container-fluid py-5" style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card border-0 shadow-lg p-5 mx-auto"
-          style={{ maxWidth: '800px', borderRadius: '32px', background: 'var(--bg-surface)' }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="premium-card p-5 mx-auto text-center"
+          style={{ maxWidth: '800px' }}
         >
-          <div className="text-center mb-5">
-            <div className="display-4 mb-3">
-              {evalResult.accuracy_percentage >= 80 ? '🎉' : '✍️'}
+          <div className="display-1 mb-4">
+            {evalResult.accuracy_percentage >= 80 ? '🏆' : '📚'}
+          </div>
+          <h1 className="fw-black mb-2 h1" style={{ fontFamily: 'Outfit' }}>
+            {evalResult.accuracy_percentage >= 80 ? 'Mastery Confirmed!' : 'Keep Learning!'}
+          </h1>
+          <p className="text-muted fs-5 mb-5">Your assessment is complete. Here's your performance breakdown.</p>
+
+          <div className="row g-4 mb-5">
+            <div className="col-md-4">
+              <div className="p-4 rounded-4 border bg-white shadow-sm">
+                <div className="text-muted small fw-bold mb-1">ACCURACY</div>
+                <h2 className="fw-black text-primary mb-0">{evalResult?.accuracy_percentage || 0}%</h2>
+              </div>
             </div>
-            <h1 className="fw-bold">Quiz Results</h1>
-            <p className="text-muted">Here is how you performed across your mastered topics.</p>
+            <div className="col-md-4">
+              <div className="p-4 rounded-4 border bg-white shadow-sm">
+                <div className="text-muted small fw-bold mb-1">CORRECT</div>
+                <h2 className="fw-black text-success mb-0">{evalResult.correct_count}</h2>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="p-4 rounded-4 border bg-white shadow-sm">
+                <div className="text-muted small fw-bold mb-1">WRONG</div>
+                <h2 className="fw-black text-danger mb-0">{evalResult.wrong_count}</h2>
+              </div>
+            </div>
           </div>
 
-          <div className="row g-4 mb-5 text-center">
-            <div className="col-4">
-              <div className="p-4 rounded-4 border" style={{ borderColor: 'var(--border)' }}>
-                <h2 className="fw-bold text-success mb-1">{evalResult.correct_count}</h2>
-                <p className="text-muted small mb-0">CORRECT</p>
-              </div>
-            </div>
-            <div className="col-4">
-              <div className="p-4 rounded-4 border" style={{ borderColor: 'var(--border)' }}>
-                <h2 className="fw-bold text-danger mb-1">{evalResult.wrong_count}</h2>
-                <p className="text-muted small mb-0">WRONG</p>
-              </div>
-            </div>
-                <h2 className="fw-bold text-primary mb-1">{evalResult?.accuracy_percentage || 0}%</h2>
-                <p className="text-muted small mb-0">ACCURACY</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-5">
+          <div className="text-start p-5 rounded-4 mb-5" style={{ background: '#F1F5F9', border: '1px solid var(--border)' }}>
             <h4 className="fw-bold mb-4 d-flex align-items-center gap-2">
-              <IoAlertCircleOutline /> Gap Analysis
+              <IoBulbOutline className="text-primary" /> Concept Gap Analysis
             </h4>
-            <div className="p-4 rounded-4" style={{ background: 'rgba(79, 110, 247, 0.05)', border: '2px dashed var(--border)' }}>
-              <div className="mb-4">
-                <p className="fw-bold text-muted small mb-2 text-uppercase">Weak Concepts</p>
-                <div className="d-flex flex-wrap gap-2">
-                  {gapAnalysis.weak_concepts?.length > 0 ? (
-                    gapAnalysis.weak_concepts.map((c, i) => (
-                      <span key={i} className="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">{c}</span>
-                    ))
-                  ) : (
-                    <span className="text-success fw-bold">No significant weaknesses detected!</span>
-                  )}
-                </div>
+            
+            <div className="mb-4">
+              <p className="text-muted small fw-bold mb-2">AREAS FOR IMPROVEMENT</p>
+              <div className="d-flex flex-wrap gap-2">
+                {gapAnalysis.weak_concepts?.length > 0 ? (
+                  gapAnalysis.weak_concepts.map((c, i) => (
+                    <span key={i} className="badge bg-white text-danger border px-3 py-2 rounded-pill fw-bold shadow-sm">{c}</span>
+                  ))
+                ) : (
+                  <span className="badge bg-white text-success border px-3 py-2 rounded-pill fw-bold shadow-sm">No significant gaps found!</span>
+                )}
               </div>
-              <div>
-                <p className="fw-bold text-muted small mb-2 text-uppercase">What To Learn Next</p>
-                <p className="mb-0" style={{ lineHeight: 1.6 }}>{gapAnalysis.summary || 'Continue exploring your roadmap!'}</p>
-              </div>
+            </div>
+
+            <div>
+              <p className="text-muted small fw-bold mb-2">AI RECOMMENDATION</p>
+              <p className="mb-0 fw-medium text-secondary" style={{ lineHeight: 1.6 }}>{gapAnalysis.summary || 'Excellent work! Continue progressing through your roadmap.'}</p>
             </div>
           </div>
 
           <div className="d-flex gap-3">
-            <button onClick={() => navigate(-1)} className="btn btn-outline-dark flex-fill py-3 rounded-4 fw-bold">Back to Roadmap</button>
-            <button onClick={() => navigate(`/analytics/${goalId}`)} className="btn btn-primary flex-fill py-3 rounded-4 fw-bold d-flex align-items-center justify-content-center gap-2">
-              <IoStatsChart /> View Analytics
+            <button onClick={() => navigate(-1)} className="btn btn-outline-dark flex-fill py-3 rounded-4 fw-bold">Return to Roadmap</button>
+            <button onClick={() => navigate(`/analytics/${goalId}`)} className="btn btn-primary flex-fill py-3 rounded-4 fw-bold gap-2">
+              <IoStatsChart /> Performance Trends
             </button>
           </div>
         </motion.div>
@@ -149,86 +151,98 @@ const RoadmapQuiz = () => {
   const isAnswered = userAnswers[currentIndex] !== null;
 
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-5">
-        <button onClick={() => navigate(-1)} className="btn btn-link text-decoration-none text-dark fw-bold d-flex align-items-center gap-2">
-          <IoArrowBack /> Exit Quiz
-        </button>
-        <div className="text-center">
-          <p className="text-muted small fw-bold mb-1 text-uppercase">Roadmap Assessment</p>
-          <div className="d-flex gap-1">
-            {questions.map((_, i) => (
-              <div 
-                key={i} 
-                style={{ 
-                  width: '30px', height: '6px', borderRadius: '3px',
-                  background: i === currentIndex ? 'var(--accent-primary)' : (userAnswers[i] !== null ? '#06C9A0' : 'var(--border)')
-                }} 
-              />
-            ))}
-          </div>
-        </div>
-        <div className="badge bg-dark px-3 py-2">Q{currentIndex + 1} OF 7</div>
-      </div>
-
-      <div className="card border-0 shadow-lg p-5 mx-auto" style={{ maxWidth: '900px', borderRadius: '32px', background: 'var(--bg-surface)' }}>
-        <p className="text-primary fw-bold small mb-2 text-uppercase">{currentQuestion.related_concept}</p>
-        <h2 className="fw-bold mb-5" style={{ lineHeight: 1.4 }}>{currentQuestion.prompt}</h2>
-
-        <div className="row g-3">
-          {currentQuestion.options.map((opt, i) => {
-            const isSelected = userAnswers[currentIndex] === i;
-            const isCorrect = currentQuestion.correct_option === i;
-            
-            let borderColor = 'var(--border)';
-            let bgColor = 'transparent';
-            if (isAnswered) {
-              if (isCorrect) {
-                borderColor = '#06C9A0';
-                bgColor = 'rgba(6, 201, 160, 0.05)';
-              } else if (isSelected) {
-                borderColor = '#F75C5C';
-                bgColor = 'rgba(247, 92, 92, 0.05)';
-              }
-            } else if (isSelected) {
-              borderColor = 'var(--accent-primary)';
-            }
-
-            return (
-              <div className="col-md-6" key={i}>
-                <motion.button
-                  whileHover={!isAnswered ? { scale: 1.02 } : {}}
-                  whileTap={!isAnswered ? { scale: 0.98 } : {}}
-                  onClick={() => handleAnswer(i)}
-                  className="btn w-100 text-start p-4 h-100 d-flex align-items-center justify-content-between"
-                  style={{
-                    borderRadius: '20px',
-                    border: `3px solid ${borderColor}`,
-                    background: bgColor,
-                    color: 'var(--text-primary)',
-                    fontWeight: 600,
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <span>{opt}</span>
-                  {isAnswered && (
-                    isCorrect ? <IoCheckmarkCircle size={24} color="#06C9A0" /> : (isSelected ? <IoCloseCircle size={24} color="#F75C5C" /> : null)
-                  )}
-                </motion.button>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-5 pt-4 border-top d-flex justify-content-end">
-          <button 
-            disabled={!isAnswered || submitting}
-            onClick={handleNext}
-            className="btn btn-primary px-5 py-3 rounded-pill fw-bold"
-          >
-            {submitting ? 'Evaluating...' : (currentIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question')}
+    <div className="container-fluid py-5" style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
+      <div className="mx-auto" style={{ maxWidth: '900px' }}>
+        <div className="d-flex justify-content-between align-items-center mb-5">
+          <button onClick={() => navigate(-1)} className="btn btn-link text-decoration-none text-muted fw-bold d-flex align-items-center gap-2 p-0">
+            <IoArrowBack /> Exit Assessment
           </button>
+          <div className="text-center">
+            <p className="text-muted small fw-bold mb-2 text-uppercase" style={{ letterSpacing: '1px' }}>Roadmap Progress</p>
+            <div className="d-flex gap-2">
+              {questions.map((_, i) => (
+                <div 
+                  key={i} 
+                  style={{ 
+                    width: '40px', height: '6px', borderRadius: '3px',
+                    background: i === currentIndex ? 'var(--accent-secondary)' : (userAnswers[i] !== null ? 'var(--accent-success)' : 'var(--border)'),
+                    transition: 'all 0.3s ease'
+                  }} 
+                />
+              ))}
+            </div>
+          </div>
+          <div className="badge bg-dark px-3 py-2 rounded-pill">QUESTION {currentIndex + 1}/7</div>
         </div>
+
+        <motion.div 
+          key={currentIndex}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="premium-card p-5"
+        >
+          <p className="text-primary fw-bold small mb-3 text-uppercase" style={{ letterSpacing: '1px' }}>{currentQuestion.related_concept}</p>
+          <h2 className="fw-black mb-5 h1" style={{ lineHeight: 1.3, fontFamily: 'Outfit' }}>{currentQuestion.prompt}</h2>
+
+          <div className="row g-4">
+            {currentQuestion.options.map((opt, i) => {
+              const isSelected = userAnswers[currentIndex] === i;
+              const isCorrect = currentQuestion.correct_option === i;
+              
+              let borderColor = 'var(--border)';
+              let bgColor = 'var(--bg-surface)';
+              let textColor = 'var(--text-primary)';
+
+              if (isAnswered) {
+                if (isCorrect) {
+                  borderColor = 'var(--accent-success)';
+                  bgColor = 'rgba(16, 185, 129, 0.05)';
+                } else if (isSelected) {
+                  borderColor = 'var(--accent-danger)';
+                  bgColor = 'rgba(239, 68, 68, 0.05)';
+                }
+              } else if (isSelected) {
+                borderColor = 'var(--accent-secondary)';
+                bgColor = 'rgba(99, 102, 241, 0.05)';
+              }
+
+              return (
+                <div className="col-md-6" key={i}>
+                  <motion.button
+                    whileHover={!isAnswered ? { scale: 1.02, borderColor: 'var(--accent-secondary)' } : {}}
+                    whileTap={!isAnswered ? { scale: 0.98 } : {}}
+                    onClick={() => handleAnswer(i)}
+                    className="btn w-100 text-start p-4 h-100 d-flex align-items-center justify-content-between"
+                    style={{
+                      borderRadius: '20px',
+                      border: `2px solid ${borderColor}`,
+                      background: bgColor,
+                      color: textColor,
+                      fontWeight: 600,
+                      boxShadow: isSelected && !isAnswered ? '0 0 0 4px rgba(99, 102, 241, 0.1)' : 'var(--shadow-sm)'
+                    }}
+                  >
+                    <span className="pe-3">{opt}</span>
+                    {isAnswered && (
+                      isCorrect ? <IoCheckmarkCircle size={24} className="text-success" /> : (isSelected ? <IoCloseCircle size={24} className="text-danger" /> : null)
+                    )}
+                  </motion.button>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+            <p className="text-muted small fw-medium">Choose the most accurate answer based on your study.</p>
+            <button 
+              disabled={!isAnswered || submitting}
+              onClick={handleNext}
+              className="btn btn-primary px-5 py-3 rounded-pill fw-bold shadow-lg"
+            >
+              {submitting ? 'Analyzing Results...' : (currentIndex === questions.length - 1 ? 'Complete Assessment' : 'Next Question')}
+            </button>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

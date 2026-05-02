@@ -184,18 +184,17 @@ const GraphView = () => {
       <motion.button 
         whileHover={{ scale: 1.05, x: -5 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => window.history.back()}
-        className="btn btn-sm"
+        onClick={() => navigate('/roadmaps')}
+        className="btn"
         style={{
           position: 'absolute', top: '24px', left: '24px', zIndex: 100,
-          background: 'var(--glass-surface)', color: 'var(--text-primary)',
-          border: '3px solid var(--border)', borderRadius: '12px',
-          padding: '10px 20px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
-          boxShadow: '4px 4px 0px var(--border)', cursor: 'pointer',
-          backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)'
+          background: 'var(--bg-surface)', color: 'var(--text-primary)',
+          border: '1px solid var(--border)', borderRadius: '12px',
+          padding: '12px 24px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px',
+          boxShadow: 'var(--shadow-md)', cursor: 'pointer'
         }}
       >
-        <span>&larr;</span> Back
+        <IoArrowBack /> Back
       </motion.button>
 
       <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 100, display: 'flex', gap: '12px' }}>
@@ -206,10 +205,11 @@ const GraphView = () => {
             onClick={() => navigate(`/quiz/${goalId}`)}
             className="btn"
             style={{
-              background: '#06C9A0', color: 'white',
-              border: '3px solid #04a886', borderRadius: '12px',
-              padding: '10px 24px', fontWeight: 800,
-              boxShadow: '4px 4px 0px #04a886', cursor: 'pointer'
+              background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)', 
+              color: 'white',
+              border: 'none', borderRadius: '12px',
+              padding: '12px 28px', fontWeight: 700,
+              boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.3)', cursor: 'pointer'
             }}
           >
             Take Quiz ({quizStatus?.completed_subtopics_count || 0})
@@ -222,11 +222,10 @@ const GraphView = () => {
           onClick={() => navigate(`/analytics/${goalId}`)}
           className="btn"
           style={{
-            background: 'var(--glass-surface)', color: 'var(--text-primary)',
-            border: '3px solid var(--border)', borderRadius: '12px',
-            padding: '10px 24px', fontWeight: 800,
-            boxShadow: '4px 4px 0px var(--border)', cursor: 'pointer',
-            backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)'
+            background: 'var(--bg-surface)', color: 'var(--text-primary)',
+            border: '1px solid var(--border)', borderRadius: '12px',
+            padding: '12px 28px', fontWeight: 700,
+            boxShadow: 'var(--shadow-md)', cursor: 'pointer'
           }}
         >
           Analytics
