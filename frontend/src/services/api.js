@@ -17,13 +17,41 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('username');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // If 401 and not already retrying
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem('refresh_token');
+      
+      if (refreshToken) {
+        try {
+          // Attempt to refresh the token
+          const response = await axios.post(`${api.defaults.baseURL}auth/refresh/`, {
+            refresh: refreshToken
+          });
+          
+          const newAccessToken = response.data.access;
+          localStorage.setItem('access_token', newAccessToken);
+          
+          // Update original request header and retry
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        } catch (refreshError) {
+          // Refresh failed, clear everything and redirect to login
+          localStorage.clear();
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(refreshError);
+        }
+      } else {
+        // No refresh token available, logout
+        localStorage.clear();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

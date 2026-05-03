@@ -1,5 +1,4 @@
 import logging
-import json
 from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -291,6 +290,7 @@ def start_session(request):
         practice = generate_practice(subject, difficulty, subtopics)
         return Response({'session_id': session.id, 'practice': practice})
     except Exception as e:
+        logging.error(f"Error in start_session: {e}", exc_info=True)
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
@@ -321,6 +321,7 @@ def evaluate_session_answer(request, id):
         
         return Response(result)
     except Exception as e:
+        logging.error(f"Error in evaluate_session_answer: {e}", exc_info=True)
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
@@ -346,18 +347,15 @@ def get_progress(request, user_id):
 def get_user_stats(request):
     try:
         user = request.user
-        goals = Goal.objects.filter(user=user)
-        total_goals = goals.count()
+        # Optimized goal completion check
+        goals = Goal.objects.filter(user=user).prefetch_related('nodes')
+        user_checkpoints = {cp.skill_name: cp.proficiency for cp in Checkpoint.objects.filter(user=user)}
         
         completed_goals = 0
         for goal in goals:
-            skill_nodes = goal.nodes.all()
-            if skill_nodes.exists():
-                skill_names = [sn.skill_name for sn in skill_nodes]
-                checkpoints = Checkpoint.objects.filter(user=user, skill_name__in=skill_names)
-                # A goal is completed if all its skills have a checkpoint >= 80
-                if checkpoints.count() == len(skill_names) and checkpoints.count() > 0 and all(cp.proficiency >= 80 for cp in checkpoints):
-                    completed_goals += 1
+            nodes = goal.nodes.all()
+            if nodes.exists() and all(user_checkpoints.get(sn.skill_name, 0) >= 80 for sn in nodes):
+                completed_goals += 1
         
         practice_count = Session.objects.filter(user=user).count()
         roadmap_quiz_count = QuizSession.objects.filter(user=user).count()
@@ -367,7 +365,7 @@ def get_user_stats(request):
         mastery_points = Checkpoint.objects.filter(user=user).aggregate(Sum('proficiency'))['proficiency__sum'] or 0
         
         return Response({
-            'total_goals': total_goals,
+            'total_goals': goals.count(),
             'completed_goals': completed_goals,
             'total_quizzes': total_quizzes,
             'practice_sessions': practice_count,
@@ -432,6 +430,7 @@ def mark_subtopic_mastered(request):
     except Subtopic.DoesNotExist:
         return Response({'error': 'Subtopic not found'}, status=404)
     except Exception as e:
+        logging.error(f"Error in mark_subtopic_mastered: {e}", exc_info=True)
         return Response({'error': str(e)}, status=500)
 
 @api_view(['GET'])

@@ -20,7 +20,7 @@ class SkillNode(models.Model):
         ('done', 'Done')
     ]
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name='nodes')
-    skill_name = models.CharField(max_length=255)
+    skill_name = models.CharField(max_length=255, db_index=True)
     description = models.TextField(blank=True)
     x_pos = models.FloatField(default=0.0)
     y_pos = models.FloatField(default=0.0)
@@ -41,13 +41,13 @@ class Session(models.Model):
 
 class Checkpoint(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='checkpoints', null=True, blank=True)
-    skill_name = models.CharField(max_length=255)
+    skill_name = models.CharField(max_length=255, db_index=True)
     proficiency = models.IntegerField(default=0)
     last_assessed = models.DateTimeField(auto_now=True)
 
 class Subtopic(models.Model):
     skill_node = models.ForeignKey(SkillNode, on_delete=models.CASCADE, related_name='subtopics')
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, db_index=True)
     description = models.TextField(blank=True)
     duration_mins = models.IntegerField(default=30)
     is_studied = models.BooleanField(default=False)

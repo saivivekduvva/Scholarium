@@ -1,6 +1,5 @@
 # Scholarium Agent Engine v1.0.1
 import json
-import hashlib
 import time
 import logging
 from datetime import datetime
