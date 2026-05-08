@@ -44,17 +44,11 @@ const AboutPage = () => {
 
           <section className="mb-5">
             <h3 style={{ fontWeight: 800, marginBottom: '24px' }}>The Team</h3>
-            <div className="row g-4">
+            <div className="row justify-content-center">
               <div className="col-md-6">
-                <div style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: '24px', border: '3px solid var(--border)', boxShadow: '6px 6px 0px var(--border)' }}>
+                <div style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: '24px', border: '3px solid var(--border)', boxShadow: '6px 6px 0px var(--border)', textAlign: 'center' }}>
                   <h5 style={{ fontWeight: 900, marginBottom: '4px' }}>Duvva Sai Vivek</h5>
                   <p className="m-0 fw-bold text-muted" style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Founder</p>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: '24px', border: '3px solid var(--border)', boxShadow: '6px 6px 0px var(--border)' }}>
-                  <h5 style={{ fontWeight: 900, marginBottom: '4px' }}>Mokshagna BC</h5>
-                  <p className="m-0 fw-bold text-muted" style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Co-Founder</p>
                 </div>
               </div>
             </div>

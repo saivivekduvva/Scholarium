@@ -42,23 +42,6 @@ const ContactPage = () => {
               <h4 style={{ fontWeight: 800, marginBottom: '5px' }}>Duvva Sai Vivek</h4>
               <p className="text-muted small">Founder, Scholarium</p>
             </div>
-
-            {/* Founder 2: Mokshagna BC */}
-            <div style={{ textAlign: 'center', maxWidth: '280px' }}>
-              <div style={{ 
-                width: '220px', height: '280px', 
-                borderRadius: '24px', 
-                border: '4px solid #1A1A1A',
-                overflow: 'hidden',
-                margin: '0 auto 20px',
-                boxShadow: '10px 10px 0px var(--accent-warn)',
-                backgroundColor: 'var(--bg-surface)'
-              }}>
-                <img src="/mokshagna.jpeg" alt="Mokshagna BC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <h4 style={{ fontWeight: 800, marginBottom: '5px' }}>Mokshagna BC</h4>
-              <p className="text-muted small">Co-Founder, Scholarium</p>
-            </div>
           </motion.div>
         </div>
 
