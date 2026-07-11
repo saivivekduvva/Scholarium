@@ -1,10 +1,6 @@
 # Scholarium — AI-Driven Mastery Roadmap
 
-Scholarium is a premium, high-rigor skill acquisition platform that transforms any learning goal into a personalized, interactive, and gamified educational journey. Built on the **Akademia** design system, it leverages Google's Gemini AI and Anthropic's Claude to architect dynamic, data-driven curriculums that adapt to the learner's pace.
-
-![Scholarium UI Concept](https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2000&auto=format&fit=crop)
-
-## 🚀 The Scholarium Experience
+Scholarium is a premium, high-rigor skill acquisition platform that transforms any learning goal into a personalized, interactive, and gamified educational journey.
 
 ### 🗺️ Dynamic Skill Roadmapping
 Enter any goal—from "Mastering Quantum Computing" to "Becoming a Backend Engineer"—and Scholarium's AI Engine architecturally maps out a **Directed Acyclic Graph (DAG)** of foundational and advanced skills. Powered by **@xyflow/react**, the roadmap is logically sequenced and fully interactive.
@@ -108,9 +104,3 @@ VITE_API_URL=http://127.0.0.1:8000
    npm install
    npm run dev
    ```
-
-## 📜 License
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-Built with ❤️ by the Scholarium Team.
