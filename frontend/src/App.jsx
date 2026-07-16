@@ -20,6 +20,7 @@ import HowToUse from './pages/HowToUse';
 import RoadmapQuiz from './pages/RoadmapQuiz';
 import QuizAnalytics from './pages/QuizAnalytics';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
+import DatabaseExpired from './pages/DatabaseExpired';
 
 // A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
 // A component to render the Navigation (Sidebar for mobile, Topbar for desktop)
@@ -174,9 +175,12 @@ const Footer = () => {
 };
 
 function App() {
+  const DATABASE_EXPIRED = true; // Hardcoded flag to show the database expired popup
+
   return (
     <ThemeProvider>
       <BrowserRouter>
+        {DATABASE_EXPIRED && <DatabaseExpired />}
         <AuthProvider>
           <Navigation />
           <div className="main-content-wrapper" style={{ transition: 'padding-top 0.3s ease' }}>
